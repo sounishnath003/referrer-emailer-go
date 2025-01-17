@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -25,9 +27,26 @@ func SendEmailHandler(c echo.Context) error {
 
 	hctx := c.(*HandlerContext)
 
-	err = hctx.GetCore().InvokeSendMail(emailSenderDto.From, emailSenderDto.To, emailSenderDto.Sub, emailSenderDto.Body)
-	if err != nil {
-		return SendErrorResponse(c, http.StatusInternalServerError, err)
+	// Create a context with a timeout of 5 seonds
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Channel to receive the result of the email sending
+	resultChan := make(chan error, 1)
+
+	// Start a goroutine to send the email
+	go func() {
+		resultChan <- hctx.GetCore().InvokeSendMail(emailSenderDto.From, emailSenderDto.To, emailSenderDto.Sub, emailSenderDto.Body)
+	}()
+
+	select {
+	case <-ctx.Done():
+		// Context timeout
+		return SendErrorResponse(c, http.StatusRequestTimeout, ctx.Err())
+	case err := <-resultChan:
+		if err != nil {
+			return SendErrorResponse(c, http.StatusInternalServerError, err)
+		}
 	}
 
 	return c.JSON(http.StatusOK, emailSenderDto)
