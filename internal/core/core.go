@@ -12,7 +12,7 @@ type Core struct {
 	mailAddr   string
 	mailSecret string
 	smtpAddr   string
-	lo         *slog.Logger
+	Lo         *slog.Logger
 }
 
 func NewCore() *Core {
@@ -22,6 +22,6 @@ func NewCore() *Core {
 		mailAddr:   utils.GetStringFromEnv("MAIL_ADDR", "flock.sinasini@gmail.com"),
 		mailSecret: utils.GetStringFromEnv("MAIL_SECRET", "P@55w0Rd5!"),
 		smtpAddr:   "smtp.gmail.com",
-		lo:         slog.Default(),
+		Lo:         slog.Default(),
 	}
 }

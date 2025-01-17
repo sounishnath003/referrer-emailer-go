@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -10,9 +11,19 @@ import (
 	"github.com/sounishnath003/customgo-mailer-service/internal/handlers"
 )
 
-// InitServer - run a ever blocking server spawn to run the webservice backend.
+type Server struct {
+	co *core.Core
+}
+
+func NewServer(co *core.Core) *Server {
+	return &Server{
+		co: co,
+	}
+}
+
+// Start - run a ever blocking server spawn to run the webservice backend.
 // Make sure if you have other I/O bounded tasks, are runs on goroutines.
-func InitServer(co *core.Core) error {
+func (s *Server) Start() error {
 	e := echo.New()
 
 	// Add context
@@ -20,7 +31,7 @@ func InitServer(co *core.Core) error {
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cc := &handlers.HandlerContext{
-				Context: c, Co: co,
+				Context: c, Co: s.co,
 			}
 			return next(cc)
 		}
@@ -28,7 +39,7 @@ func InitServer(co *core.Core) error {
 
 	// Add middlewares
 	e.Use(middleware.RemoveTrailingSlash())
-	// e.Use(middleware.Logger())
+	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
 	// Add routes
@@ -40,5 +51,7 @@ func InitServer(co *core.Core) error {
 	api := e.Group("/api")
 	api.Add("POST", "/send-email", handlers.SendEmailHandler)
 
-	return e.Start(fmt.Sprintf(":%d", co.Port))
+	// Log that server started
+	s.co.Lo.Info("server has been started on port ", slog.Any("API", fmt.Sprintf("http://localhost:%d", s.co.Port)))
+	return e.Start(fmt.Sprintf(":%d", s.co.Port))
 }

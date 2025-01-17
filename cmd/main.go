@@ -9,6 +9,6 @@ func main() {
 
 	co := core.NewCore()
 
-	server.InitServer(co)
-
+	server := server.NewServer(co)
+	panic(server.Start())
 }
