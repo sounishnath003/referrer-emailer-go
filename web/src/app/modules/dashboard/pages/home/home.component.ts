@@ -1,15 +1,18 @@
 import { NgFor, NgForOf } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TopTemplateComponent } from "./components/top-templates/top-templates.component";
+import { TemplateInformationType } from './components/types';
+
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, NgFor, NgForOf],
+  imports: [RouterLink, TopTemplateComponent, NgFor, NgForOf],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  templatesInformations = [
+  templatesInformations: TemplateInformationType[] = [
     {
       label: "Software Engineering",
       shortDesc: "Craft Software engineering roles customized email."

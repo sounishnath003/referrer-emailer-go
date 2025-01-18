@@ -1,7 +1,7 @@
-.card {
-    @apply flex flex-col flex-wrap max-w-xs  gap-3 p-3 rounded cursor-pointer bg-gradient-to-r from-violet-200 to-pink-200;
-}
-
 .button {
     @apply flex w-full justify-center rounded-md bg-pink-600 px-3 py-1.5 text-sm/8 text-white shadow-sm hover:bg-pink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600;
+}
+
+.card {
+    @apply flex flex-col flex-wrap max-w-xs gap-3 p-3 rounded cursor-pointer bg-gradient-to-r from-violet-200 to-pink-200;
 }

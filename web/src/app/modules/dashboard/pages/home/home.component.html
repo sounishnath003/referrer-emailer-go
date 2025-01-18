@@ -1,15 +1,12 @@
 <div>
-    <div>
-        <h3 class="text-xl text-indigo-800 font-semibold md:text-2xl"> &bull; Tailored templates ✍️</h3>
+    <h3 class="text-xl text-indigo-800 font-semibold md:text-2xl"> &bull; Tailored referral templates ✍️</h3>
+</div>
+<div
+    class="max-w-5xl flex flex-col md:flex-row flex-wrap items-center gap-3 items-center justify-around md:justify-start my-8 mx-8">
+    <div class="card" *ngFor="let item of templatesInformations">
+        <app-top-templates [templatesInformation]="item"></app-top-templates>
     </div>
-    <div
-        class="max-w-5xl flex flex-col md:flex-row flex-wrap items-center gap-3 items-center justify-center md:justify-start my-8 mx-8">
-        <div *ngFor="let item of templatesInformations" class="card">
-            <div class="font-semibold text-gray-800 text-xl"> {{item.label}} </div>
-            <p class="text-sm text-gray-700"> {{item.shortDesc}} </p>
-        </div>
-    </div>
-    <div>
-        <button class="button" routerLink="email-drafter">Write your own from scratch &rarr;</button>
-    </div>
+</div>
+<div>
+    <button class="button" routerLink="email-drafter">Write your own from scratch &rarr;</button>
 </div>
