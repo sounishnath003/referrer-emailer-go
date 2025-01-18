@@ -57,6 +57,10 @@ func (s *Server) Start() error {
 
 	// Add API routes.
 	api := e.Group("/api")
+	
+	// Auth endpoints.
+	api.Add("POST", "/auth/login", handlers.LoginHandler)
+	// Email endpoints.
 	api.Add("POST", "/send-email", handlers.SendEmailHandler)
 
 	// Log that server started
