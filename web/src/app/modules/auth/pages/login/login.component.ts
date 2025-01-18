@@ -1,6 +1,7 @@
 import { CommonModule, NgStyle } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -9,6 +10,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
+  constructor(private readonly router: Router) { }
   loginForm: FormGroup = new FormGroup({
     email: new FormControl(null, [Validators.required, Validators.email]),
     password: new FormControl(null, [Validators.required, Validators.minLength(6)]),
@@ -41,7 +43,7 @@ export class LoginComponent implements OnInit {
 
   onLoginSubmit() {
     const value = this.loginForm.value;
-    window.alert(JSON.stringify(value));
+    this.router.navigate(['dashboard'], { preserveFragment: false });
   }
 
 }
