@@ -1,14 +1,34 @@
-<div class="grid grid-cols-2 p-5 rounded-lg">
-    <div class="flex flex-col gap-5 items-start justify-center">
+<div class="min-w-full grid grid-cols-1 lg:grid-cols-8 p-5 rounded-lg">
+    <div class="col-span-6 flex flex-col gap-5 items-start justify-between">
         <div>
-            <h3 class="md:text-xl  text-gray-900"> Email Drafter </h3>
+            <h3 class="md:text-xl text-gray-900">Email Drafter</h3>
         </div>
         <div>
-            <form [formGroup]="emailSenderForm">
-                <div>
-                    <span class="email-pill">sounishnath[at]microsoft.com</span>
-                    <span class="email-pill">sounishnath[at]microsoft.com</span>
+            <form [formGroup]="emailSenderForm" class="flex flex-col gap-5">
+                <!-- Email Chips -->
+                <div class="flex flex-row flex-wrap gap-1">
+                    @for (email of toEmailIds; track $index) {
+                    <span class="email-pill" (click)="removeEmail(email)">
+                        {{ email }} &times;
+                    </span>
 
+                    }
+                </div>
+
+                <!-- Email Input -->
+                <div>
+                    <input type="email" formControlName="to" class="form-control-input-box min-w-full"
+                        placeholder="Add email ids whom you want to send" (keydown.enter)="addEmail()" />
+                </div>
+
+                <div>
+                    <input type="text" formControlName="subject" class="form-control-input-box"
+                        placeholder="Add referral subject line" />
+                </div>
+
+                <div>
+                    <textarea rows="10" cols="70" formControlName="body" class="form-control-input-box"
+                        placeholder="Write your referral message in markdown format."></textarea>
                 </div>
             </form>
         </div>

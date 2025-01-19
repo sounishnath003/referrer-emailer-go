@@ -7,7 +7,7 @@ import { TemplateInformationType } from './components/types';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, TopTemplateComponent, NgFor, NgForOf],
+  imports: [RouterLink, TopTemplateComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
