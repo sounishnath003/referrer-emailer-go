@@ -1,7 +1,7 @@
-<div class="min-w-full grid grid-cols-1 lg:grid-cols-8 p-5 rounded-lg">
-    <div class="col-span-6 flex flex-col gap-5 items-start justify-between">
+<div class="min-w-full grid grid-cols-1 lg:grid-cols-12 p-5 rounded-lg gap-3">
+    <div class="col-span-6 flex flex-col gap-5 items-start justify-between order-last lg:order-first">
         <div>
-            <h3 class="md:text-xl text-gray-900">Email Drafter</h3>
+            <h3 class="md:text-xl text-gray-900"> &bull; Email Drafter</h3>
         </div>
         <div>
             <form [formGroup]="emailSenderForm" class="flex flex-col gap-5">
@@ -31,9 +31,20 @@
                         placeholder="Write your referral message in markdown format."></textarea>
                 </div>
             </form>
+            <div class="my-5">
+                <button [disabled]="emailSenderForm.invalid" type="submit" (click)="onEmailSend()"
+                    class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Send
+                    &rarr;</button>
+            </div>
         </div>
     </div>
-    <div>
-        <p>email-drafter works!</p>
+    <div class="col-span-6 flex flex-col gap-2">
+        <div>
+            <p class="font-semibold text-indigo-700">&bull; Draft preview ✨</p>
+        </div>
+        <div *ngIf="subscribeToFormUpdate$() | async as formValue" class="p-2 rounded-lg border">
+            <div class="lg:text-xl- font-semibold" [innerHTML]="parseMarkdownContent(formValue.subject)"></div>
+            <article class="prose my-3 text-sm" [innerHTML]="parseMarkdownContent(formValue.body)"></article>
+        </div>
     </div>
 </div>
