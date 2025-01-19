@@ -18,7 +18,7 @@
                 <!-- Email Input -->
                 <div>
                     <input type="email" formControlName="to" class="form-control-input-box min-w-full"
-                        placeholder="Add email ids whom you want to send" (keydown.enter)="addEmail()" />
+                        placeholder="Type email id and hit enter" (keydown.enter)="addEmail()" />
                 </div>
 
                 <div>
@@ -32,7 +32,7 @@
                 </div>
             </form>
             <div class="my-5">
-                <button [disabled]="emailSenderForm.invalid" type="submit" (click)="onEmailSend()"
+                <button type="submit" (click)="onEmailSend()"
                     class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Send
                     &rarr;</button>
             </div>

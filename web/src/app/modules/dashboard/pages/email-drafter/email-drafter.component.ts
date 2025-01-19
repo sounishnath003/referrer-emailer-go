@@ -1,27 +1,27 @@
 import { AsyncPipe, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MarkdownModule, MarkdownService } from 'ngx-markdown';
-import { Observable } from 'rxjs';
+import { MarkdownService } from 'ngx-markdown';
+import { EmailingService } from '../../services/emailing.service';
 
 @Component({
   selector: 'app-email-drafter',
   templateUrl: './email-drafter.component.html',
   styleUrls: ['./email-drafter.component.css'],
   imports: [FormsModule, ReactiveFormsModule, NgIf, AsyncPipe],
-  providers: [MarkdownService]
+  providers: [MarkdownService, EmailingService]
 })
 export class EmailDrafterComponent {
   toEmailIds: string[] = [];
 
   emailSenderForm: FormGroup = new FormGroup({
     to: new FormControl(null, [Validators.required, Validators.email]),
-    from: new FormControl(null, [Validators.required, Validators.email]),
+    from: new FormControl('flock.sinasini@gmai.com', [Validators.required, Validators.email]),
     subject: new FormControl(null, [Validators.required, Validators.maxLength(40)]),
-    body: new FormControl(null, [Validators.required, Validators.maxLength(2000)]),
+    body: new FormControl(null, [Validators.required, Validators.minLength(30), Validators.maxLength(2000)]),
   });
 
-  constructor(private readonly markdownService: MarkdownService) { }
+  constructor(private readonly markdownService: MarkdownService, private emailingService: EmailingService) { }
 
   // Function to handle email addition
   addEmail(): void {
@@ -43,12 +43,30 @@ export class EmailDrafterComponent {
   }
 
   onEmailSend() {
-    window.alert('email has been sent')
+    const emailFormValue = this.emailSenderForm.value;
+    // Check validations    
+    if (this.toEmailIds.length == 0 || emailFormValue["body"].length < 10) {
+      console.log(this.emailSenderForm.value);
+      window.alert(JSON.stringify('Form is invalid'));
+      return;
+    }
+
+
+    emailFormValue['to'] = [...this.toEmailIds, emailFormValue['from']];
+    emailFormValue['body'] = this.parseMarkdownContent(emailFormValue['body']);
+
+    // Call Api
+    this.emailingService.sendEmail$(emailFormValue["from"], emailFormValue["to"], emailFormValue["subject"], emailFormValue["body"]).subscribe((resp) => {
+      window.alert('Email has been sent');
+      // Clear off
+      this.emailSenderForm.reset();
+      this.toEmailIds = [];
+      console.log(resp);
+    })
+
   }
 
   parseMarkdownContent(content: string): string {
-    console.log(content);
-
     return this.markdownService.parse(content) as string;
   }
 
