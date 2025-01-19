@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sounishnath003/customgo-mailer-service/internal/core"
 	"github.com/sounishnath003/customgo-mailer-service/internal/handlers"
+	"golang.org/x/time/rate"
 )
 
 type Server struct {
@@ -49,6 +50,7 @@ func (s *Server) Start() error {
 		MaxAge:       time.Now().Add(1 * time.Hour).Second(),
 	}))
 	e.Use(middleware.Gzip())
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(5))))
 
 	// Add routes
 	e.Add("GET", "health", func(c echo.Context) error {
@@ -57,7 +59,7 @@ func (s *Server) Start() error {
 
 	// Add API routes.
 	api := e.Group("/api")
-	
+
 	// Auth endpoints.
 	api.Add("POST", "/auth/login", handlers.LoginHandler)
 	// Email endpoints.

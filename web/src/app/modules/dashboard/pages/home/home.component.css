@@ -3,5 +3,5 @@
 }
 
 .card {
-    @apply flex flex-col flex-wrap max-w-xs gap-3 p-3 rounded cursor-pointer bg-gradient-to-r from-violet-200 to-pink-200;
+    @apply flex flex-col flex-wrap max-w-xs gap-3 p-3 rounded cursor-pointer bg-gradient-to-r from-violet-200 to-pink-200 hover:to-pink-300 h-28;
 }
