@@ -1,0 +1,4 @@
+
+.email-users {
+    @apply p-2 rounded-lg bg-white flex items-center gap-2 cursor-pointer hover:bg-blue-100;
+}
