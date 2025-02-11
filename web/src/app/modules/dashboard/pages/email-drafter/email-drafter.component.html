@@ -26,11 +26,13 @@
                         placeholder="Add referral subject line" />
                 </div>
 
-                <div>
-                    <textarea rows="10" cols="70" formControlName="body" class="form-control-input-box"
-                        placeholder="Write your referral message in markdown format."></textarea>
+                <div class="NgxEditor__Wrapper form-control-input-box">
+                    <ngx-editor-menu [editor]="editorBox"> </ngx-editor-menu>
+                    <ngx-editor [editor]="editorBox" [(ngModel)]="html" [placeholder]="'Type here...'" [spellcheck]=true
+                        formControlName="body"></ngx-editor>
                 </div>
             </form>
+
             <div class="my-5">
                 <button type="submit" (click)="onEmailSend()"
                     class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Send
@@ -43,8 +45,8 @@
             <p class="font-semibold text-indigo-700">&bull; Draft preview ✨</p>
         </div>
         <div *ngIf="subscribeToFormUpdate$() | async as formValue" class="p-2 rounded-lg border">
-            <div class="lg:text-xl- font-semibold" [innerHTML]="parseMarkdownContent(formValue.subject)"></div>
-            <article class="prose my-3 text-sm" [innerHTML]="parseMarkdownContent(formValue.body)"></article>
+            <div class="lg:text-xl- font-semibold" [innerHTML]="formValue.subject"></div>
+            <article class="prose my-3 text-sm" [innerHTML]="formValue.body"></article>
         </div>
     </div>
 </div>

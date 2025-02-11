@@ -9,7 +9,7 @@ import { routes } from './dashboard.routes';
   declarations: [],
   imports: [
     CommonModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
   ]
 })
 export class DashboardModule { }
