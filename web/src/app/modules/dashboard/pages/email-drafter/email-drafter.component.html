@@ -1,53 +1,39 @@
-<div class="rounded-lg">
-    <div class="flex flex-col gap-5 items-start justify-between order-last lg:order-first">
-        <div>
-            <h3 class="md:text-xl text-gray-900"> &bull; Email Drafter</h3>
-        </div>
-        <div>
-            <form [formGroup]="emailSenderForm" class="flex flex-col gap-5">
-                <!-- Email Chips -->
-                <div class="flex flex-row flex-wrap gap-1">
-                    @for (email of toEmailIds; track $index) {
-                    <span class="email-pill" (click)="removeEmail(email)">
-                        {{ email }} &times;
-                    </span>
+<div class="flex flex-col gap-5 items-center justify-between min-w-[720px]">
 
-                    }
-                </div>
-
-                <!-- Email Input -->
-                <div>
-                    <input type="email" formControlName="to" class="form-control-input-box w-full"
-                        placeholder="Type email id and hit enter" (keydown.enter)="addEmail()" />
-                </div>
-
-                <div>
-                    <input type="text" formControlName="subject" class="form-control-input-box"
-                        placeholder="Add referral subject line" />
-                </div>
-
-                <div class="NgxEditor__Wrapper form-control-input-box">
-                    <ngx-editor-menu [editor]="editorBox"> </ngx-editor-menu>
-                    <ngx-editor [editor]="editorBox" [(ngModel)]="html" [placeholder]="'Type here...'" [spellcheck]=true
-                        formControlName="body"></ngx-editor>
-                </div>
-            </form>
-
-            <div class="my-5">
-                <button type="submit" (click)="onEmailSend()"
-                    class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Send
-                    &rarr;</button>
+    <div class="w-full">
+        <form [formGroup]="emailSenderForm" class="flex flex-col gap-5 w-full">
+            <!-- Email Chips -->
+            <div class="flex flex-row flex-wrap gap-1 w-full">
+                @for (email of toEmailIds; track $index) {
+                <span class="email-pill" (click)="removeEmail(email)">
+                    {{ email }} &times;
+                </span>
+                }
             </div>
+
+            <!-- Email Input -->
+            <div class="w-full">
+                <input type="email" formControlName="to" class="form-control-input-box w-full"
+                    placeholder="Type email id and hit enter" (keydown.enter)="addEmail()" />
+            </div>
+
+            <div class="w-full">
+                <input type="text" formControlName="subject" class="form-control-input-box w-full"
+                    placeholder="Add referral subject line" />
+            </div>
+
+            <div class="NgxEditor__Wrapper form-control-input-box w-full h-64">
+                <ngx-editor-menu [editor]="editorBox"> </ngx-editor-menu>
+                <ngx-editor aria-multiline="true" [editor]="editorBox" [(ngModel)]="html"
+                    [placeholder]="'Start typing your customized referral message...'" [spellcheck]=true
+                    formControlName="body"></ngx-editor>
+            </div>
+        </form>
+
+        <div class="my-5 w-full">
+            <button type="submit" (click)="onEmailSend()"
+                class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Send
+                &rarr;</button>
         </div>
     </div>
-    <!-- Draft preview feature -->
-    <!-- <div class="col-span-6 flex flex-col gap-2">
-        <div>
-            <p class="font-semibold text-indigo-700">&bull; Draft preview ✨</p>
-        </div>
-        <div *ngIf="subscribeToFormUpdate$() | async as formValue" class="p-2 rounded-lg border">
-            <div class="lg:text-xl- font-semibold" [innerHTML]="formValue.subject"></div>
-            <article class="prose my-3 text-sm" [innerHTML]="formValue.body"></article>
-        </div>
-    </div> -->
 </div>

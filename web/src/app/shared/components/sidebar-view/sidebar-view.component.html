@@ -1,0 +1,20 @@
+<div class="send-emailer-users flex flex-col gap-3 m-2 overflow-y-scroll h-screen">
+    <div class="text-blue-800">
+        <p class="my-2">✉️ Referrals Sent Box</p>
+        <hr />
+    </div>
+
+    @for (item of [1,2,3,4,5]; track $index) {
+    <div class="email-users">
+        <div><img
+                src='https://avataaars.io/?avatarStyle=Circle&topType=LongHairDreads&accessoriesType=Prescription01&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Happy&eyebrowType=DefaultNatural&mouthType=Smile&skinColor=Light'
+                class="w-10" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <div><span class="text-xs font-semibold text-blue-800"> Jackie &bull; Microsoft</span></div>
+            <div class="text-xs font-sans text-gray-700">Lorem ipsum dolor sit amet consectetur adipisicing
+                elit.</div>
+        </div>
+    </div>
+    }
+</div>

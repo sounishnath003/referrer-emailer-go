@@ -1,8 +1,7 @@
 <div>
     <h3 class="text-xl text-indigo-800 font-semibold md:text-2xl"> &bull; Tailored referral templates ✍️</h3>
 </div>
-<div
-    class="max-w-5xl flex flex-col md:flex-row flex-wrap items-center gap-3 items-center justify-around md:justify-start my-8 mx-8">
+<div class="max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-3 items-center justify-center my-8 mx-8">
     @for (item of templatesInformations; track $index) {
     <div class="card">
         <app-top-templates [templatesInformation]="item"></app-top-templates>
