@@ -53,6 +53,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
     const currentTo = this.emailSenderForm.get('to')?.value;
     const newTo = currentTo.replace(/@\w*$/, `${suggestion}`);
     this.emailSenderForm.get('to')?.setValue(newTo);
+    this.addEmail();
     this.filteredSuggestions = [];
   }
 
@@ -80,7 +81,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
 
     const emailFormValue = this.emailSenderForm.value;
     // Check validations    
-    if (this.toEmailIds.length == 0 || emailFormValue["body"].length < 10) {
+    if (this.toEmailIds.length == 0 || emailFormValue["subject"].length < 3 || emailFormValue["body"].length < 10) {
       console.log(this.emailSenderForm.value);
       window.alert(JSON.stringify('Form is invalid'));
       return;

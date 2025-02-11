@@ -7,7 +7,7 @@ install:
 
 .PHONY: build
 build:
-	CGO_ENABLED=0 GO_ARCH=amd64 go build -o ./tmp/main cmd/*.go
+	CGO_ENABLED=0 GO_ARCH=amd64 go build -o ./tmp/main ./cmd/*.go
 
 .PHONY: run
 run: build
@@ -21,3 +21,8 @@ web:
 all: build
 	source .env && make run &
 	cd web && npm start
+
+.PHONY: docker-build
+docker-build:
+	docker build -t referrer-emailer -f Dockerfile .
+	docker images

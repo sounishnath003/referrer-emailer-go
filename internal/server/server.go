@@ -52,6 +52,9 @@ func (s *Server) Start() error {
 	e.Use(middleware.Gzip())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(5))))
 
+	// Serve static files from web/dist directory as per in docker container
+	e.Static("/", "web/dist")
+
 	// Add routes
 	e.Add("GET", "health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hellow. Ok!")
