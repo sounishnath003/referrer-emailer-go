@@ -1,0 +1,11 @@
+    .autocomplete-list {
+        @apply border border-gray-300 max-h-40 max-w-[720px] overflow-y-auto bg-white absolute w-full z-10;
+    }
+
+    .autocomplete-list li {
+        @apply p-2 cursor-pointer;
+    }
+
+    .autocomplete-list li:hover {
+        @apply bg-gray-100;
+    }

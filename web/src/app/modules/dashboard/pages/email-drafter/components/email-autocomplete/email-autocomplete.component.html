@@ -1,0 +1,7 @@
+<ul *ngIf="suggestions.length > 0" class="autocomplete-list">
+    @for (suggestion of suggestions; track $index) {
+    <li (click)="selectSuggestion(suggestion)">
+        {{ suggestion }}
+    </li>
+    }
+</ul>

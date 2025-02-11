@@ -14,7 +14,10 @@
             <!-- Email Input -->
             <div class="w-full">
                 <input type="email" formControlName="to" class="form-control-input-box w-full"
-                    placeholder="Type email id and hit enter" (keydown.enter)="addEmail()" />
+                    placeholder="Type email id and hit enter" (keydown.enter)="addEmail()"
+                    (input)="onEmailInput($event)" />
+                <app-email-autocomplete [suggestions]="filteredSuggestions"
+                    (suggestionSelected)="onSuggestionSelected($event)"></app-email-autocomplete>
             </div>
 
             <div class="w-full">

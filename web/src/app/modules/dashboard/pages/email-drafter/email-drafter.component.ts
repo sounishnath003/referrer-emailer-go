@@ -2,12 +2,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EmailingService } from '../../services/emailing.service';
 import { Editor, NgxEditorModule } from 'ngx-editor';
+import { EmailAutocompleteComponent } from "./components/email-autocomplete/email-autocomplete.component";
 
 @Component({
   selector: 'app-email-drafter',
   templateUrl: './email-drafter.component.html',
   styleUrls: ['./email-drafter.component.css'],
-  imports: [FormsModule, ReactiveFormsModule, NgxEditorModule],
+  imports: [FormsModule, ReactiveFormsModule, NgxEditorModule, EmailAutocompleteComponent],
   providers: [EmailingService]
 })
 export class EmailDrafterComponent implements OnInit, OnDestroy {
@@ -15,6 +16,9 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
   html: string = "";
 
   toEmailIds: string[] = [];
+
+  suggestions: string[] = ['example1@example.com', 'example2@example.com', 'example3@example.com']; // Example suggestions
+  filteredSuggestions: string[] = [];
 
   emailSenderForm: FormGroup = new FormGroup({
     to: new FormControl(null, [Validators.required, Validators.email]),
@@ -32,6 +36,24 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
     this.editorBox.destroy();
     this.toEmailIds = [];
     this.emailSenderForm.reset();
+  }
+
+  onEmailInput(event: Event): void {
+    const input = (event.target as HTMLInputElement).value;
+    if (input.includes('@')) {
+      const prefix = input.split('@').pop() || "";
+      this.filteredSuggestions = this.suggestions.filter(s => s.startsWith(prefix));
+    } else {
+      this.filteredSuggestions = [];
+    }
+  }
+
+  onSuggestionSelected(suggestion: string | undefined): void {
+    if (suggestion === undefined) return;
+    const currentTo = this.emailSenderForm.get('to')?.value;
+    const newTo = currentTo.replace(/@\w*$/, `@${suggestion}`);
+    this.emailSenderForm.get('to')?.setValue(newTo);
+    this.filteredSuggestions = [];
   }
 
   // Function to handle email addition
