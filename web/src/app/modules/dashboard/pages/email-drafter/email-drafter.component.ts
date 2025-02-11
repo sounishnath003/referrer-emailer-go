@@ -40,7 +40,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
 
   onEmailInput(event: Event): void {
     const input = (event.target as HTMLInputElement).value;
-    if (input.includes('@')) {
+    if (input.startsWith('@')) {
       const prefix = input.split('@').pop() || "";
       this.filteredSuggestions = this.suggestions.filter(s => s.startsWith(prefix));
     } else {
@@ -51,7 +51,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
   onSuggestionSelected(suggestion: string | undefined): void {
     if (suggestion === undefined) return;
     const currentTo = this.emailSenderForm.get('to')?.value;
-    const newTo = currentTo.replace(/@\w*$/, `@${suggestion}`);
+    const newTo = currentTo.replace(/@\w*$/, `${suggestion}`);
     this.emailSenderForm.get('to')?.setValue(newTo);
     this.filteredSuggestions = [];
   }
