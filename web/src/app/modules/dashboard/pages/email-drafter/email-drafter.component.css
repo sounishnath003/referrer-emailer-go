@@ -1,5 +1,5 @@
 .email-pill {
-    @apply bg-indigo-100 text-indigo-800 text-xs me-2 px-2.5 py-0.5 rounded;
+    @apply bg-indigo-100 text-indigo-800 text-xs me-2 px-2.5 py-0.5 rounded cursor-pointer;
 }
 
 .form-control-input-box {

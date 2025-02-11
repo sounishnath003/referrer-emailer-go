@@ -1,5 +1,5 @@
-<div class="min-w-full grid grid-cols-1 lg:grid-cols-12 p-5 rounded-lg gap-3">
-    <div class="col-span-6 flex flex-col gap-5 items-start justify-between order-last lg:order-first">
+<div class="rounded-lg">
+    <div class="flex flex-col gap-5 items-start justify-between order-last lg:order-first">
         <div>
             <h3 class="md:text-xl text-gray-900"> &bull; Email Drafter</h3>
         </div>
@@ -17,7 +17,7 @@
 
                 <!-- Email Input -->
                 <div>
-                    <input type="email" formControlName="to" class="form-control-input-box min-w-full"
+                    <input type="email" formControlName="to" class="form-control-input-box w-full"
                         placeholder="Type email id and hit enter" (keydown.enter)="addEmail()" />
                 </div>
 
@@ -40,7 +40,8 @@
             </div>
         </div>
     </div>
-    <div class="col-span-6 flex flex-col gap-2">
+    <!-- Draft preview feature -->
+    <!-- <div class="col-span-6 flex flex-col gap-2">
         <div>
             <p class="font-semibold text-indigo-700">&bull; Draft preview ✨</p>
         </div>
@@ -48,5 +49,5 @@
             <div class="lg:text-xl- font-semibold" [innerHTML]="formValue.subject"></div>
             <article class="prose my-3 text-sm" [innerHTML]="formValue.body"></article>
         </div>
-    </div>
+    </div> -->
 </div>

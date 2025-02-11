@@ -1,4 +1,3 @@
-import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EmailingService } from '../../services/emailing.service';
@@ -8,7 +7,7 @@ import { Editor, NgxEditorModule } from 'ngx-editor';
   selector: 'app-email-drafter',
   templateUrl: './email-drafter.component.html',
   styleUrls: ['./email-drafter.component.css'],
-  imports: [FormsModule, ReactiveFormsModule, NgIf, AsyncPipe, NgxEditorModule],
+  imports: [FormsModule, ReactiveFormsModule, NgxEditorModule],
   providers: [EmailingService]
 })
 export class EmailDrafterComponent implements OnInit, OnDestroy {
