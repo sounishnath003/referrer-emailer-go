@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { EmailDrafterComponent } from './pages/email-drafter/email-drafter.component';
 import { HomeComponent } from './pages/home/home.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 export const routes: Routes = [
     {
@@ -18,6 +19,11 @@ export const routes: Routes = [
                 pathMatch: "full",
                 component: EmailDrafterComponent
             },
+            {
+                path: "profile",
+                pathMatch: "full",
+                component: ProfileComponent
+            }
         ]
     },
 ];

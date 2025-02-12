@@ -17,7 +17,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
 
   toEmailIds: string[] = [];
 
-  suggestions: string[] = ['example1@example.com', 'example2@example.com', 'example3@example.com']; // Example suggestions
+  suggestions: string[] = ['example1@example.com', 'flock.sinasini@gmail.com', 'example3@example.com']; // Example suggestions
   filteredSuggestions: string[] = [];
 
   emailSenderForm: FormGroup = new FormGroup({
