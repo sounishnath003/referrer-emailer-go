@@ -1,19 +1,22 @@
 <div class="grid auto-cols-[minmax(0, 3fr)] grid-flow-col content-center rounded-lg">
+    @if (
+    sentReferrals.length
+    ) {
     <div class="lg:block hidden max-w-xs bg-gray-100">
-        <app-sidebar-view></app-sidebar-view>
+        <app-sidebar-view [sentReferrals]="sentReferrals"></app-sidebar-view>
     </div>
+    }
     <div class="mx-3 my-2">
         <div class="flex">
             <div class="flex-1"></div>
-            <div routerLink="profile" class="cursor-pointer"><img src="user.svg" alt="settings"></div>
+            <div routerLink="profile" class="cursor-pointer text-red-500"><img src="user.svg" alt="settings"></div>
         </div>
         <div class="flex flex-col gap-6 items-center justify-center min-h-screen m-auto">
             <div>
                 <p class="text-xl md:text-3xl font-semibold text-indigo-600">Welcome back, Sounish! 👋</p>
             </div>
-            <div class="text-sm text-gray-800 font-semibold">Let's write an refferal request today!</div>
+            <div class="text-sm font-semibold text-gray-800">Let's write an refferal request today!</div>
             <router-outlet class="w-full"></router-outlet>
         </div>
     </div>
-
 </div>

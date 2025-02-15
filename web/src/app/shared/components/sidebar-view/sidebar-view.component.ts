@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-sidebar-view',
@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './sidebar-view.component.css'
 })
 export class SidebarViewComponent {
-
+  @Input() sentReferrals!: number[];
 }

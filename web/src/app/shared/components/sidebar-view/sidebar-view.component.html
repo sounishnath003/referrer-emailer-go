@@ -4,7 +4,8 @@
         <hr />
     </div>
 
-    @for (item of [1,2,3,4,5]; track $index) {
+    @if (sentReferrals.length) {
+    @for (item of sentReferrals; track $index) {
     <div class="email-users">
         <div><img
                 src='https://avataaars.io/?avatarStyle=Circle&topType=LongHairDreads&accessoriesType=Prescription01&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Happy&eyebrowType=DefaultNatural&mouthType=Smile&skinColor=Light'
@@ -16,5 +17,8 @@
                 elit.</div>
         </div>
     </div>
+    }
+    } @else {
+    <div class="text-blue-700 text-center text-xs rounded-md p-2 bg-blue-100 text-semibold">No referrals sent.</div>
     }
 </div>
