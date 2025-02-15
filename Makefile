@@ -24,5 +24,11 @@ all: build
 
 .PHONY: docker-build
 docker-build:
+	docker rmi -f (docker images referrer-emailer -qa)
 	docker build -t referrer-emailer -f Dockerfile .
 	docker images
+
+.PHONY: docker-run
+docker-run:
+	docker images
+	docker run -ti -p 3000:3000 referrer-emailer:latest
