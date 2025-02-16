@@ -29,6 +29,7 @@
     "@angular/compiler-cli": "^19.1.5",
     "@tailwindcss/typography": "^0.5.16",
     "@types/jasmine": "~5.1.0",
+    "@types/node": "^22.13.4",
     "autoprefixer": "^10.4.20",
     "jasmine-core": "~5.5.0",
     "karma": "~6.4.0",

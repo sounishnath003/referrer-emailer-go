@@ -31,4 +31,5 @@ docker-build:
 .PHONY: docker-run
 docker-run:
 	docker images
-	docker run -ti -p 3000:3000 referrer-emailer:latest
+	source .env;
+	docker run -ti -e MAIL_ADDR=$MAIL_ADDR -e MAIL_SECRET=$MAIL_SECRET -p 3000:3000 referrer-emailer:latest

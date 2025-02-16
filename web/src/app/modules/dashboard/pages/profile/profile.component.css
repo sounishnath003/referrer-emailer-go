@@ -1,0 +1,4 @@
+
+.form-control-errors {
+    @apply text-xs text-red-600 my-1 my-1;
+}

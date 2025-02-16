@@ -65,6 +65,8 @@ func (s *Server) Start() error {
 
 	// Auth endpoints.
 	api.Add("POST", "/auth/login", handlers.LoginHandler)
+	// Profile endpoints.
+	api.Add("POST", "/profile/information", handlers.ProfileInformationHandler)
 	// Email endpoints.
 	api.Add("POST", "/send-email", handlers.SendEmailHandler)
 

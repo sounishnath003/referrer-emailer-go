@@ -19,7 +19,7 @@ WORKDIR /app
 COPY web .
 
 RUN npm cache clean --force
-RUN npm install @angular/cli
+RUN npm install -g @angular/cli
 RUN npm install
 RUN npm run build
 
