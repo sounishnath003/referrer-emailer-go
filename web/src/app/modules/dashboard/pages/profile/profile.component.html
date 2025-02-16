@@ -1,7 +1,5 @@
 <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
     <div class="space-y-12">
-
-        {{ formErrors | json }}
         <div class="border-b border-gray-900/10 pb-12">
             <h2 class="text-base/7 font-semibold text-indigo-900">Personal Information</h2>
             <p class="mt-1 text-sm/6 text-gray-600">This information will be displayed publicly so be careful what
@@ -71,7 +69,7 @@
                                 </label>
                                 <p class="pl-1">or drag and drop</p>
                             </div>
-                            <p class="text-xs/5 text-gray-600">PDF up to 5MB</p>
+                            <p class="text-xs/5 text-gray-600">PDF up to 2MB</p>
                         </div>
                     </div>
                     <div *ngIf="formErrors.resume" class="form-control-errors">
@@ -82,8 +80,7 @@
                 <div class="sm:col-span-4">
                     <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
                     <div class="mt-2">
-                        <input formControlName="email" value="flock.sinasini@gmail.com" id="email" name="email"
-                            type="email" autocomplete="email"
+                        <input formControlName="email" id="email" name="email" type="email" autocomplete="email"
                             class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                     </div>
                 </div>
@@ -154,8 +151,19 @@
         </div>
     </div>
 
+    <!-- Success message display -->
+    <div *ngIf="successMessage" class="my-2 text-sm text-green-800 bg-green-50 p-2 rounded-md">
+        <span class="font-semibold">Success: </span> <span>{{ successMessage }}</span>
+    </div>
+    <!-- Error message display -->
+    <div *ngIf="errorMessage" class="my-2 text-sm text-red-600 bg-red-50 p-2 rounded-md">
+        <span class="font-semibold">Error: </span> <span>{{ errorMessage }}</span>
+    </div>
+
+
     <div class="mt-6 flex items-center justify-end gap-x-6">
-        <button type="button" class="text-sm/6 font-semibold text-gray-900">Cancel</button>
+        <button routerLink="/dashboard" [preserveFragment]="false" type="button"
+            class="text-sm/6 font-semibold text-gray-900 hover:bg-gray-100 px-4 py-1 rounded-md">Back</button>
         <button type="submit" [disabled]="!this.profileForm.valid"
             class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
     </div>

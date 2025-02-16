@@ -1,24 +1,29 @@
-import { AsyncPipe, JsonPipe, NgIf } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ProfileInformation, ProfileService } from '../../services/profile.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
-  imports: [FormsModule, ReactiveFormsModule, NgIf, JsonPipe],
+  imports: [FormsModule, ReactiveFormsModule, NgIf, RouterLink],
+  providers: [ProfileService],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
   formErrors: any = {};
+  errorMessage: string | null = null; // property to hanle API errors messages
+  successMessage: string | null = null; // property to hanle API success messages
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private readonly profileService: ProfileService) {
     this.profileForm = this.fb.group({
       firstName: ["", [Validators.required, Validators.minLength(3)]],
       lastName: ["", [Validators.required, Validators.minLength(3)]],
       about: ["", [Validators.required, Validators.minLength(50)]],
       resume: ["", [Validators.required]],
-      email: [{ value: 'flock.sinasini@gmail.com', disabled: true }],
+      email: [{ value: "flock.sinasini@gmail.com", disabled: true }],
       country: ['', Validators.required],
       notifications: this.fb.group({
         receiveEmails: [true],
@@ -42,14 +47,20 @@ export class ProfileComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log({ isValid: this.profileForm.valid, profileForm: this.profileForm.value });
+    const formValue: ProfileInformation = { ...this.profileForm.value, email: "flock.sinasini@gmail.com" } as ProfileInformation;
+
+    this.profileService.updateProfileInformation$(formValue).subscribe((data) => {
+      this.errorMessage = null;
+      this.successMessage = `Profile information has been updated.`;
+    }, (err) => {
+      this.errorMessage = JSON.stringify(err.error?.error || `Failed to update information. Please try again later.`);
+      this.successMessage = null;
+    })
   }
 
   private onFormValueChange() {
     if (this.profileForm.invalid) {
       this.formErrors = this.getFormValidationErrors();
-      console.log(this.formErrors);
-
     } else {
       this.formErrors = {};
     }
