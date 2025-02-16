@@ -26,16 +26,27 @@ RUN npm run build
 # Final Build
 FROM alpine:latest
 
-WORKDIR /app
+WORKDIR /home/nonroot
+RUN apk --no-cache add shadow
+
+RUN useradd -m nonroot
+RUN mkdir -p /home/nonroot/storage
 
 # Copy Golang binary
-COPY --from=gobuilder /app/tmp/main /app/main
+COPY --from=gobuilder /app/tmp/main /home/nonroot/main
 
 # Copy Angular dist files
-COPY --from=nodebuilder /app/dist/web/browser /app/web/dist
+COPY --from=nodebuilder /app/dist/web/browser /home/nonroot/web/dist
+
+RUN chown -R nonroot:nonroot /home/nonroot/main
+RUN chown -R nonroot:nonroot /home/nonroot/web
+RUN chown -R nonroot:nonroot /home/nonroot/storage
+
+# User to nonroot
+USER nonroot
 
 # Expose necessary ports
 EXPOSE 3000
 
 # Command to run the Golang API
-ENTRYPOINT ["/app/main"]
+ENTRYPOINT ["/home/nonroot/main"]
