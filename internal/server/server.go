@@ -64,6 +64,7 @@ func (s *Server) Start() error {
 	api := e.Group("/api")
 
 	// Auth endpoints.
+	api.Add("POST", "/auth/signup", handlers.SignupHandler)
 	api.Add("POST", "/auth/login", handlers.LoginHandler)
 	// Profile endpoints.
 	api.Add("POST", "/profile/information", handlers.ProfileInformationHandler)

@@ -11,6 +11,7 @@ type HandlerContext struct {
 	Co *core.Core
 }
 
+// GetCore handles to get the *core options for the application
 func (hc *HandlerContext) GetCore() *core.Core {
 	return hc.Co
 }

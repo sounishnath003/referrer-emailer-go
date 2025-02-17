@@ -6,6 +6,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: P455w0Rd!
+    ports:
+      - 27017:27017
 
   mongo-express:
     image: mongo-express
