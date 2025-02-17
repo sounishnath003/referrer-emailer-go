@@ -1,5 +1,5 @@
 <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
-    <form class="space-y-6" [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+    <form class="space-y-6" [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()">
         <div>
             <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address:</label>
             <div class="mt-2">
@@ -31,7 +31,7 @@
         </div>
 
         <div>
-            <button [disabled]="loginForm.invalid" type="submit"
+            <button [disabled]="signupForm.invalid" type="submit"
                 class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Let's
                 go</button>
         </div>
@@ -40,9 +40,9 @@
 
     <div>
         <p class="mt-10 text-center text-sm/6 text-gray-500">
-            Don't have an Account?
-            <a routerLink="/auth/signup" class="font-semibold text-indigo-600 hover:text-indigo-500 underline">Let's
-                Sign up</a>
+            Already have an account?
+            <a routerLink="/auth/login" class="font-semibold text-indigo-600 hover:text-indigo-500 underline">
+                Login to your account</a>
         </p>
     </div>
 </div>
