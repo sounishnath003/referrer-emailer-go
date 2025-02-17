@@ -34,7 +34,7 @@ export class HomeComponent {
       shortDesc: "Craft send congratulations roles customized email."
     },
     {
-      label: "Appreciate Author",
+      label: "Draft as per job description",
       shortDesc: "Send appreciation note to Sounish Nath for this easy emailer service."
     },
   ]
