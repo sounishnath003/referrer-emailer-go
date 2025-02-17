@@ -34,8 +34,8 @@ export class HomeComponent {
       shortDesc: "Craft send congratulations roles customized email."
     },
     {
-      label: "Draft as per job description",
-      shortDesc: "Send appreciation note to Sounish Nath for this easy emailer service."
+      label: "Draft with AI",
+      shortDesc: "Use Generative AI to draft an customized message"
     },
   ]
 }

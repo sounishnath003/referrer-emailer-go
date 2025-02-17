@@ -22,6 +22,11 @@ all: build
 	source .env && make run &
 	cd web && npm start
 
+.PHONY: compose-up
+compose-up:
+	docker-compose down
+	docker-compose up --build
+
 .PHONY: docker-build
 docker-build:
 	docker rmi -f $$(docker images referrer-emailer -qa)

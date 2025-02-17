@@ -1,0 +1,25 @@
+services:
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: P455w0Rd!
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: P455w0Rd!
+      ME_CONFIG_MONGODB_URL: mongodb://root:P455w0Rd!@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
+    volumes:
+      - ./mongostore:/data/db
+
+
+networks:
+  referrer-mailer-subnet:
