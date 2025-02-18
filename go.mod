@@ -3,6 +3,8 @@ module github.com/sounishnath003/customgo-mailer-service
 go 1.23.4
 
 require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/labstack/echo/v4 v4.13.3
 	go.mongodb.org/mongo-driver v1.17.2
 	golang.org/x/time v0.8.0

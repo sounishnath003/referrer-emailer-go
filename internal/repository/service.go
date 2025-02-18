@@ -2,7 +2,9 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -46,6 +48,7 @@ func (mc *MongoDBClient) UpdateProfileInformation(u *User) error {
 	return err
 }
 
+// GetProfileByEmail helps to find the user by email address
 func (mc *MongoDBClient) GetProfileByEmail(email string) (*User, error) {
 	ctx, cancel := getContextWithTimeout(5)
 	defer cancel()
@@ -61,10 +64,38 @@ func (mc *MongoDBClient) GetProfileByEmail(email string) (*User, error) {
 
 	var u User
 	err := m.Decode(&u)
+	if err != nil || len(u.Email) == 0 {
+		return nil, fmt.Errorf("user or email is not found")
+	}
+
+	return &u, nil
+}
+
+// FindUserByEmailAndPassword user by email and password
+func (mc *MongoDBClient) FindUserByEmailAndPassword(email, password string) (*User, error) {
+	u, err := mc.GetProfileByEmail(email)
+
+	if err != nil || u == nil || (u.Password != password) {
+		return nil, fmt.Errorf("email or password is not valid")
+	}
+
+	// Create token.
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Set claims.
+	claims := token.Claims.(jwt.MapClaims)
+	claims["email"] = u.Email
+	claims["exp"] = time.Now().Add(1 * time.Hour).Unix() // 1 Hour
+
+	// Generate encoded token and send it as response
+	u.Token, err = token.SignedString([]byte("Sec%&!*RT#*!@(89231%&!*RT#12345"))
 	if err != nil {
 		return nil, err
 	}
+
+	// Changing the password to empty, not to send in API response.
 	u.Password = ""
 
-	return &u, nil
+	return u, nil
+
 }

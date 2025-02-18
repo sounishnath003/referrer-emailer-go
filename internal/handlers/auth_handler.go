@@ -43,6 +43,9 @@ type LoginUserDto struct {
 }
 
 func LoginHandler(c echo.Context) error {
+	// Get the core
+	hctx := c.(*HandlerContext)
+
 	var user LoginUserDto
 	err := c.Bind(&user)
 
@@ -55,13 +58,16 @@ func LoginHandler(c echo.Context) error {
 	}
 
 	// Check the user credentails and other into Dbs.
+	u, err := hctx.GetCore().DB.FindUserByEmailAndPassword(user.Email, user.Passwd)
 
-	// return Success or Failure
-	token := "token-12424356789"
+	if err != nil {
+		return SendErrorResponse(c, http.StatusBadRequest, err)
+	}
 
 	resp := map[string]any{
-		"token":  token,
-		"sucess": true,
+		"user":        u,
+		"accessToken": u.Token,
+		"success":     true,
 	}
 
 	return c.JSON(http.StatusOK, resp)

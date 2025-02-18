@@ -27,8 +27,8 @@ services:
   referrer-emailer:
     image: referrer-emailer:latest
     restart: always
-    ports:
-      - 3000:3000
+    # ports:
+    #   - 3000:3000
     env_file:
       - .env
     environment:

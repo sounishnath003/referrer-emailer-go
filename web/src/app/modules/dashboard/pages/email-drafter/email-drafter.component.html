@@ -34,9 +34,26 @@
         </form>
 
         <div class="my-5 w-full">
-            <button type="submit" (click)="onEmailSend()"
-                class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Send
+            @if (errorMessage) {
+            <button type="reset"
+                class="flex w-full justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">{{errorMessage}}
+            </button>
+            } @else if (successMessage) {
+            <button type="reset"
+                class="flex w-full justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">
+                {{successMessage}} </button>
+            } @else if (processing$ | async) {
+            <button type="menu" [disabled]="true"
+                class="flex w-full justify-center rounded-md bg-sky-100 px-3 py-1.5 text-sm/6 font-semibold text-blue-700 shadow-sm hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-100 cursor-pointer">
+                Hold on, Email is being sent...
                 &rarr;</button>
+            } @else {
+            <button type="submit" (click)="onEmailSend()"
+                class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                Send
+                &rarr;</button>
+            }
         </div>
+
     </div>
 </div>

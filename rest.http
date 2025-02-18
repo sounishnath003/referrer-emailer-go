@@ -11,8 +11,8 @@ POST http://localhost:3000/api/auth/login HTTP/1.1
 Content-type: application/json
 
 {
-    "email": "sounish@gmail.com", 
-    "password": "password"
+    "email": "flock.sinasini@gmail.com", 
+    "password": "111111"
 }
 
 POST http://localhost:3000/api/profile/information HTTP/1.1

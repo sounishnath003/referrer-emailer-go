@@ -14,7 +14,7 @@ func (co *Core) InvokeSendMail(from string, to []string, subject, body string) e
 	// Prepare the mail body to be sent.
 	mailBody := fmt.Sprintf("To: %s\nSubject: %s\n%s\n\n%s\n\n", strings.Join(to, ","), subject, headers, body)
 
-	// Sending email.
+	// // Sending email.
 	err := smtp.SendMail(
 		fmt.Sprintf("%s:587", co.smtpAddr),
 		co.smtpAuth,

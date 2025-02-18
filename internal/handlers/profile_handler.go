@@ -155,6 +155,8 @@ func GetProfileHandler(c echo.Context) error {
 	}
 
 	u, err := hctx.GetCore().DB.GetProfileByEmail(email)
+	// Make sure you omit the user's password
+	u.Password = ""
 	if err != nil {
 		return SendErrorResponse(c, http.StatusBadRequest, err)
 	}

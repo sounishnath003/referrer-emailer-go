@@ -9,5 +9,5 @@ import { SidebarViewComponent } from '../../shared/components/sidebar-view/sideb
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent {
-  sentReferrals: number[] = [1,2,3,4];
+  sentReferrals: number[] = [1,2,3];
 }

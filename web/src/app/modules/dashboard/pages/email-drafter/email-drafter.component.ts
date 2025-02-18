@@ -3,22 +3,26 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { EmailingService } from '../../services/emailing.service';
 import { Editor, NgxEditorModule } from 'ngx-editor';
 import { EmailAutocompleteComponent } from "./components/email-autocomplete/email-autocomplete.component";
+import { BehaviorSubject, catchError, of } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-email-drafter',
   templateUrl: './email-drafter.component.html',
   styleUrls: ['./email-drafter.component.css'],
-  imports: [FormsModule, ReactiveFormsModule, NgxEditorModule, EmailAutocompleteComponent],
+  imports: [FormsModule, ReactiveFormsModule, NgxEditorModule, EmailAutocompleteComponent, AsyncPipe],
   providers: [EmailingService]
 })
 export class EmailDrafterComponent implements OnInit, OnDestroy {
   editorBox!: Editor;
   html: string = "";
-
   toEmailIds: string[] = [];
-
   suggestions: string[] = ['example1@example.com', 'flock.sinasini@gmail.com', 'example3@example.com']; // Example suggestions
   filteredSuggestions: string[] = [];
+  processing$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+  successMessage: string | null = null;
+  errorMessage: string | null = null;
 
   emailSenderForm: FormGroup = new FormGroup({
     to: new FormControl(null, [Validators.required, Validators.email]),
@@ -92,8 +96,18 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
     emailFormValue['body'] = emailFormValue['body'];
 
     // Call Api
-    this.emailingService.sendEmail$(emailFormValue["from"], emailFormValue["to"], emailFormValue["subject"], emailFormValue["body"]).subscribe((resp) => {
-      window.alert('Email has been sent');
+    this.processing$.next(true);
+    this.emailingService.sendEmail$(emailFormValue["from"], emailFormValue["to"], emailFormValue["subject"], emailFormValue["body"]).pipe(
+      catchError(err => {
+        this.errorMessage = err.error.error;
+        return of(null);
+      })
+    ).subscribe((resp) => {
+      if (resp === null) return;
+      this.errorMessage = null;
+      this.successMessage = `Email has been sent.`;
+      this.processing$.next(false);
+
       // Clear off
       this.emailSenderForm.reset();
       this.toEmailIds = [];
@@ -104,6 +118,10 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
 
 
   subscribeToFormUpdate$() {
+    // reset the error | success messages.
+    this.successMessage = null;
+    this.errorMessage = null;
+    this.processing$.next(false);
     // return this.emailSenderForm.get('body')?.valueChanges;
     return this.emailSenderForm.valueChanges;
   }
