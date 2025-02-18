@@ -37,4 +37,4 @@ docker-build:
 docker-run:
 	docker images
 	source .env;
-	docker run -ti -e MAIL_ADDR=$MAIL_ADDR -e MAIL_SECRET=$MAIL_SECRET -v ./storage:/home/nonroot/storage -p 3000:3000 referrer-emailer:latest
+	docker run -ti -e MAIL_ADDR=$MAIL_ADDR -e MAIL_SECRET=$MAIL_SECRET -e MONGO_DB_URI=$MONGO_DB_URI -v ./storage:/home/nonroot/storage -p 3000:3000 referrer-emailer:latest

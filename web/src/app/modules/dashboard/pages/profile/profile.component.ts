@@ -67,8 +67,6 @@ export class ProfileComponent implements OnInit {
   onSubmit() {
     const formValue: ProfileInformation = { ...this.profileForm.value, email: this.emailFromQueryParam } as ProfileInformation;
 
-    console.log(formValue);
-
     this.profileService.updateProfileInformation$(formValue).subscribe((data) => {
       this.errorMessage = null;
       this.successMessage = `Profile information has been updated.`;
