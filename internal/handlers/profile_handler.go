@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
@@ -36,31 +37,59 @@ func ProfileInformationHandler(c echo.Context) error {
 	}
 
 	// Check the file size limit
-	if err = isFileUnder1MB(file); err != nil {
+	if err = isFileUnder2MB(file); err != nil {
 		return SendErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	dstPath, shouldReturn, err := saveResumeIntoDisk(file, c)
-	if shouldReturn {
-		return SendErrorResponse(c, http.StatusBadRequest, err)
-	}
+	var wg sync.WaitGroup
+	errChan := make(chan error, 2)
+	dstPathChan := make(chan string, 1)
 
-	// Create response DTO
-	profileInfo := &repository.User{
-		Firstname: firstName,
-		LastName:  lastName,
-		Resume:    dstPath,
-		About:     about,
-		Email:     email,
-	}
+	// Goroutine to save the resume to disk
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		dstPath, shouldReturn, err := saveResumeIntoDisk(file, c)
+		if shouldReturn {
+			errChan <- err
+			return
+		}
+		dstPathChan <- dstPath
+	}()
 
-	err = hctx.GetCore().DB.UpdateProfileInformation(profileInfo)
-	if err != nil {
-		return SendErrorResponse(c, http.StatusBadRequest, err)
+	// Goroutine to update profile information in the database
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		dstPath := <-dstPathChan
+		profileInfo := &repository.User{
+			Firstname: firstName,
+			LastName:  lastName,
+			Resume:    dstPath,
+			About:     about,
+			Email:     email,
+		}
+
+		err := hctx.GetCore().DB.UpdateProfileInformation(profileInfo)
+		if err != nil {
+			errChan <- err
+		}
+	}()
+
+	// Wait for both goroutines to complete
+	wg.Wait()
+	close(errChan)
+	close(dstPathChan)
+
+	// Check for errors
+	for err := range errChan {
+		if err != nil {
+			return SendErrorResponse(c, http.StatusInternalServerError, err)
+		}
 	}
 
 	// Return response
-	return c.JSON(http.StatusOK, profileInfo)
+	return c.JSON(http.StatusOK, map[string]string{"message": "Profile information updated successfully"})
 
 }
 
@@ -86,7 +115,7 @@ func saveResumeIntoDisk(file *multipart.FileHeader, c echo.Context) (string, boo
 	return dstPath, false, nil
 }
 
-func isFileUnder1MB(file *multipart.FileHeader) error {
+func isFileUnder2MB(file *multipart.FileHeader) error {
 	const MAX_LIMIT = (2 * 1024 * 1024) // 2 MB
 	if file.Size > MAX_LIMIT {
 		return fmt.Errorf("file exceeds 2 MB limit.")
