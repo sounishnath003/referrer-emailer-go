@@ -17,6 +17,7 @@ type User struct {
 	LastName     string       `json:"lastName" bson:"lastName"`
 	Resume       string       `json:"resume" bson:"resume"`
 	About        string       `json:"about" bson:"about"`
+	Country      string       `json:"country" bson:"country"`
 	Notification Notification `json:"notifications" bson:"notifications"`
 
 	Email    string `json:"email" bson:"email"`

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -24,6 +25,15 @@ func ProfileInformationHandler(c echo.Context) error {
 	lastName := c.FormValue("lastName")
 	about := c.FormValue("about")
 	email := c.FormValue("email")
+	country := c.FormValue("country")
+	notificationsStr := c.FormValue("notifications")
+
+	// Parse the notification into the repository.notification struct
+	var notification repository.Notification
+	err := json.Unmarshal([]byte(notificationsStr), &notification)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("notification json parsing error"))
+	}
 
 	// Handle file upload functionality
 	file, err := c.FormFile("resume")
@@ -63,11 +73,13 @@ func ProfileInformationHandler(c echo.Context) error {
 		defer wg.Done()
 		dstPath := <-dstPathChan
 		profileInfo := &repository.User{
-			Firstname: firstName,
-			LastName:  lastName,
-			Resume:    dstPath,
-			About:     about,
-			Email:     email,
+			Firstname:    firstName,
+			LastName:     lastName,
+			Resume:       dstPath,
+			About:        about,
+			Email:        email,
+			Country:      country,
+			Notification: notification,
 		}
 
 		err := hctx.GetCore().DB.UpdateProfileInformation(profileInfo)
@@ -129,4 +141,23 @@ func isFilePDF(file *multipart.FileHeader) error {
 		return fmt.Errorf("only pdf files are allowed.")
 	}
 	return nil
+}
+
+// GetProfileHandler helps to get the information from the provided email from query params.
+func GetProfileHandler(c echo.Context) error {
+	// Get core
+	hctx := c.(*HandlerContext)
+
+	email := c.QueryParam("email")
+	hctx.GetCore().Lo.Info("is valid email", "email", email, "valid", isValidEmail(email))
+	if len(email) == 0 || !isValidEmail(email) {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("provide valid email address"))
+	}
+
+	u, err := hctx.GetCore().DB.GetProfileByEmail(email)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusBadRequest, err)
+	}
+
+	return c.JSON(http.StatusOK, u)
 }

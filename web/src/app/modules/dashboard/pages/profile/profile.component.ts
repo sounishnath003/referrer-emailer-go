@@ -2,7 +2,8 @@ import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileInformation, ProfileService } from '../../services/profile.service';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Params, RouterLink } from '@angular/router';
+import { catchError, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -16,14 +17,15 @@ export class ProfileComponent implements OnInit {
   formErrors: any = {};
   errorMessage: string | null = null; // property to hanle API errors messages
   successMessage: string | null = null; // property to hanle API success messages
+  emailFromQueryParam: string = "";
 
-  constructor(private fb: FormBuilder, private readonly profileService: ProfileService) {
+  constructor(private fb: FormBuilder, private readonly route: ActivatedRoute, private readonly profileService: ProfileService) {
     this.profileForm = this.fb.group({
       firstName: ["", [Validators.required, Validators.minLength(3)]],
       lastName: ["", [Validators.required, Validators.minLength(3)]],
       about: ["", [Validators.required, Validators.minLength(50)]],
       resume: ["", [Validators.required]],
-      email: [{ value: "flock.sinasini@gmail.com", disabled: true }],
+      email: [{ value: "", disabled: true }],
       country: ['', Validators.required],
       notifications: this.fb.group({
         receiveEmails: [true],
@@ -34,6 +36,22 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // get email from query param
+    this.route.queryParams.pipe(
+      switchMap((param: Params) => {
+        this.emailFromQueryParam = param["email"];
+        return this.profileService.getProfileInformation$(param["email"])
+      }),
+      catchError((err) => {
+        this.errorMessage = err.error?.error || JSON.stringify(err.error);
+        return of(null);
+      })
+    ).subscribe(
+      data => {
+        if (data === null) { return; }
+        this.profileForm.patchValue({ ...this.profileForm.value, ...data }, { emitEvent: true, })
+      }
+    )
     this.profileForm.valueChanges.subscribe(() => this.onFormValueChange())
   }
 
@@ -47,7 +65,9 @@ export class ProfileComponent implements OnInit {
   }
 
   onSubmit() {
-    const formValue: ProfileInformation = { ...this.profileForm.value, email: "flock.sinasini@gmail.com" } as ProfileInformation;
+    const formValue: ProfileInformation = { ...this.profileForm.value, email: this.emailFromQueryParam } as ProfileInformation;
+
+    console.log(formValue);
 
     this.profileService.updateProfileInformation$(formValue).subscribe((data) => {
       this.errorMessage = null;

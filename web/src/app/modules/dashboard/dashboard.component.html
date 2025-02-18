@@ -9,7 +9,9 @@
     <div class="mx-3 my-2">
         <div class="flex">
             <div class="flex-1"></div>
-            <div routerLink="profile" class="cursor-pointer text-red-500 hover:bg-blue-50 p-1 rounded-full"><img src="user.svg" alt="settings"></div>
+            <div routerLink="profile" [queryParams]="{'email': 'flock.sinasini@gmail.com'}"
+                class="cursor-pointer text-red-500 hover:bg-blue-50 p-1 rounded-full"><img src="user.svg"
+                    alt="settings"></div>
         </div>
         <div class="flex flex-col gap-6 items-center justify-center min-h-screen m-auto">
             <div>

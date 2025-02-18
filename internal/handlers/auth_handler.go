@@ -22,7 +22,7 @@ func SignupHandler(c echo.Context) error {
 	}
 
 	// Check validation.
-	if len(u.Email) == 0 || len(u.Password) == 0 {
+	if len(u.Email) == 0 || len(u.Password) == 0 || !isValidEmail(u.Email) {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or password."))
 	}
 
@@ -45,6 +45,10 @@ type LoginUserDto struct {
 func LoginHandler(c echo.Context) error {
 	var user LoginUserDto
 	err := c.Bind(&user)
+
+	if len(user.Email) == 0 || !isValidEmail(user.Email) {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email address"))
+	}
 
 	if err != nil {
 		return SendErrorResponse(c, http.StatusBadRequest, err)
