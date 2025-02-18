@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
@@ -29,14 +27,11 @@ func SignupHandler(c echo.Context) error {
 	}
 
 	// Save the user.
-	db := hctx.GetCore().DB
-	ctx, cancel := context.WithTimeout(c.Request().Context(), 5*time.Second)
-	defer cancel()
-
-	collection := db.Database("referrer").Collection("users")
-	_, err := collection.InsertOne(ctx, u)
+	err := hctx.GetCore().DB.CreateUser(u)
+	// It may failed due to duplicate email as email has to be unique
 	if err != nil {
-		return SendErrorResponse(c, http.StatusInternalServerError, err)
+		hctx.GetCore().Lo.Error("duplicate key found", "error", err.Error())
+		return SendErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	return c.JSON(http.StatusOK, "user created")

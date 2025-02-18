@@ -52,6 +52,10 @@ export class ProfileComponent implements OnInit {
     this.profileService.updateProfileInformation$(formValue).subscribe((data) => {
       this.errorMessage = null;
       this.successMessage = `Profile information has been updated.`;
+      // Change the location to home page. in 2.5 seconds...
+      setInterval(() => {
+        window.location.replace("/");
+      }, 2500);
     }, (err) => {
       this.errorMessage = JSON.stringify(err.error?.error || `Failed to update information. Please try again later.`);
       this.successMessage = null;

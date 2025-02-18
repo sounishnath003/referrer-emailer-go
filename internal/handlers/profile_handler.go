@@ -9,26 +9,15 @@ import (
 	"path/filepath"
 
 	"github.com/labstack/echo/v4"
+	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
 )
-
-type NotificationType struct {
-	Offers           bool   `json:"offers"`
-	PushNotification string `json:"pushNotifications"`
-	ReceiveEmails    bool   `json:"receiveEmails"`
-}
-
-type ProfileInformationRequestDto struct {
-	Firstname    string           `json:"firstName"`
-	LastName     string           `json:"lastName"`
-	Resume       string           `json:"resume"`
-	About        string           `json:"about"`
-	Email        string           `json:"email"`
-	Notification NotificationType `json:"notifications"`
-}
 
 // ProfileInformationHandler handlers the submission of information
 // It will have a upload resume button which will upload the resume also.
 func ProfileInformationHandler(c echo.Context) error {
+	// Get core.
+	hctx := c.(*HandlerContext)
+
 	// Parse form data
 	firstName := c.FormValue("firstName")
 	lastName := c.FormValue("lastName")
@@ -57,12 +46,17 @@ func ProfileInformationHandler(c echo.Context) error {
 	}
 
 	// Create response DTO
-	profileInfo := ProfileInformationRequestDto{
+	profileInfo := &repository.User{
 		Firstname: firstName,
 		LastName:  lastName,
 		Resume:    dstPath,
 		About:     about,
 		Email:     email,
+	}
+
+	err = hctx.GetCore().DB.UpdateProfileInformation(profileInfo)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	// Return response

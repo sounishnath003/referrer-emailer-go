@@ -1,14 +1,11 @@
 package core
 
 import (
-	"context"
 	"log/slog"
 	"net/smtp"
-	"time"
 
+	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
 	"github.com/sounishnath003/customgo-mailer-service/internal/utils"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Core defines the core construct of the service.
@@ -20,26 +17,14 @@ type Core struct {
 	mongoDbUri string
 	smtpAuth   smtp.Auth
 
-	DB *mongo.Client
+	DB *repository.MongoDBClient
 	Lo *slog.Logger
 }
 
-// initDB tries to connect with mongo DB database within 10 second context
-func initDB(dbUri string) (*mongo.Client, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbUri))
-	if err != nil {
-		return nil, err
-	}
-
-	if err = client.Ping(ctx, nil); err != nil {
-		return nil, err
-	}
-
-	slog.Info("mongo db client instance ping checkked and connected")
-	return client, nil
+// configureIndexesDB helps to configure database level constraints and checks.
+// If complaints and rules on the collections as per the defined actions to make data integrity stronger.
+func (co *Core) configureIndexesDB() {
+	co.configureUsersIndexes()
 }
 
 func NewCore() *Core {
@@ -55,12 +40,17 @@ func NewCore() *Core {
 	}
 
 	// Initialize the database
-	mdb, err := initDB(co.mongoDbUri)
+	mdb, err := intiializeDatabase(co.mongoDbUri)
 	if err != nil {
 		co.Lo.Error("not able to connect to mongoDB", slog.Any("mdb_err", err.Error()))
 		panic(err)
 	}
-	co.DB = mdb
+	co.DB = &repository.MongoDBClient{
+		Client: mdb,
+	}
+
+	// Configure indexes managements
+	go co.configureIndexesDB()
 
 	// Initialize the SMTP Auth instance to be reused.
 	co.smtpAuth = smtp.PlainAuth(
