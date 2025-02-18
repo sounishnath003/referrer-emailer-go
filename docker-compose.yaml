@@ -8,6 +8,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: P455w0Rd!
     ports:
       - 27017:27017
+    volumes:
+      - ./mongostore:/data/db
 
   mongo-express:
     image: mongo-express
@@ -19,9 +21,6 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: P455w0Rd!
       ME_CONFIG_MONGODB_URL: mongodb://root:P455w0Rd!@mongo:27017/
       ME_CONFIG_BASICAUTH: false
-    volumes:
-      - ./mongostore:/data/db
-
 
 networks:
   referrer-mailer-subnet:
