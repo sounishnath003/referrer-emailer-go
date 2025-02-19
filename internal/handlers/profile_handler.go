@@ -51,8 +51,6 @@ func ProfileInformationHandler(c echo.Context) error {
 		return SendErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
-	err = hctx.GetCore().GenerateProfileSummary(dstPath)
-
 	profileInfo := &repository.User{
 		Firstname:    firstName,
 		LastName:     lastName,

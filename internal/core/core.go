@@ -97,6 +97,7 @@ func (co *Core) initializeGCSClient() error {
 	defer cancel()
 
 	storageClient, err := storage.NewClient(ctx, option.WithServiceAccountFile("/Users/sounishnath/sounish-cloud-workstation-ac143dfffa26.json"))
+
 	if err != nil {
 		return fmt.Errorf("Unable to create GCS storage client: %w\n", err)
 	}

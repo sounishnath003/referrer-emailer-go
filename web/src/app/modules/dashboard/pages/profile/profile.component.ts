@@ -69,7 +69,7 @@ export class ProfileComponent implements OnInit {
 
     this.profileService.updateProfileInformation$(formValue).pipe(
       catchError(err => {
-        this.errorMessage = JSON.stringify(err.error);
+        this.errorMessage = JSON.stringify(err.error.error);
         return of(null);
       })
     ).subscribe((data) => {
