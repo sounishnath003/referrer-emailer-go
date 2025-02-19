@@ -1,8 +1,11 @@
 package core
 
 import (
+	"fmt"
 	"log/slog"
 	"net/smtp"
+
+	"cloud.google.com/go/storage"
 
 	"cloud.google.com/go/vertexai/genai"
 	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
@@ -15,9 +18,10 @@ type CoreOpts struct {
 	SmtpAddr   string
 	MongoDbUri string
 
-	ModelName    string
-	GcpProjectID string
-	GcpLocation  string
+	ModelName        string
+	GcpProjectID     string
+	GcpLocation      string
+	GcpStorageBucket string
 }
 
 // Core defines the core construct of the service.
@@ -25,10 +29,11 @@ type Core struct {
 	Port int
 	opts *CoreOpts
 
-	smtpAuth smtp.Auth
-	llm      *genai.GenerativeModel
-	DB       *repository.MongoDBClient
-	Lo       *slog.Logger
+	smtpAuth      smtp.Auth
+	storageClient *storage.Client
+	llm           *genai.GenerativeModel
+	DB            *repository.MongoDBClient
+	Lo            *slog.Logger
 }
 
 // configureIndexesDB helps to configure database level constraints and checks.
@@ -71,5 +76,25 @@ func NewCore(opts *CoreOpts) *Core {
 		panic(err)
 	}
 
+	// Initialize Storage Client (GCS Bucket).
+	if err := co.initializeGCSClient(); err != nil {
+		co.Lo.Error("error occured during GCS storage client inisialization:", "error", fmt.Errorf("Unable to create GCS storage client: %w\n", err))
+		panic(err)
+	}
+
 	return co
+}
+
+func (co *Core) initializeGCSClient() error {
+	ctx, cancel := getContextWithTimeout(10)
+	defer cancel()
+
+	storageClient, err := storage.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("Unable to create GCS storage client: %w\n", err)
+	}
+
+	co.storageClient = storageClient
+
+	return nil
 }
