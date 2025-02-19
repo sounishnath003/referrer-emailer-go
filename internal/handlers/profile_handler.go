@@ -66,7 +66,7 @@ func ProfileInformationHandler(c echo.Context) error {
 		}
 		dstPathChan <- dstPath
 
-		err = hctx.GetCore().ResumeParser(dstPath)
+		err = hctx.GetCore().GenerateProfileSummary(dstPath)
 		if err != nil {
 			errChan <- err
 		}

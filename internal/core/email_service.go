@@ -16,7 +16,7 @@ func (co *Core) InvokeSendMail(from string, to []string, subject, body string) e
 
 	// // Sending email.
 	err := smtp.SendMail(
-		fmt.Sprintf("%s:587", co.smtpAddr),
+		fmt.Sprintf("%s:587", co.opts.SmtpAddr),
 		co.smtpAuth,
 		from,
 		to,
