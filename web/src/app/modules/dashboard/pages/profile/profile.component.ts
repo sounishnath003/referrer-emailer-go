@@ -67,17 +67,22 @@ export class ProfileComponent implements OnInit {
   onSubmit() {
     const formValue: ProfileInformation = { ...this.profileForm.value, email: this.emailFromQueryParam } as ProfileInformation;
 
-    this.profileService.updateProfileInformation$(formValue).subscribe((data) => {
+    this.profileService.updateProfileInformation$(formValue).pipe(
+      catchError(err => {
+        this.errorMessage = JSON.stringify(err.error);
+        return of(null);
+      })
+    ).subscribe((data) => {
+      if (data === null) {
+        return;
+      }
       this.errorMessage = null;
       this.successMessage = `Profile information has been updated.`;
       // Change the location to home page. in 2.5 seconds...
       setInterval(() => {
         window.location.replace("/");
       }, 2500);
-    }, (err) => {
-      this.errorMessage = JSON.stringify(err.error?.error || `Failed to update information. Please try again later.`);
-      this.successMessage = null;
-    })
+    });
   }
 
   private onFormValueChange() {

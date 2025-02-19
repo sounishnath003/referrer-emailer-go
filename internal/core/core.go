@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/smtp"
 
+	"cloud.google.com/go/vertexai/genai"
 	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
 	"github.com/sounishnath003/customgo-mailer-service/internal/utils"
 )
@@ -16,6 +17,11 @@ type Core struct {
 	smtpAddr   string
 	mongoDbUri string
 	smtpAuth   smtp.Auth
+
+	modelName    string
+	gcpProjectID string
+	gcpLocation  string
+	llm          *genai.GenerativeModel
 
 	DB *repository.MongoDBClient
 	Lo *slog.Logger
@@ -30,11 +36,14 @@ func (co *Core) configureIndexesDB() {
 func NewCore() *Core {
 
 	co := &Core{
-		smtpAddr:   "smtp.gmail.com",
-		Port:       utils.GetNumberFromEnv("PORT", 3000),
-		mailAddr:   utils.GetStringFromEnv("MAIL_ADDR", "flock.sinasini@gmail.com"),
-		mailSecret: utils.GetStringFromEnv("MAIL_SECRET", "P@55w0Rd5!"),
-		mongoDbUri: utils.GetStringFromEnv("MONGO_DB_URI", "localhost"),
+		smtpAddr:     "smtp.gmail.com",
+		Port:         utils.GetNumberFromEnv("PORT", 3000),
+		mailAddr:     utils.GetStringFromEnv("MAIL_ADDR", "flock.sinasini@gmail.com"),
+		mailSecret:   utils.GetStringFromEnv("MAIL_SECRET", "P@55w0Rd5!"),
+		mongoDbUri:   utils.GetStringFromEnv("MONGO_DB_URI", "localhost"),
+		gcpProjectID: utils.GetStringFromEnv("GCP_PROJECT_ID", "sounish-cloud-workstation"),
+		gcpLocation:  utils.GetStringFromEnv("GCP_PROJECT_LOCATION", "asia-south1"),
+		modelName:    utils.GetStringFromEnv("GCP_VERTEX_AI_LLM", "gemini-1.5-flash-002"),
 
 		Lo: slog.Default(),
 	}
@@ -49,9 +58,6 @@ func NewCore() *Core {
 		Client: mdb,
 	}
 
-	// Configure indexes managements
-	go co.configureIndexesDB()
-
 	// Initialize the SMTP Auth instance to be reused.
 	co.smtpAuth = smtp.PlainAuth(
 		"",
@@ -59,6 +65,14 @@ func NewCore() *Core {
 		co.mailSecret,
 		co.smtpAddr,
 	)
+
+	// Configure indexes managements
+	go co.configureIndexesDB()
+
+	// Initialize LLM model (Gemini).
+	if err := co.initializeLLM(); err != nil {
+		panic(err)
+	}
 
 	return co
 }

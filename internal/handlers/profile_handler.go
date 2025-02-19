@@ -65,6 +65,11 @@ func ProfileInformationHandler(c echo.Context) error {
 			return
 		}
 		dstPathChan <- dstPath
+
+		err = hctx.GetCore().ResumeParser(dstPath)
+		if err != nil {
+			errChan <- err
+		}
 	}()
 
 	// Goroutine to update profile information in the database
