@@ -46,7 +46,7 @@ func (co *Core) GenerateProfileSummary(resumePath string) error {
 
 	part := genai.FileData{
 		MIMEType: "application/pdf",
-		FileURI:  "gs://sounish-cloud-workstation/referrer-uploads/Sounish_Nath_Resume_25.pdf",
+		FileURI:  resumePath,
 	}
 
 	res, err := co.llm.GenerateContent(ctx, part, genai.Text(`

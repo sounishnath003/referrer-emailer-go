@@ -2,10 +2,13 @@ package core
 
 import (
 	"fmt"
+	"io"
 	"log/slog"
+	"mime/multipart"
 	"net/smtp"
 
 	"cloud.google.com/go/storage"
+	"google.golang.org/api/option"
 
 	"cloud.google.com/go/vertexai/genai"
 	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
@@ -85,11 +88,15 @@ func NewCore(opts *CoreOpts) *Core {
 	return co
 }
 
+// initializeGCSClient initializes a new Google Cloud Storage (GCS) client and assigns it to the Core struct.
+// It sets a context with a timeout of 10 seconds for the client creation process.
+// If the client creation fails, it returns an error with a descriptive message.
+// The function returns nil if the client is successfully created.
 func (co *Core) initializeGCSClient() error {
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
 
-	storageClient, err := storage.NewClient(ctx)
+	storageClient, err := storage.NewClient(ctx, option.WithServiceAccountFile("/Users/sounishnath/sounish-cloud-workstation-ac143dfffa26.json"))
 	if err != nil {
 		return fmt.Errorf("Unable to create GCS storage client: %w\n", err)
 	}
@@ -97,4 +104,29 @@ func (co *Core) initializeGCSClient() error {
 	co.storageClient = storageClient
 
 	return nil
+}
+
+func (co *Core) UploadFileToGCSBucket(file *multipart.FileHeader) (string, error) {
+
+	src, err := file.Open()
+	if err != nil {
+		return "", fmt.Errorf("error opening file: %w\n", err)
+	}
+	defer src.Close()
+
+	ctx, cancel := getContextWithTimeout(10) // waits for 10 seconds
+	defer cancel()
+
+	objectName := fmt.Sprintf("referrer-uploads/%s", file.Filename)
+	wc := co.storageClient.Bucket(co.opts.GcpStorageBucket).Object(objectName).NewWriter(ctx)
+
+	if _, err = io.Copy(wc, src); err != nil {
+		return "", fmt.Errorf("failed to upload resume to GCS: %w", err)
+	}
+
+	if err := wc.Close(); err != nil {
+		return "", fmt.Errorf("failed to close the GCS writer: %w", err)
+	}
+
+	return fmt.Sprintf("gs://%s/%s", co.opts.GcpStorageBucket, objectName), nil
 }
