@@ -6,7 +6,7 @@ import { SubheroComponent } from "./pages/shared/subhero/subhero.component";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterOutlet, SidebarViewComponent, MenuComponent, MenuComponent, SubheroComponent],
+  imports: [RouterOutlet, SidebarViewComponent, MenuComponent, MenuComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

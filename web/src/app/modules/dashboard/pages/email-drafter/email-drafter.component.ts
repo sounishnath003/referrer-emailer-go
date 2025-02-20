@@ -5,12 +5,13 @@ import { Editor, NgxEditorModule } from 'ngx-editor';
 import { EmailAutocompleteComponent } from "./components/email-autocomplete/email-autocomplete.component";
 import { BehaviorSubject, catchError, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { SubheroComponent } from "../shared/subhero/subhero.component";
 
 @Component({
   selector: 'app-email-drafter',
   templateUrl: './email-drafter.component.html',
   styleUrls: ['./email-drafter.component.css'],
-  imports: [FormsModule, ReactiveFormsModule, NgxEditorModule, EmailAutocompleteComponent, AsyncPipe],
+  imports: [FormsModule, ReactiveFormsModule, NgxEditorModule, EmailAutocompleteComponent, AsyncPipe, SubheroComponent],
   providers: [EmailingService]
 })
 export class EmailDrafterComponent implements OnInit, OnDestroy {
