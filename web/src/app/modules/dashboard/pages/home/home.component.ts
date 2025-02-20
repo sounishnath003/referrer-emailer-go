@@ -1,13 +1,13 @@
-import { NgFor, NgForOf } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TopTemplateComponent } from "./components/top-templates/top-templates.component";
 import { TemplateInformationType } from './components/types';
+import { SubheroComponent } from '../shared/subhero/subhero.component';
 
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, TopTemplateComponent],
+  imports: [RouterLink, TopTemplateComponent, SubheroComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -27,7 +27,7 @@ export class HomeComponent {
     },
     {
       label: "Ask for Job Opportunities",
-      shortDesc: "Craft an email asking job oppotunities at companies."
+      shortDesc: "Craft an email asking job opportunities at companies."
     },
     {
       label: "Send Congratulations",

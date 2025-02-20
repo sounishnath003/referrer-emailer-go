@@ -2,20 +2,16 @@
     @if (
     sentReferrals.length
     ) {
-    <div class="lg:block hidden max-w-xs bg-gray-100">
+    <div class="md:block hidden max-w-xs bg-gray-100">
         <app-sidebar-view [sentReferrals]="sentReferrals"></app-sidebar-view>
     </div>
     }
-    <div class="mx-3 my-2">
+    <div class="mx-3">
         <div class="flex justify-end">
-            <app-menu class=""></app-menu>
+            <app-menu></app-menu>
         </div>
-        <div class="flex flex-col gap-6 items-center justify-center min-h-screen m-auto">
-            <div>
-                <p class="text-xl md:text-3xl font-semibold text-indigo-600">Welcome back, Sounish! 👋</p>
-            </div>
-            <div class="text-sm font-semibold text-gray-800">Let's write a referral request today!</div>
-            <router-outlet class="w-full"></router-outlet>
+        <div class="flex flex-col items-center justify-center min-h-screen m-auto">
+            <router-outlet></router-outlet>
         </div>
     </div>
 </div>

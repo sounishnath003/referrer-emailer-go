@@ -21,12 +21,12 @@ export const routes: Routes = [
                 component: EmailDrafterComponent
             },
             {
-                path: "profile",
+                path: "profile/update",
                 pathMatch: "full",
                 component: ProfileComponent
             },
             {
-                path: "resume",
+                path: "profile/resume",
                 pathMatch: "full",
                 component: ResumeViewComponent
             }

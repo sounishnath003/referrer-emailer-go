@@ -1,1 +1,16 @@
-<p>resume-view works!</p>
+<app-subhero title="Preview Resume 👋"
+    subtitle="Preview the extracted content from your uploaded resume."></app-subhero>
+
+<div *ngIf="profileInformation$ | async as  profile; else noContent" class="-mt-16">
+    <div *ngIf="profile.extractedContent; else noResumeContent">
+        <div class="prose-lg p-10 rounded-lg bg-white border" [innerHTML]="parseMarkdown(profile.extractedContent)">
+        </div>
+    </div>
+    <ng-template #noResumeContent class="p-2 rounded-lg text-md bg-blue-100 text-indigo-700">Content is being
+        loaded...</ng-template>
+</div>
+<ng-template #noContent>
+    <div class="bg-red-50 p-3 rounded-lg text-red-600 min-w-xl text-sm">
+        <span class="font-semibold">Something went wrong:</span> {{errorMessage}}
+    </div>
+</ng-template>

@@ -43,7 +43,7 @@ func (co *Core) ExtractResumeContentLLM(resumePath string) (string, error) {
 
 		[Task]: 
 		- Given a "Resume", You have to extract all the "Key Informations" of this candidate. 
-		- Start with "Candidate Name". DO NOT ADD ANYTHING ELSE.
+		- Start with "## Candidate Name" . DO NOT ADD ANYTHING ELSE.
 
 		[Important to note]:
     	1. Extract all the Social Links (Linkedin, Github, MobileNo, EmailAdress etc).

@@ -4,10 +4,11 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { ProfileInformation, ProfileService } from '../../services/profile.service';
 import { ActivatedRoute, Params, RouterLink } from '@angular/router';
 import { catchError, of, switchMap } from 'rxjs';
+import { SubheroComponent } from '../shared/subhero/subhero.component';
 
 @Component({
   selector: 'app-profile',
-  imports: [FormsModule, ReactiveFormsModule, NgIf, RouterLink],
+  imports: [FormsModule, ReactiveFormsModule, NgIf, RouterLink, SubheroComponent],
   providers: [ProfileService],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
