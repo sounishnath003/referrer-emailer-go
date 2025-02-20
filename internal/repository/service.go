@@ -34,12 +34,14 @@ func (mc *MongoDBClient) UpdateProfileInformation(u *User) error {
 	}
 	updateDoc := bson.M{"$set": bson.M{
 
-		"firstName":     u.Firstname,
-		"lastName":      u.LastName,
-		"about":         u.About,
-		"notifications": u.Notification,
-		"resume":        u.Resume,
-		"country":       u.Country,
+		"firstName":        u.Firstname,
+		"lastName":         u.LastName,
+		"about":            u.About,
+		"notifications":    u.Notification,
+		"resume":           u.Resume,
+		"country":          u.Country,
+		"profileSummary":   u.ProfileSummary,
+		"extractedContent": u.ExtractedContent,
 	}}
 	m, err := collection.UpdateOne(ctx, filterCondn, updateDoc)
 	if m.MatchedCount == 0 {

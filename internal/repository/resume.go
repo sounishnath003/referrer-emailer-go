@@ -47,5 +47,6 @@ type ResumeInformation struct {
 	Educations       []Education      `json:"educations" bson:"educations"`
 	Achievements     []Achievement    `json:"achievements" bson:"achievements"`
 
-	ProfileSummary string `json:"profileSummary" bson:"profileSummary"`
+	ProfileSummary   string `json:"profileSummary" bson:"profileSummary"`
+	ExtractedContent string `json:"extractedContent" bson:"extractedContent"`
 }

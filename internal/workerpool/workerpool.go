@@ -1,4 +1,4 @@
-package core
+package workerpool
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/sounishnath003/customgo-mailer-service/internal/core"
 	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -14,26 +15,27 @@ import (
 )
 
 type WorkerPool struct {
-	Concurrency int
-	JobQueue    chan repository.JobQueue
+	concurrency int
+	jobQueue    chan repository.JobQueue
 
-	wg       sync.WaitGroup
-	mu       sync.Mutex
-	lo       *slog.Logger
-	dbClient *repository.MongoDBClient
+	wg sync.WaitGroup
+	mu sync.Mutex
+	lo *slog.Logger
+	co *core.Core
 }
 
-func NewWorkerPool(dbClient *repository.MongoDBClient, concurrency, bufferSize int) *WorkerPool {
+func NewWorkerPool(co *core.Core, concurrency int) *WorkerPool {
 	return &WorkerPool{
-		Concurrency: concurrency,
-		JobQueue:    make(chan repository.JobQueue, bufferSize),
-		dbClient:    dbClient,
-		lo:          slog.Default(),
+		co: co,
+		lo: slog.Default(),
+
+		concurrency: concurrency,
+		jobQueue:    make(chan repository.JobQueue, 10*concurrency),
 	}
 }
 
 func (wp *WorkerPool) StartWorkers() {
-	for i := 0; i < wp.Concurrency; i++ {
+	for i := 0; i < wp.concurrency; i++ {
 		wp.wg.Add(1)
 		go wp.worker()
 		wp.lo.Info("[WORKERPOOL]:", "initilized.worker", i)
@@ -42,7 +44,7 @@ func (wp *WorkerPool) StartWorkers() {
 
 func (wp *WorkerPool) worker() {
 	defer wp.wg.Done()
-	for job := range wp.JobQueue {
+	for job := range wp.jobQueue {
 		wp.processJob(job)
 	}
 }
@@ -55,23 +57,39 @@ func (wp *WorkerPool) processJob(job repository.JobQueue) {
 	wp.lo.Info("[WORKERPOOL]: started processing new", "userEmail", job.UserEmailAddress, "job_type", job.JobType, "currentTime", currentTime)
 
 	switch job.JobType {
-	case "EXTRACT_CONTENT":
+	case repository.EXTRACT_CONTENT:
 		// extract content from resume
-		
-		wp.lo.Info("[WORKERPOOL]:", "userEmail", job.UserEmailAddress, "job_type", job.JobType, "completedAt", time.Now())
-		job.JobType = "GENERATE_PROFILE_SUMMARY"
-	case "GENERATE_PROFILE_SUMMARY":
+		content, err := wp.co.ExtractResumeContentLLM(job.Payload.ResumeURL)
+		if err != nil {
+			break
+		}
+		job.Payload.ExtractedContent = content
+		wp.lo.Info("[WORKERPOOL]: completed", "userEmail", job.UserEmailAddress, "job_type", job.JobType.String(), "timeElapsed", time.Since(currentTime))
+		job.JobType = repository.GENERATE_PROFILE_SUMMARY
+	case repository.GENERATE_PROFILE_SUMMARY:
 		// generate profile summary
 		wp.lo.Info("[WORKERPOOL]:", "userEmail", job.UserEmailAddress, "job_type", job.JobType, "completedAt", time.Now())
-		job.JobType = "RESUME_TO_JSON"
-	case "RESUME_TO_JSON":
-		// generate the JSON struct for the resume
-		wp.lo.Info("[WORKERPOOL]:", "userEmail", job.UserEmailAddress, "job_type", job.JobType, "completedAt", time.Now())
-		job.JobType = "UPDATE_RESUME_DOCUMENT"
-	case "UPDATE_RESUME_DOCUMENT":
-		wp.lo.Info("[WORKERPOOL]:", "userEmail", job.UserEmailAddress, "job_type", job.JobType, "completedAt", time.Now())
-		job.JobType = "EMAIL_NOTIFICATION"
-	case "EMAIL_NOTIFICATION":
+		summary, err := wp.co.GenerateProfileSummaryLLM(job.Payload.ExtractedContent)
+		if err != nil {
+			break
+		}
+		job.Payload.Summary = summary
+		wp.lo.Info("[WORKERPOOL]: completed", "userEmail", job.UserEmailAddress, "job_type", job.JobType.String(), "timeElapsed", time.Since(currentTime))
+		job.JobType = repository.UPDATE_RESUME_DOCUMENT
+	case repository.UPDATE_RESUME_DOCUMENT:
+		u, err := wp.co.DB.GetProfileByEmail(job.UserEmailAddress)
+		if err != nil {
+			return
+		}
+		u.ExtractedContent = job.Payload.ExtractedContent
+		u.ProfileSummary = job.Payload.Summary
+		if err = wp.co.DB.UpdateProfileInformation(u); err != nil {
+			wp.lo.Error("error updating the users profile content", "userEmailAddress", job.UserEmailAddress, "error", err)
+			break
+		}
+		wp.lo.Info("[WORKERPOOL]:", "userEmail", job.UserEmailAddress, "job_type", job.JobType.String(), "completedAt", time.Now())
+		job.JobType = repository.EMAIL_NOTIFICATION
+	case repository.EMAIL_NOTIFICATION:
 		// send the email to user
 		wp.lo.Info("[WORKERPOOL]:", "userEmail", job.UserEmailAddress, "job_type", job.JobType, "status", "COMPLETED", "completedAt", time.Now())
 		job.Status = "COMPLETED"
@@ -85,11 +103,20 @@ func (wp *WorkerPool) processJob(job repository.JobQueue) {
 	// Update job status in MongoDB
 	job.UpdatedAt = time.Now()
 
-	collection := wp.dbClient.Database("referrer").Collection("job_queues")
+	collection := wp.co.DB.Database("referrer").Collection("job_queues")
 	m, err := collection.UpdateOne(
 		context.TODO(),
 		bson.M{"userEmailAddress": job.UserEmailAddress, "status": "IN_PROGRESS"},
-		bson.M{"$set": bson.M{"status": job.Status, "jobType": job.JobType, "updatedAt": job.UpdatedAt}},
+		bson.M{"$set": bson.M{
+			"status":    job.Status,
+			"jobType":   job.JobType,
+			"updatedAt": job.UpdatedAt,
+			"payload": bson.M{
+				"resumeUrl":        job.Payload.ResumeURL,
+				"extractedContent": job.Payload.ExtractedContent,
+				"summary":          job.Payload.Summary,
+			},
+		}},
 	)
 
 	if m.MatchedCount == 0 || err != nil {
@@ -98,13 +125,13 @@ func (wp *WorkerPool) processJob(job repository.JobQueue) {
 
 	// If job is not completed, push it back to the job queue for the next stages
 	if job.Status != "COMPLETED" && job.Status != "FAILED" {
-		wp.JobQueue <- job
+		wp.jobQueue <- job
 	}
 
 }
 
 func (wp *WorkerPool) ListenForThePendingJobs() {
-	collection := wp.dbClient.Database("referrer").Collection("job_queues")
+	collection := wp.co.DB.Database("referrer").Collection("job_queues")
 
 	for {
 		var job repository.JobQueue
@@ -116,7 +143,7 @@ func (wp *WorkerPool) ListenForThePendingJobs() {
 		).Decode(&job)
 
 		if err == nil {
-			wp.JobQueue <- job
+			wp.jobQueue <- job
 		} else if err != mongo.ErrNoDocuments {
 			wp.lo.Error("[WORKERPOOL]: not able to pull pending jobs from job-queues:", "error", err)
 		}
@@ -126,6 +153,6 @@ func (wp *WorkerPool) ListenForThePendingJobs() {
 }
 
 func (wp *WorkerPool) Wait() {
-	defer close(wp.JobQueue)
+	defer close(wp.jobQueue)
 	wp.wg.Wait()
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/sounishnath003/customgo-mailer-service/internal/core"
 	"github.com/sounishnath003/customgo-mailer-service/internal/server"
 	"github.com/sounishnath003/customgo-mailer-service/internal/utils"
+	"github.com/sounishnath003/customgo-mailer-service/internal/workerpool"
 )
 
 func main() {
@@ -18,9 +19,20 @@ func main() {
 		GcpLocation:      utils.GetStringFromEnv("GCP_PROJECT_LOCATION", "asia-south1"),
 		ModelName:        utils.GetStringFromEnv("GCP_VERTEX_AI_LLM", "gemini-1.5-flash-002"),
 		GcpStorageBucket: utils.GetStringFromEnv("GCP_STORAGE_BUCKET", "sounish-cloud-workstation"),
-
-		Conucrrency: 5,
 	})
+
+	// Initialize worker pool
+	// Buffer Queue = 10 x Concurrency
+	wp := workerpool.NewWorkerPool(co, 5)
+
+	go func() {
+		// Start worker pool
+		go wp.StartWorkers()
+		// Attach the mongo db client
+		wp.ListenForThePendingJobs()
+		// Wait for the execution
+		wp.Wait()
+	}()
 
 	server := server.NewServer(co)
 	panic(server.Start())

@@ -57,13 +57,15 @@ func ProfileInformationHandler(c echo.Context) error {
 	}
 
 	profileInfo := &repository.User{
-		Firstname:    firstName,
-		LastName:     lastName,
-		Resume:       dstPath,
-		About:        about,
-		Email:        email,
-		Country:      country,
-		Notification: notification,
+		Firstname:        firstName,
+		LastName:         lastName,
+		Resume:           dstPath,
+		About:            about,
+		Email:            email,
+		Country:          country,
+		ProfileSummary:   "",
+		ExtractedContent: "",
+		Notification:     notification,
 	}
 
 	err = hctx.GetCore().DB.UpdateProfileInformation(profileInfo)

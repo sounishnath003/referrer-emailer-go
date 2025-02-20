@@ -22,5 +22,9 @@ type User struct {
 
 	Email    string `json:"email" bson:"email"`
 	Password string `json:"password,omitempty" bson:"password"`
-	Token    string `json:"token,omitempty" bson:"-"`
+
+	ProfileSummary   string `json:"profileSummary" bson:"profileSummary"`
+	ExtractedContent string `json:"extractedContent" bson:"extractedContent"`
+
+	Token string `json:"token,omitempty" bson:"-"`
 }

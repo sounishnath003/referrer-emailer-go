@@ -25,8 +25,6 @@ type CoreOpts struct {
 	GcpProjectID     string
 	GcpLocation      string
 	GcpStorageBucket string
-
-	Conucrrency int
 }
 
 // Core defines the core construct of the service.
@@ -39,7 +37,6 @@ type Core struct {
 	smtpAuth      smtp.Auth
 	storageClient *storage.Client
 	llm           *genai.GenerativeModel
-	workerPool    *WorkerPool
 }
 
 // configureIndexesDB helps to configure database level constraints and checks.
@@ -89,20 +86,6 @@ func NewCore(opts *CoreOpts) *Core {
 		co.Lo.Error("error occured during GCS storage client inisialization:", "error", fmt.Errorf("Unable to create GCS storage client: %w\n", err))
 		panic(err)
 	}
-
-	// Initialize worker pool
-	// Buffer Queue = 10 x Concurrency
-	wp := NewWorkerPool(co.DB, opts.Conucrrency, 10*opts.Conucrrency)
-	co.workerPool = wp
-
-	go func() {
-		// Start worker pool
-		go co.workerPool.StartWorkers()
-		// Attach the mongo db client
-		co.workerPool.ListenForThePendingJobs()
-		// Wait for the execution
-		co.workerPool.Wait()
-	}()
 
 	return co
 }
@@ -180,7 +163,7 @@ func (co *Core) SubmitResumeToJobQueue(userEmailAddress, resumeGCSPath string) e
 	// Create a job
 	job := repository.JobQueue{
 		UserEmailAddress: userEmailAddress,
-		JobType:          "EXTRACT_CONTENT",
+		JobType:          repository.EXTRACT_CONTENT,
 		Status:           "PENDING",
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
