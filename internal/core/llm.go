@@ -41,7 +41,9 @@ func (co *Core) ExtractResumeContentLLM(resumePath string) (string, error) {
 	res, err := co.llm.GenerateContent(ctx, part, genai.Text(`
 		[Backstory]: You are a very "Professional Hiring Manager Specialist" of a Company. You have to screen candidate based on their resume.
 
-		[Task]: Given a "Resume", You have to extract all the "Key Informations" of this candidate. 
+		[Task]: 
+		- Given a "Resume", You have to extract all the "Key Informations" of this candidate. 
+		- Start with "Candidate Name". DO NOT ADD ANYTHING ELSE.
 
 		[Important to note]:
     	1. Extract all the Social Links (Linkedin, Github, MobileNo, EmailAdress etc).
