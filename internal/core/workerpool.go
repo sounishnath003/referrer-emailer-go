@@ -43,7 +43,6 @@ func (wp *WorkerPool) StartWorkers() {
 func (wp *WorkerPool) worker() {
 	defer wp.wg.Done()
 	for job := range wp.JobQueue {
-		wp.lo.Debug("job debug", "job", job)
 		wp.processJob(job)
 	}
 }
@@ -58,6 +57,7 @@ func (wp *WorkerPool) processJob(job repository.JobQueue) {
 	switch job.JobType {
 	case "EXTRACT_CONTENT":
 		// extract content from resume
+		
 		wp.lo.Info("[WORKERPOOL]:", "userEmail", job.UserEmailAddress, "job_type", job.JobType, "completedAt", time.Now())
 		job.JobType = "GENERATE_PROFILE_SUMMARY"
 	case "GENERATE_PROFILE_SUMMARY":
@@ -126,6 +126,6 @@ func (wp *WorkerPool) ListenForThePendingJobs() {
 }
 
 func (wp *WorkerPool) Wait() {
-	close(wp.JobQueue)
+	defer close(wp.JobQueue)
 	wp.wg.Wait()
 }

@@ -52,7 +52,7 @@ func ProfileInformationHandler(c echo.Context) error {
 	}
 
 	// Push the resume update as new job
-	if err = hctx.GetCore().PushResumeToJobQueueAsJob(email, dstPath); err != nil {
+	if err = hctx.GetCore().SubmitResumeToJobQueue(email, dstPath); err != nil {
 		return SendErrorResponse(c, http.StatusInternalServerError, err)
 	}
 

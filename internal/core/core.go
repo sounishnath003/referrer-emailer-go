@@ -91,7 +91,8 @@ func NewCore(opts *CoreOpts) *Core {
 	}
 
 	// Initialize worker pool
-	wp := NewWorkerPool(co.DB, opts.Conucrrency, 2*opts.Conucrrency)
+	// Buffer Queue = 10 x Concurrency
+	wp := NewWorkerPool(co.DB, opts.Conucrrency, 10*opts.Conucrrency)
 	co.workerPool = wp
 
 	go func() {
@@ -169,7 +170,7 @@ func (co *Core) UploadFileToGCSBucket(file *multipart.FileHeader) (string, error
 	return dstPath, nil
 }
 
-func (co *Core) PushResumeToJobQueueAsJob(userEmailAddress, resumeGCSPath string) error {
+func (co *Core) SubmitResumeToJobQueue(userEmailAddress, resumeGCSPath string) error {
 	// Get context.
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
