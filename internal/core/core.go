@@ -91,7 +91,7 @@ func NewCore(opts *CoreOpts) *Core {
 	}
 
 	// Initialize worker pool
-	wp := NewWorkerPool(opts.Conucrrency, 2*opts.Conucrrency)
+	wp := NewWorkerPool(co.DB, opts.Conucrrency, 2*opts.Conucrrency)
 	co.workerPool = wp
 
 	go func() {
@@ -183,7 +183,6 @@ func (co *Core) PushResumeToJobQueueAsJob(userEmailAddress, resumeGCSPath string
 		Status:           "PENDING",
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
-		DbClient:         co.DB,
 		Payload: repository.Payload{
 			ResumeURL: resumeGCSPath,
 		},

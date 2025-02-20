@@ -15,17 +15,19 @@ import (
 
 type WorkerPool struct {
 	Concurrency int
-	JobQueue    chan *repository.JobQueue
+	JobQueue    chan repository.JobQueue
 
-	wg sync.WaitGroup
-	mu sync.Mutex
-	lo *slog.Logger
+	wg       sync.WaitGroup
+	mu       sync.Mutex
+	lo       *slog.Logger
+	dbClient *repository.MongoDBClient
 }
 
-func NewWorkerPool(concurrency, bufferSize int) *WorkerPool {
+func NewWorkerPool(dbClient *repository.MongoDBClient, concurrency, bufferSize int) *WorkerPool {
 	return &WorkerPool{
 		Concurrency: concurrency,
-		JobQueue:    make(chan *repository.JobQueue, bufferSize),
+		JobQueue:    make(chan repository.JobQueue, bufferSize),
+		dbClient:    dbClient,
 		lo:          slog.Default(),
 	}
 }
@@ -46,7 +48,7 @@ func (wp *WorkerPool) worker() {
 	}
 }
 
-func (wp *WorkerPool) processJob(job *repository.JobQueue) {
+func (wp *WorkerPool) processJob(job repository.JobQueue) {
 	wp.mu.Lock()
 	defer wp.mu.Unlock()
 
@@ -72,7 +74,6 @@ func (wp *WorkerPool) processJob(job *repository.JobQueue) {
 	case "EMAIL_NOTIFICATION":
 		// send the email to user
 		wp.lo.Info("[WORKERPOOL]:", "userEmail", job.UserEmailAddress, "job_type", job.JobType, "status", "COMPLETED", "completedAt", time.Now())
-		job.JobType = "EMAIL_NOTIFICATION"
 		job.Status = "COMPLETED"
 	default:
 		wp.lo.Error("[WORKERPOOL]: unknown", "job type", job.JobType, "error", fmt.Errorf("job type not recognized: email=%s, job_type=%s\n", job.UserEmailAddress, job.JobType))
@@ -83,15 +84,16 @@ func (wp *WorkerPool) processJob(job *repository.JobQueue) {
 
 	// Update job status in MongoDB
 	job.UpdatedAt = time.Now()
-	collection := job.DbClient.Database("referrer").Collection("job_queues")
-	_, err := collection.UpdateOne(
+
+	collection := wp.dbClient.Database("referrer").Collection("job_queues")
+	m, err := collection.UpdateOne(
 		context.TODO(),
-		bson.M{"_id": job.ID},
+		bson.M{"userEmailAddress": job.UserEmailAddress, "status": "IN_PROGRESS"},
 		bson.M{"$set": bson.M{"status": job.Status, "jobType": job.JobType, "updatedAt": job.UpdatedAt}},
 	)
 
-	if err != nil {
-		wp.lo.Error("[WORKERPOOL]: failed to update job status in MongoDB:", "error", err)
+	if m.MatchedCount == 0 || err != nil {
+		wp.lo.Error("[WORKERPOOL]: failed to update job status in MongoDB:", "job", job, "error", err)
 	}
 
 	// If job is not completed, push it back to the job queue for the next stages
@@ -114,7 +116,7 @@ func (wp *WorkerPool) ListenForJobs(dbClient *repository.MongoDBClient) {
 		).Decode(&job)
 
 		if err == nil {
-			wp.JobQueue <- &job
+			wp.JobQueue <- job
 		} else if err != mongo.ErrNoDocuments {
 			wp.lo.Error("[WORKERPOOL]: not able to pull pending jobs from job-queues:", "error", err)
 		}

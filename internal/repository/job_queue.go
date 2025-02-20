@@ -22,6 +22,4 @@ type JobQueue struct {
 	CreatedAt        time.Time `json:"createdAt" bson:"createdAt"`
 	UpdatedAt        time.Time `json:"updatedAt" bson:"updatedAt"`
 	Payload          Payload   `json:"payload" bson:"payload"`
-
-	DbClient *MongoDBClient `json:"-" bson:"-"`
 }
