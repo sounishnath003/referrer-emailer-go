@@ -98,7 +98,7 @@ func NewCore(opts *CoreOpts) *Core {
 		// Start worker pool
 		go co.workerPool.StartWorkers()
 		// Attach the mongo db client
-		co.workerPool.ListenForJobs(co.DB)
+		co.workerPool.ListenForThePendingJobs()
 		// Wait for the execution
 		co.workerPool.Wait()
 	}()

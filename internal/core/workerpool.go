@@ -103,8 +103,8 @@ func (wp *WorkerPool) processJob(job repository.JobQueue) {
 
 }
 
-func (wp *WorkerPool) ListenForJobs(dbClient *repository.MongoDBClient) {
-	collection := dbClient.Database("referrer").Collection("job_queues")
+func (wp *WorkerPool) ListenForThePendingJobs() {
+	collection := wp.dbClient.Database("referrer").Collection("job_queues")
 
 	for {
 		var job repository.JobQueue
