@@ -37,7 +37,7 @@ type Achievement struct {
 }
 
 type ResumeInformation struct {
-	ID bson.ObjectId `json:"id" bson:"_id"`
+	ID bson.ObjectId `json:"id" bson:"_id,omitempty"`
 
 	Email            string           `json:"email" bson:"email"`
 	Skills           Skills           `json:"skills" bson:"skills"`

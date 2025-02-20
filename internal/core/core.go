@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"mime/multipart"
 	"net/smtp"
+	"time"
 
 	"cloud.google.com/go/storage"
-	"google.golang.org/api/option"
 
 	"cloud.google.com/go/vertexai/genai"
 	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
@@ -25,24 +25,29 @@ type CoreOpts struct {
 	GcpProjectID     string
 	GcpLocation      string
 	GcpStorageBucket string
+
+	Conucrrency int
 }
 
 // Core defines the core construct of the service.
 type Core struct {
 	Port int
-	opts *CoreOpts
+	DB   *repository.MongoDBClient
+	Lo   *slog.Logger
 
+	opts          *CoreOpts
 	smtpAuth      smtp.Auth
 	storageClient *storage.Client
 	llm           *genai.GenerativeModel
-	DB            *repository.MongoDBClient
-	Lo            *slog.Logger
+	workerPool    *WorkerPool
 }
 
 // configureIndexesDB helps to configure database level constraints and checks.
 // If complaints and rules on the collections as per the defined actions to make data integrity stronger.
 func (co *Core) configureIndexesDB() {
-	co.configureUsersIndexes()
+	co.createIndexHelper("users", "email", true)
+	co.createIndexHelper("job_queues", "userEmailAddress", false)
+	co.createIndexHelper("resumes", "emailAddress", true)
 }
 
 func NewCore(opts *CoreOpts) *Core {
@@ -85,6 +90,19 @@ func NewCore(opts *CoreOpts) *Core {
 		panic(err)
 	}
 
+	// Initialize worker pool
+	wp := NewWorkerPool(opts.Conucrrency, 2*opts.Conucrrency)
+	co.workerPool = wp
+
+	go func() {
+		// Start worker pool
+		go co.workerPool.StartWorkers()
+		// Attach the mongo db client
+		co.workerPool.ListenForJobs(co.DB)
+		// Wait for the execution
+		co.workerPool.Wait()
+	}()
+
 	return co
 }
 
@@ -96,7 +114,7 @@ func (co *Core) initializeGCSClient() error {
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
 
-	storageClient, err := storage.NewClient(ctx, option.WithServiceAccountFile("/Users/sounishnath/sounish-cloud-workstation-ac143dfffa26.json"))
+	storageClient, err := storage.NewClient(ctx)
 
 	if err != nil {
 		return fmt.Errorf("Unable to create GCS storage client: %w\n", err)
@@ -107,6 +125,24 @@ func (co *Core) initializeGCSClient() error {
 	return nil
 }
 
+// UploadFileToGCSBucket uploads a file to a Google Cloud Storage (GCS) bucket.
+// It takes a multipart.FileHeader as input and returns the URL of the uploaded file
+// or an error if the upload fails.
+//
+// Parameters:
+//   - file: A pointer to a multipart.FileHeader representing the file to be uploaded.
+//
+// Returns:
+//   - string: The URL of the uploaded file in the GCS bucket.
+//   - error: An error if the upload fails.
+//
+// Example:
+//
+//	url, err := co.UploadFileToGCSBucket(fileHeader)
+//	if err != nil {
+//	    log.Fatalf("Failed to upload file: %v", err)
+//	}
+//	fmt.Printf("File uploaded to: %s\n", url)
 func (co *Core) UploadFileToGCSBucket(file *multipart.FileHeader) (string, error) {
 
 	src, err := file.Open()
@@ -115,10 +151,11 @@ func (co *Core) UploadFileToGCSBucket(file *multipart.FileHeader) (string, error
 	}
 	defer src.Close()
 
-	ctx, cancel := getContextWithTimeout(10) // waits for 10 seconds
+	ctx, cancel := getContextWithTimeout(50) // waits for 50 seconds
 	defer cancel()
 
 	objectName := fmt.Sprintf("referrer-uploads/%s", file.Filename)
+	dstPath := fmt.Sprintf("gs://%s/%s", co.opts.GcpStorageBucket, objectName)
 	wc := co.storageClient.Bucket(co.opts.GcpStorageBucket).Object(objectName).NewWriter(ctx)
 
 	if _, err = io.Copy(wc, src); err != nil {
@@ -129,5 +166,32 @@ func (co *Core) UploadFileToGCSBucket(file *multipart.FileHeader) (string, error
 		return "", fmt.Errorf("failed to close the GCS writer: %w", err)
 	}
 
-	return fmt.Sprintf("gs://%s/%s", co.opts.GcpStorageBucket, objectName), nil
+	return dstPath, nil
+}
+
+func (co *Core) PushResumeToJobQueueAsJob(userEmailAddress, resumeGCSPath string) error {
+	// Get context.
+	ctx, cancel := getContextWithTimeout(10)
+	defer cancel()
+
+	collection := co.DB.Database("referrer").Collection("job_queues")
+
+	// Create a job
+	job := repository.JobQueue{
+		UserEmailAddress: userEmailAddress,
+		JobType:          "EXTRACT_CONTENT",
+		Status:           "PENDING",
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
+		DbClient:         co.DB,
+		Payload: repository.Payload{
+			ResumeURL: resumeGCSPath,
+		},
+	}
+	_, err := collection.InsertOne(ctx, job)
+	if err != nil {
+		return fmt.Errorf("not able to process resume: %w\n", err)
+	}
+
+	return nil
 }

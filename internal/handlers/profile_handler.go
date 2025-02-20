@@ -51,6 +51,11 @@ func ProfileInformationHandler(c echo.Context) error {
 		return SendErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
+	// Push the resume update as new job
+	if err = hctx.GetCore().PushResumeToJobQueueAsJob(email, dstPath); err != nil {
+		return SendErrorResponse(c, http.StatusInternalServerError, err)
+	}
+
 	profileInfo := &repository.User{
 		Firstname:    firstName,
 		LastName:     lastName,

@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -33,23 +34,23 @@ func intiializeDatabase(dbUri string) (*mongo.Client, error) {
 	return client, nil
 }
 
-func (co *Core) configureUsersIndexes() {
+func (co *Core) createIndexHelper(collectionName, fieldName string, isUnique bool) {
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
 
-	collection := co.DB.Database("referrer").Collection("users")
+	collection := co.DB.Database("referrer").Collection(collectionName)
 
-	foo, _ := bson.Marshal(bson.D{{Name: "email", Value: 1}})
+	foo, _ := bson.Marshal(bson.D{{Name: fieldName, Value: 1}})
 	indexModel := mongo.IndexModel{
 		Keys:    foo, // Create index on `email` field
-		Options: options.Index().SetUnique(true).SetName("email_index"),
+		Options: options.Index().SetUnique(isUnique).SetName(fmt.Sprintf("%s_index", fieldName)),
 	}
 
 	_, err := collection.Indexes().CreateOne(ctx, indexModel)
 	if err != nil {
-		co.Lo.Error("failed to create index on users collection", slog.Any("index_err", err.Error()))
+		co.Lo.Error("failed to create index on", "collectionName", collectionName, "fieldName", fieldName, slog.Any("index_err", err.Error()))
 		panic(err)
 	}
 
-	co.Lo.Info("successfully created index on users collection")
+	co.Lo.Info("successfully created index", "collectionName", collectionName, "fieldName", fieldName)
 }

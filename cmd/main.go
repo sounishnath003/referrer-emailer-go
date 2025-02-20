@@ -18,6 +18,8 @@ func main() {
 		GcpLocation:      utils.GetStringFromEnv("GCP_PROJECT_LOCATION", "asia-south1"),
 		ModelName:        utils.GetStringFromEnv("GCP_VERTEX_AI_LLM", "gemini-1.5-flash-002"),
 		GcpStorageBucket: utils.GetStringFromEnv("GCP_STORAGE_BUCKET", "sounish-cloud-workstation"),
+
+		Conucrrency: 5,
 	})
 
 	server := server.NewServer(co)

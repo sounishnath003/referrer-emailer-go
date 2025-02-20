@@ -44,11 +44,12 @@ func (s *Server) Start() error {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:4200", "localhost:4200"},
-		AllowMethods: []string{"GET", "POST"},
-		AllowHeaders: []string{"Content-Type", "Content-Length", "Authorization", "X-API-TrackerId"},
+		AllowOrigins: []string{"http://localhost:4200", "http://localhost:3000"},
+		AllowMethods: []string{echo.POST, echo.GET},
+		AllowHeaders: []string{"X-API-TrackerId", echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAuthorization, echo.HeaderContentLength},
 		MaxAge:       time.Now().Add(1 * time.Hour).Second(),
 	}))
+	// e.Use(middleware.CORS())
 	e.Use(middleware.Gzip())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(5))))
 
