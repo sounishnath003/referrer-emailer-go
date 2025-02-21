@@ -1,0 +1,11 @@
+.email-pill {
+    @apply bg-indigo-100 text-indigo-800 text-xs me-2 px-2.5 py-0.5 rounded cursor-pointer;
+}
+
+.form-control-input-box {
+    @apply block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6;
+}
+
+.form-control-errors {
+    @apply text-xs text-red-600 my-1 my-1;
+}

@@ -6,7 +6,8 @@
 <div class="max-w-5xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-center justify-center my-8 mx-8">
     @for (item of templatesInformations; track $index) {
     <div class="card">
-        <app-top-templates [templatesInformation]="item"></app-top-templates>
+        <app-top-templates routerLink="draft-with-ai" [queryParams]="{template: item.label}"
+            [templatesInformation]="item"></app-top-templates>
     </div>
     }
 </div>

@@ -5,6 +5,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ResumeViewComponent } from './pages/resume-view/resume-view.component';
 import { SentReferralsComponent } from './pages/sent-referrals/sent-referrals.component';
+import { DraftWithAiComponent } from './pages/draft-with-ai/draft-with-ai.component';
 
 export const routes: Routes = [
     {
@@ -35,6 +36,11 @@ export const routes: Routes = [
                 path: 'sent-referrals/:uuid',
                 pathMatch: 'full',
                 component: SentReferralsComponent,
+            },
+            {
+                path: "draft-with-ai",
+                pathMatch: "full",
+                component: DraftWithAiComponent
             }
         ]
     },

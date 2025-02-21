@@ -44,7 +44,6 @@ type Core struct {
 func (co *Core) configureIndexesDB() {
 	co.createIndexHelper("users", "email", true)
 	co.createIndexHelper("job_queues", "userEmailAddress", false)
-	co.createIndexHelper("resumes", "emailAddress", true)
 	co.createIndexHelper("referral_mailbox", "from", false)
 }
 
