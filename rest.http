@@ -39,3 +39,6 @@ Content-Type: application/json
     "subject": "my-first-subject", 
     "body": "<div><h3>Welcome Sounish!</h3><p>To the whole new world of building softwares referrals</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod ea, et in autem sint, ex sapiente consequunturassumenda magni est debitis voluptas nemo praesentium optio, itaque nisi minus totam quo.</p><p> Thanks and regards</p><p>Customgo-emailer-service</p></div>"
 }
+
+GET http://localhost:3000/api/sent-referrals?email=flock.sinasini@gmail.com HTTP/1.1
+Content-Type: application/json

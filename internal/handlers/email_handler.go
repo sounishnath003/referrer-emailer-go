@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -27,8 +28,8 @@ func SendEmailHandler(c echo.Context) error {
 
 	hctx := c.(*HandlerContext)
 
-	// Create a context with a timeout of 5 seonds
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// Create a context with a timeout of 10 seonds
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	// Channel to receive the result of the email sending
@@ -50,4 +51,21 @@ func SendEmailHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, emailSenderDto)
+}
+
+func GetReferralEmailsHandler(c echo.Context) error {
+	// Get context
+	hctx := c.(*HandlerContext)
+
+	userEmail := c.QueryParam("email")
+	if len(userEmail) == 0 || !isValidEmail(userEmail) {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or no email found."))
+	}
+
+	emails, err := hctx.GetCore().DB.GetLatestEmailsByEmail(userEmail)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("failed to fetch mails: %w", err))
+	}
+
+	return c.JSON(http.StatusOK, emails)
 }

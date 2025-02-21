@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -100,4 +102,64 @@ func (mc *MongoDBClient) FindUserByEmailAndPassword(email, password string) (*Us
 
 	return u, nil
 
+}
+
+// CreateEmailInMailbox stores the email into mailbox
+func (mc *MongoDBClient) CreateEmailInMailbox(from string, to []string, subject, body string) error {
+	// Get context
+	ctx, cancel := getContextWithTimeout(10)
+	defer cancel()
+
+	mail := ReferralMailbox{
+		Uuid:      uuid.New().String(),
+		From:      from,
+		To:        to,
+		Subject:   subject,
+		Body:      body,
+		CreatedAt: time.Now(),
+	}
+
+	collection := mc.Database("referrer").Collection("referral_mailbox")
+	_, err := collection.InsertOne(ctx, mail)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (mc *MongoDBClient) GetLatestEmailsByEmail(emailAddress string) ([]*ReferralMailbox, error) {
+	// Get context.
+	ctx, cancel := getContextWithTimeout(10)
+	defer cancel()
+
+	var mails []*ReferralMailbox
+
+	collection := mc.Database("referrer").Collection("referral_mailbox")
+
+	filterCondn := bson.M{"from": emailAddress}
+	cursor, err := collection.Find(ctx, filterCondn, options.Find().SetLimit(10).SetSort(bson.M{"createdAt": -1}))
+	defer cursor.Close(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+	if err := cursor.Err(); err != nil {
+		return mails, nil
+	}
+
+	for cursor.Next(ctx) {
+		var r ReferralMailbox
+		err := cursor.Decode(&r)
+		if err != nil {
+			fmt.Println("error occured", err)
+			return nil, err
+		}
+		mails = append(mails, &r)
+	}
+
+	if len(mails) == 0 {
+		return mails, fmt.Errorf("no results found")
+	}
+
+	return mails, nil
 }

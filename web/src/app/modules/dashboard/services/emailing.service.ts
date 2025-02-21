@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
+import { Observable, switchMap, timer } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -24,4 +25,27 @@ export class EmailingService {
       withCredentials: false,
     })
   }
+
+  pollReferralMailbox$(userEmailAddress: string): Observable<ReferralMailbox[]> {
+    const headers = new HttpHeaders();
+    headers.append("Content-Type", "application/json");
+
+    return timer(0, 3000).pipe(
+      switchMap(() => this.httpClient.get<ReferralMailbox[]>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/sent-referrals`, {
+        headers: headers,
+        params: { email: userEmailAddress }
+      }))
+    )
+  }
+}
+
+
+export interface ReferralMailbox {
+  id: string;
+  uuid: string;
+  from: string;
+  to: string[];
+  subject: string;
+  body: string;
+  createdAt: Date;
 }

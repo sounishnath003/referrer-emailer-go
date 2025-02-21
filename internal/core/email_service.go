@@ -23,5 +23,12 @@ func (co *Core) InvokeSendMail(from string, to []string, subject, body string) e
 		[]byte(mailBody),
 	)
 
+	// Store the email into database.
+	err = co.DB.CreateEmailInMailbox(from, to, subject, body)
+	if err != nil {
+		co.Lo.Error("error saving referral email into mailbox", "error", err)
+		return err
+	}
+
 	return err
 }

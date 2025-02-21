@@ -71,6 +71,7 @@ func (s *Server) Start() error {
 	api.Add("GET", "/profile", handlers.GetProfileHandler)
 	api.Add("POST", "/profile/information", handlers.ProfileInformationHandler)
 	// Email endpoints.
+	api.Add("GET", "/sent-referrals", handlers.GetReferralEmailsHandler)
 	api.Add("POST", "/send-email", handlers.SendEmailHandler)
 
 	// Log that server started

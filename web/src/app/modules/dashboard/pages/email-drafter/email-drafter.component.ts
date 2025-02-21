@@ -27,7 +27,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
 
   emailSenderForm: FormGroup = new FormGroup({
     to: new FormControl(null, [Validators.required, Validators.email]),
-    from: new FormControl('flock.sinasini@gmai.com', [Validators.required, Validators.email]),
+    from: new FormControl('flock.sinasini@gmail.com', [Validators.required, Validators.email]),
     subject: new FormControl(null, [Validators.required, Validators.maxLength(40)]),
     body: new FormControl(null, [Validators.required, Validators.minLength(30), Validators.maxLength(2000)]),
   });

@@ -6,17 +6,19 @@
 
     @if (sentReferrals.length) {
     @for (item of sentReferrals; track $index) {
-    <div class="email-users">
-        <div><img
-                src='https://avataaars.io/?avatarStyle=Circle&topType=LongHairDreads&accessoriesType=Prescription01&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Happy&eyebrowType=DefaultNatural&mouthType=Smile&skinColor=Light'
-                class="w-10" />
-        </div>
+    <div class="email-users" [routerLink]="['sent-referrals', item.uuid]">
+        <img src='https://avataaars.io/?avatarStyle=Circle&topType=LongHairDreads&accessoriesType=Prescription01&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Happy&eyebrowType=DefaultNatural&mouthType=Smile&skinColor=Light'
+            class="w-10" />
+
         <div class="flex flex-col gap-1">
-            <div><span class="text-xs font-semibold text-blue-800"> Jackie &bull; Microsoft</span></div>
-            <div class="text-xs font-sans text-gray-700">Lorem ipsum dolor sit amet consectetur adipisicing
-                elit.</div>
+            <div><span class="text-xs font-semibold text-blue-800"> {{ item.subject | titlecase }} &bull;
+                    Microsoft</span></div>
+            <div class="text-xs/4 leading-1 tracking-normal line-height-2 font-sans text-gray-700"
+                [innerHTML]="parseMarkdown(item.body)"></div>
         </div>
+
     </div>
+
     }
     } @else {
     <div class="text-blue-700 text-center text-xs rounded-md p-2 bg-blue-100 text-semibold">No referrals sent.</div>

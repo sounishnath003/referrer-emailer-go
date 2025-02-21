@@ -1,11 +1,9 @@
 <div class="grid auto-cols-[minmax(0, 3fr)] grid-flow-col content-center rounded-lg">
-    @if (
-    sentReferrals.length
-    ) {
-    <div class="md:block hidden max-w-xs bg-gray-100">
-        <app-sidebar-view [sentReferrals]="sentReferrals"></app-sidebar-view>
+    <div *ngIf="sentReferrals|async as referrals">
+        <div class="md:block hidden max-w-xs bg-gray-100">
+            <app-sidebar-view [sentReferrals]="referrals"></app-sidebar-view>
+        </div>
     </div>
-    }
     <div class="mx-3">
         <div class="flex justify-end">
             <app-menu></app-menu>
