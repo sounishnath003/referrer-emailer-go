@@ -8,7 +8,7 @@
 <div class="m-4">
     @for (item of referralEmails; track $index) {
     <div class="min-w-[720px]- bg-white p-4 rounded-lg flex flex-col items-start justify-start gap-4">
-        <div class="text-xl md:text-3xl"> Subject: {{ item.subject | titlecase }} </div>
+        <div class="text-xl md:text-3xl my-2"> Subject: {{ item.subject | titlecase }} </div>
         <div class="flex flex-row gap-4">
             <div>To:</div>
             @for (item of item.to; track $index) {
