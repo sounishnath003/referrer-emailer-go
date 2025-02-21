@@ -81,7 +81,7 @@ export class ProfileComponent implements OnInit {
       this.successMessage = `Profile information has been updated.`;
       // Change the location to home page. in 2.5 seconds...
       setInterval(() => {
-        window.location.replace("/");
+        window.location.replace("auth/login");
       }, 2500);
     });
   }

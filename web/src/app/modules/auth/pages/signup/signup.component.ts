@@ -60,7 +60,7 @@ export class SignupComponent implements OnInit {
       next: (data) => {
         if (data === null) return;
         this.errorMessage = null;
-        this.router.navigate(['dashboard', 'profile'], { preserveFragment: false, skipLocationChange: false, queryParams: { email } })
+        this.router.navigate(['dashboard', 'profile', 'update'], { preserveFragment: false, skipLocationChange: false, queryParams: { email } })
       },
     })
   }
