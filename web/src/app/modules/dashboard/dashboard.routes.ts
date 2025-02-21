@@ -4,6 +4,7 @@ import { EmailDrafterComponent } from './pages/email-drafter/email-drafter.compo
 import { HomeComponent } from './pages/home/home.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ResumeViewComponent } from './pages/resume-view/resume-view.component';
+import { SentReferralsComponent } from './pages/sent-referrals/sent-referrals.component';
 
 export const routes: Routes = [
     {
@@ -29,6 +30,11 @@ export const routes: Routes = [
                 path: "profile/resume",
                 pathMatch: "full",
                 component: ResumeViewComponent
+            },
+            {
+                path: 'sent-referrals/:uuid',
+                pathMatch: 'full',
+                component: SentReferralsComponent,
             }
         ]
     },

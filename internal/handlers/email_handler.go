@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // EmailSenderDto hold the DTO for the email sending data payload.
@@ -58,14 +59,20 @@ func GetReferralEmailsHandler(c echo.Context) error {
 	hctx := c.(*HandlerContext)
 
 	userEmail := c.QueryParam("email")
-	if len(userEmail) == 0 || !isValidEmail(userEmail) {
+	emailUuid := c.QueryParam("uuid")
+
+	if len(userEmail) > 0 && !isValidEmail(userEmail) {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or no email found."))
 	}
 
-	emails, err := hctx.GetCore().DB.GetLatestEmailsByEmail(userEmail)
+	emails, err := hctx.GetCore().DB.GetLatestEmailsByFilter(bson.M{
+		"$or": []bson.M{
+			bson.M{"from": userEmail},
+			bson.M{"uuid": emailUuid},
+		},
+	})
 	if err != nil {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("failed to fetch mails: %w", err))
 	}
-
 	return c.JSON(http.StatusOK, emails)
 }

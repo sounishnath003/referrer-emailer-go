@@ -30,12 +30,21 @@ export class EmailingService {
     const headers = new HttpHeaders();
     headers.append("Content-Type", "application/json");
 
-    return timer(0, 3000).pipe(
-      switchMap(() => this.httpClient.get<ReferralMailbox[]>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/sent-referrals`, {
-        headers: headers,
-        params: { email: userEmailAddress }
-      }))
-    )
+    // return timer(0, 3000).pipe(
+    //   switchMap(() => this.httpClient.get<ReferralMailbox[]>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/sent-referrals`, {
+    //     headers: headers,
+    //     params: { email: userEmailAddress }
+    //   }))
+    // )
+
+    return this.httpClient.get<ReferralMailbox[]>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/sent-referrals`, {
+      headers: headers,
+      params: { email: userEmailAddress }
+    })
+  }
+
+  getReferralEmailByUuid$(uuid: string) {
+    return this.httpClient.get<ReferralMailbox[]>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/sent-referrals?uuid=${uuid}`)
   }
 }
 

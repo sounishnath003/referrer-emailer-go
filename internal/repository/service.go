@@ -127,7 +127,7 @@ func (mc *MongoDBClient) CreateEmailInMailbox(from string, to []string, subject,
 	return nil
 }
 
-func (mc *MongoDBClient) GetLatestEmailsByEmail(emailAddress string) ([]*ReferralMailbox, error) {
+func (mc *MongoDBClient) GetLatestEmailsByFilter(filterCondn bson.M) ([]*ReferralMailbox, error) {
 	// Get context.
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
@@ -135,8 +135,8 @@ func (mc *MongoDBClient) GetLatestEmailsByEmail(emailAddress string) ([]*Referra
 	var mails []*ReferralMailbox
 
 	collection := mc.Database("referrer").Collection("referral_mailbox")
+	fmt.Println(filterCondn)
 
-	filterCondn := bson.M{"from": emailAddress}
 	cursor, err := collection.Find(ctx, filterCondn, options.Find().SetLimit(10).SetSort(bson.M{"createdAt": -1}))
 	defer cursor.Close(ctx)
 
