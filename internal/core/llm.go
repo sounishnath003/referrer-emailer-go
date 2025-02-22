@@ -87,7 +87,8 @@ func (co *Core) GenerateProfileSummaryLLM(content string) (string, error) {
 			
 			[Important to note]:
 			1. Give more attention to the "Professional Work, Skills, Project and Achievements".
-			2. Output must be "Markdown" format
+			2. Must Keep the Contact Details (phone, email, linkedin, portfolio, etc) in your summary.
+			3. Output must be "Markdown" format
 	`))
 	if err != nil {
 		return "", fmt.Errorf("unable to generate contents: %w", err)
@@ -138,26 +139,32 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 		ctx,
 		genai.Text(
 			fmt.Sprintf(`
+				** JOB Opportunity Details:**
 
 				To: %s
 				CompanyName: %s
-				jobUrls: %v,
+				JOB URLs: %v,
+				JobDescription: %s
 				
-				ProfileSummary: %s
+				** Candidate Profile:**
 
-				Coldmail Content must be "Tailored" to "%s" TOPIC.
-			`, to, companyName, jobUrls, userProfileSummary, templateType),
+				%s
+
+			`, to, companyName, jobUrls, jobDescription, userProfileSummary),
 		),
-		genai.Text(`
-			[Backstory]:  You are a career coach, who helps job seeks writing their "Cold Email Referral" Message.
-			[Task]: You have to write a "Cold Email" as per the provided Information in "Key:Value" format.
-			  
-			[Important things to note]:
-			1. Write "Short, Very Professional and Add Skills and Real Experience of the candidate" email.
-			2. ADD "Candidate's Signature" with Information from "Profile Summary:" .
-			3. Output must be in Markdown format.
-		`),
+		genai.Text(fmt.Sprintf(`
+			You are a highly skilled career coach specializing in crafting effective cold email referrals. Your task is to generate a concise, professional cold email based on the provided job opportunity and candidate profile.
+
+			**Specific Requirements:**
+
+			1.  The email must be precisely tailored to the "%s" topic and the skills and requirements mentioned in the job description.
+			2.  The email should highlight the candidate's relevant "Skills and Experience", drawing directly from their "Candidate Profile" in "Bullet points".
+			3.  Maintain a short, professional tone.
+			4.  Include a candidate signature (Contact Details: (phone, email, linkedin, portfolio, etc), utilizing information from the "Candidate Profile."
+			5.  Format the entire output as "Markdown" format. 
+		`, templateType)),
 	)
+
 	if err != nil {
 		return "", "", fmt.Errorf("unable to generate mailbody contents: %w", err)
 	}

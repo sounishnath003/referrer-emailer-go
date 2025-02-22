@@ -36,7 +36,6 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
   })
 
   processing$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
@@ -67,6 +66,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
     // extract all the urls
     const jobUrlsExtract = this.extractAllUrls(jobUrls) || [jobUrls];
 
+    this.loading = true;
     this.emailService.generateAiDraftColdEmail$(from, to, companyName, jobDescription, templateType, jobUrlsExtract).pipe(
       catchError(err => {
         this.apiErrorMsg = err.error.error || `Unable to process your request!`;
@@ -75,12 +75,12 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
     ).subscribe(data => {
       if (data === null) return;
       this.html = this.markdownService.parse(data.mailBody) as string;
-
       this.emailReferralForm.patchValue({
         subject: data.mailSubject,
         body: this.html
       }, { emitEvent: true });
 
+      this.loading = false;
       this.apiErrorMsg = null;
     })
 
