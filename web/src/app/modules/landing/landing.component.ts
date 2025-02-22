@@ -4,7 +4,7 @@ import { FooterComponent } from "../../shared/components/footer/footer.component
 
 @Component({
   selector: 'app-landing',
-  imports: [UpperCasePipe, FooterComponent],
+  imports: [UpperCasePipe],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css'
 })
