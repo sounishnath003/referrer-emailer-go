@@ -6,6 +6,9 @@ import (
 	"log/slog"
 	"mime/multipart"
 	"net/smtp"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -153,6 +156,64 @@ func (co *Core) UploadFileToGCSBucket(file *multipart.FileHeader) (string, error
 	}
 
 	return dstPath, nil
+}
+
+// DownloadObjectFromGCSBucket downloads an object from GCS and stores it in the `storage` directory.
+// It returns the local file path of the downloaded object.
+func (co *Core) DownloadObjectFromGCSBucket(objectAddress string) (string, error) {
+	// Parse the object address to get the bucket name and object name
+	bucketName, objectName, err := parseGCSObjectAddress(objectAddress)
+	if err != nil {
+		return "", fmt.Errorf("invalid GCS object address: %w", err)
+	}
+
+	// Create the storage directory if it doesn't exist
+	storageDir := "storage"
+	if err := os.MkdirAll(storageDir, os.ModePerm); err != nil {
+		return "", fmt.Errorf("failed to create storage directory: %w", err)
+	}
+
+	// Create the local file path
+	localFilePath := filepath.Join(storageDir, filepath.Base(objectName))
+
+	// Open the local file for writing
+	localFile, err := os.Create(localFilePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to create local file: %w", err)
+	}
+	defer localFile.Close()
+
+	// Get the object from GCS
+	ctx, cancel := getContextWithTimeout(50) // waits for 50 seconds
+	defer cancel()
+
+	rc, err := co.storageClient.Bucket(bucketName).Object(objectName).NewReader(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to create GCS object reader: %w", err)
+	}
+	defer rc.Close()
+
+	// Copy the object data to the local file
+	if _, err := io.Copy(localFile, rc); err != nil {
+		return "", fmt.Errorf("failed to copy GCS object to local file: %w", err)
+	}
+
+	return localFilePath, nil
+}
+
+// parseGCSObjectAddress parses a GCS object address and returns the bucket name and object name.
+func parseGCSObjectAddress(objectAddress string) (string, string, error) {
+	// Example object address: gs://bucket-name/object-name
+	if !strings.HasPrefix(objectAddress, "gs://") {
+		return "", "", fmt.Errorf("invalid GCS object address: %s", objectAddress)
+	}
+
+	parts := strings.SplitN(objectAddress[5:], "/", 2)
+	if len(parts) != 2 {
+		return "", "", fmt.Errorf("invalid GCS object address: %s", objectAddress)
+	}
+
+	return parts[0], parts[1], nil
 }
 
 func (co *Core) SubmitResumeToJobQueue(userEmailAddress, resumeGCSPath string) error {

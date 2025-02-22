@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -34,18 +35,38 @@ func SendEmailHandler(c echo.Context) error {
 	defer cancel()
 
 	// Channel to receive the result of the email sending
-	resultChan := make(chan error, 1)
+	errChan := make(chan error, 1)
 
 	// Start a goroutine to send the email
 	go func() {
-		resultChan <- hctx.GetCore().InvokeSendMail(emailSenderDto.From, emailSenderDto.To, emailSenderDto.Sub, emailSenderDto.Body)
+		// resultChan <- hctx.GetCore().InvokeSendMail(emailSenderDto.From, emailSenderDto.To, emailSenderDto.Sub, emailSenderDto.Body)
+
+		// get the `from` user from DB
+		u, err := hctx.GetCore().DB.GetProfileByEmail(emailSenderDto.From)
+		if err != nil {
+			errChan <- err
+		}
+
+		// Download the file into LocalDisk
+		localDst, err := hctx.GetCore().DownloadObjectFromGCSBucket(u.Resume)
+		if err != nil {
+			errChan <- err
+		}
+
+		// Invoke the SendMail with Attachment.
+		errChan <- hctx.GetCore().InvokeSendMailWithAttachment(emailSenderDto.From, emailSenderDto.To, emailSenderDto.Sub, emailSenderDto.Body, localDst)
+
+		// Purge the Local file
+		if err := os.Remove(localDst); err != nil {
+			hctx.GetCore().Lo.Error("error deleting the file:", "error", err)
+		}
 	}()
 
 	select {
 	case <-ctx.Done():
 		// Context timeout
 		return SendErrorResponse(c, http.StatusRequestTimeout, ctx.Err())
-	case err := <-resultChan:
+	case err := <-errChan:
 		if err != nil {
 			return SendErrorResponse(c, http.StatusInternalServerError, err)
 		}
