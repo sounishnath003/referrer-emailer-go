@@ -153,7 +153,7 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 			`, to, companyName, jobUrls, jobDescription, userProfileSummary),
 		),
 		genai.Text(fmt.Sprintf(`
-			You are a highly skilled career coach specializing in crafting effective cold email referrals. Your task is to generate a concise, professional cold email based on the provided job opportunity and candidate profile. Write it in "1st Person Candidate's View".
+			You are a highly skilled career coach specializing in crafting effective cold email referrals. Your task is to generate a concise, professional cold email based on the provided job opportunity and candidate profile. Write it in "1st Person Candidate's View". While adding "JOB URLs add in Bullet list" manner.
 
 			**Specific Requirements:**
 

@@ -40,7 +40,7 @@ func (co *Core) createIndexHelper(collectionName, fieldName string, isUnique boo
 
 	collection := co.DB.Database("referrer").Collection(collectionName)
 
-	foo, _ := bson.Marshal(bson.D{{Name: fieldName, Value: 1}})
+	foo, _ := bson.Marshal(bson.D{{Name: fieldName, Value: -1}})
 	indexModel := mongo.IndexModel{
 		Keys:    foo, // Create index on `email` field
 		Options: options.Index().SetUnique(isUnique).SetName(fmt.Sprintf("%s_index", fieldName)),

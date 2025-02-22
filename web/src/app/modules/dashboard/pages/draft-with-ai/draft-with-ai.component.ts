@@ -67,6 +67,8 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
     const jobUrlsExtract = this.extractAllUrls(jobUrls) || [jobUrls];
 
     this.loading = true;
+    this.apiErrorMsg = null;
+    this.successMessage = null;
     this.emailService.generateAiDraftColdEmail$(from, to, companyName, jobDescription, templateType, jobUrlsExtract).pipe(
       catchError(err => {
         this.apiErrorMsg = err.error.error || `Unable to process your request!`;
@@ -104,13 +106,15 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
       this.processing$.next(false);
 
       // Clear off
-      this.emailReferralForm.reset();
+      // this.emailReferralForm.reset();
     })
   }
 
 
   private onFormValueChange() {
     this.apiErrorMsg = null;
+    this.successMessage = null;
+
     if (this.emailReferralForm.invalid) {
       this.formErrors = this.getFormValidationErrors();
     } else {
