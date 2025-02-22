@@ -8,6 +8,27 @@ The Referrer Mailer Service is a tool designed to manage and send referral email
 - Customizable email templates
 - Referral tracking
 
+## Demo Page
+![hero](assets/hero.png)
+
+## Login or Signup
+![login](assets/login.png)
+
+## Dashboard
+![login](assets/login.png)
+
+## Update Account Settings
+![login](assets/update-account.png)
+
+## Resume Analyzer & Profile Metrics (Powered by Gemini)
+![login](assets/resume-analyzer.png)
+
+## Resume view (Auto Extraction)
+![login](assets/resume-view.png)
+
+## Sent Referrals
+![login](assets/sent-referrals.png)
+
 ## Installation
 To install the Referrer Mailer Service, clone the repository and install the dependencies:
 
