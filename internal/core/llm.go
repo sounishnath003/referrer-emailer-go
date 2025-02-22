@@ -126,3 +126,68 @@ func (co *Core) ConvertResumeToJSONStructLLM(content string) (string, error) {
 	llmContent := fmt.Sprintf("%v", res.Candidates[0].Content.Parts[0])
 	return llmContent, nil
 }
+
+// DraftColdEmailMessageLLM helps to generate a draft email and returns (mailSubject, mailBody, error).
+//
+// It also stores all the Ai generated draft in database to track.
+func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jobDescription, userProfileSummary string, jobUrls []string) (string, string, error) {
+	ctx, cancel := getContextWithTimeout(15)
+	defer cancel()
+
+	res, err := co.llm.GenerateContent(
+		ctx,
+		genai.Text(
+			fmt.Sprintf(`
+
+				To: %s
+				CompanyName: %s
+				jobUrls: %v,
+				
+				ProfileSummary: %s
+
+				Coldmail Content must be "Tailored" to "%s" TOPIC.
+			`, to, companyName, jobUrls, userProfileSummary, templateType),
+		),
+		genai.Text(`
+			[Backstory]:  You are a career coach, who helps job seeks writing their "Cold Email Referral" Message.
+			[Task]: You have to write a "Cold Email" as per the provided Information in "Key:Value" format.
+			  
+			[Important things to note]:
+			1. Write "Short, Very Professional and Add Skills and Real Experience of the candidate" email.
+			2. ADD "Candidate's Signature" with Information from "Profile Summary:" .
+			3. Output must be in Markdown format.
+		`),
+	)
+	if err != nil {
+		return "", "", fmt.Errorf("unable to generate mailbody contents: %w", err)
+	}
+
+	if len(res.Candidates) == 0 ||
+		len(res.Candidates[0].Content.Parts) == 0 {
+		return "", "", errors.New("empty response mailBody from model")
+	}
+
+	mailBody := fmt.Sprintf("%v", res.Candidates[0].Content.Parts[0])
+
+	res, err = co.llm.GenerateContent(ctx, genai.Text(mailBody), genai.Text(`
+		[Task]: Given "Referral Cold Email Body" in "HTML" format, targets for Which Type of Job (SWE, Backend Developer, Data Engineering, Data Analyst, etc).
+		Reply In One Word "TYPE OF THE JOB".
+	`))
+	if err != nil {
+		return "", "", fmt.Errorf("unable to generate type.Of.Job contents: %w", err)
+	}
+
+	if len(res.Candidates) == 0 ||
+		len(res.Candidates[0].Content.Parts) == 0 {
+		return "", "", errors.New("empty response type.Of.Job from model")
+	}
+
+	mailSubject := fmt.Sprintf("Interested for %s Roles Opportunities at %s", res.Candidates[0].Content.Parts[0], companyName)
+
+	// mailSubject := strings.Split(mailBody, "\n\n")[0]
+
+	// Store the draft into DB
+	_, err = co.DB.CreateAiDraftEmail(from, to, companyName, templateType, jobDescription, userProfileSummary, mailSubject, mailSubject, jobUrls)
+
+	return mailSubject, mailBody, nil
+}

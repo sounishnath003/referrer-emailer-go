@@ -70,6 +70,8 @@ func (s *Server) Start() error {
 	// Profile endpoints.
 	api.Add("GET", "/profile", handlers.GetProfileHandler)
 	api.Add("POST", "/profile/information", handlers.ProfileInformationHandler)
+	// Draft Coldmails Ai endpoints.
+	api.Add("POST", "/draft-with-ai", handlers.DraftReferralEmailWithAiHandler)
 	// Email endpoints.
 	api.Add("GET", "/sent-referrals", handlers.GetReferralEmailsHandler)
 	api.Add("POST", "/send-email", handlers.SendEmailHandler)

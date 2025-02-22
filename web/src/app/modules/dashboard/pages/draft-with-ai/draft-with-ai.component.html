@@ -1,6 +1,6 @@
 <app-subhero title="Email Writing Assistant" [subtitle]="template || ''"></app-subhero>
 
-<div class="mx-auto p-6 bg-white rounded-lg border">
+<div class="mx-auto p-6 bg-white rounded-lg border -mt-8">
     <h2 class="text-2xl font-semibold text-gray-800 mb-6"> &bull; {{template}} Cold Mail </h2>
 
     <form [formGroup]="emailReferralForm" class="space-y-4" autocomplete="off" (ngSubmit)="sendEmail()">
@@ -11,6 +11,15 @@
             <div class="form-control-errors" *ngIf="formErrors.to">
                 <span *ngIf="formErrors.to.required">* Email required</span>
                 <span *ngIf="formErrors.to.email">* Not a valid email address</span>
+            </div>
+        </div>
+
+        <div>
+            <label for="company-name" class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+            <input type="text" id="company-name" formControlName="companyName" name="company-name" rows="2"
+                class="form-control-input-box" placeholder="Enter company name">
+            <div class="form-control-errors" *ngIf="formErrors.companyName">
+                <span *ngIf="formErrors.companyName.required">*Company name required</span>
             </div>
         </div>
 
@@ -28,47 +37,88 @@
                 (Optional)</label>
             <textarea id="job-description" formControlName="jobDescription" name="job-description" rows="2"
                 class="form-control-input-box" placeholder="Enter job description"></textarea>
+            <div class="form-control-errors" *ngIf="formErrors.jobDescription">
+                <span *ngIf="formErrors.jobDescription.maxlength">* Job description is too big: {{
+                    formErrors.jobDescription.maxlength.actualLength
+                    }} / {{ formErrors.jobDescription.maxlength.requiredLength }} </span>
+            </div>
         </div>
         <div>
             <label for="template-type" class="block text-sm font-medium text-gray-700 mb-2">Template Type</label>
             <input type="text" formControlName="templateType" id="template-type" name="template-type"
                 class="form-control-input-box" aria-disabled="true">
         </div>
-        <div>
-            <label for="subject-line" class="block text-sm font-medium text-gray-700 mb-2">Subject Line</label>
-            <input type="text" formControlName="subject" id="subject-line" name="subject-line"
-                class="form-control-input-box" placeholder="Enter subject line">
-            <div class="form-control-errors" *ngIf="formErrors.subject">
-                <span *ngIf="formErrors.subject.required">* Subject is required</span>
+
+        <div *ngIf="emailReferralForm.controls['subject'].value && emailReferralForm.controls['body'].value">
+            <div>
+                <label for="subject-line" class="block text-sm font-medium text-gray-700 mb-2">Subject Line</label>
+                <input type="text" formControlName="subject" id="subject-line" name="subject-line"
+                    class="form-control-input-box" placeholder="Enter subject line">
+                <div class="form-control-errors" *ngIf="formErrors.subject">
+                    <span *ngIf="formErrors.subject.required">* Subject is required</span>
+                </div>
+            </div>
+
+            <div class="NgxEditor__Wrapper form-control-input-box w-full h-72 overflow-y-scroll my-5">
+                <label for="subject-line" class="block text-sm font-medium text-gray-700 mb-2">Mail body
+                    (Optional)</label>
+                <ngx-editor-menu [editor]="editorBox"></ngx-editor-menu>
+                <ngx-editor aria-multiline="true" [editor]="editorBox"
+                    [placeholder]="'Start typing your customized referral message...'" [spellcheck]=true
+                    formControlName="body" [(ngModel)]="html" placeholder="Enter email body"></ngx-editor>
+            </div>
+            <div class="form-control-errors" *ngIf="formErrors.body">
+                <span *ngIf="formErrors.body.required">* Body is required</span>
             </div>
         </div>
 
-        <div class="NgxEditor__Wrapper form-control-input-box w-full h-72 overflow-y-scroll">
-            <label for="subject-line" class="block text-sm font-medium text-gray-700 mb-2">Mail body (Optional)</label>
-            <ngx-editor-menu [editor]="editorBox"></ngx-editor-menu>
-            <ngx-editor aria-multiline="true" [editor]="editorBox"
-                [placeholder]="'Start typing your customized referral message...'" [spellcheck]=true
-                formControlName="body" [(ngModel)]="html" placeholder="Enter email body"></ngx-editor>
-        </div>
-        <div class="form-control-errors" *ngIf="formErrors.body">
-            <span *ngIf="formErrors.body.required">* Body is required</span>
-        </div>
-
         <div class="flex justify-between items-center">
+            @if (apiErrorMsg) {
             <button type="button" (click)="generateAiEmail()" [disabled]="emailReferralForm.invalid"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                {{apiErrorMsg}}
+            </button>
+            } @else {
+            @if (loading) {
+            <button type="button" [disabled]="loading" (click)="generateAiEmail()"
+                [disabled]="emailReferralForm.invalid"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300">
+                <div class="flex gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="#fff" class="animate-spin size-5" stroke="white" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+                    </svg>
+                    <div><span>Processing</span></div>
+                </div>
+            </button>
+            } @else {
+            <button type="button" [disabled]="loading" (click)="generateAiEmail()"
+                [disabled]="emailReferralForm.invalid"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 AI Magic (Gemini)
             </button>
+            }
+            }
+
+            @if (processing$|async) {
+            <button type="menu" [disabled]="true"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Hold on, Email is being sent...
+                &rarr;</button>
+            } @else {
             <button type="submit" [disabled]="emailReferralForm.invalid"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                Send Email
+                {{successMessage ? successMessage : 'Send Email'}}
             </button>
+            }
         </div>
     </form>
     <div class="mt-6">
         <h3 class="text-lg font-medium text-gray-800">Preview</h3>
         <div class="mt-2 p-4 bg-gray-100 rounded-md shadow-inner">
-            <p class="text-sm text-gray-700" id="preview-body">Your AI-generated email will appear here...</p>
+            <p class="text-sm text-gray-700" id="preview-body"
+                [innerHTML]="'Your AI-generated email will appear here...' "></p>
         </div>
     </div>
 </div>

@@ -42,3 +42,17 @@ Content-Type: application/json
 
 GET http://localhost:3000/api/sent-referrals?email=flock.sinasini@gmail.com HTTP/1.1
 Content-Type: application/json
+
+POST http://localhost:3000/api/draft-with-ai HTTP/1.1
+Content-Type: application/json
+
+{
+    "from": "flock.sinasini@gmail.com",
+    "to": "flock.sinasini@gmail.com",
+    "companyName": "JPMC",
+    "jobUrls": [
+        "http://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/requisitions/preview/210597528"
+    ],
+    "jobDescription": "Required qualifications, capabilities, and skills Formal training or certification on software engineering concepts and 3+ years applied experience Develop and maintain back-end components using Python, Pandas, RQL, and both object and relational databases (e.g., Cockroach DB, SQL). Deploy and manage micro-services in a Kubernetes environment, ensuring high availability and scalability. Demonstrated knowledge and application in technical discipline - Public Cloud. Hands-on practical experience in system design, application development, testing, and operational stability. Experience in developing, debugging, and maintaining code in a large corporate environment with one or more modern programming languages and database querying languages. Solid understanding of agile methodologies such as CI/CD, Application Resiliency, and Security. Demonstrated knowledge of software applications and technical processes within a technical discipline (e.g., cloud, artificial intelligence, machine learning, mobile, etc.)",
+    "templateType": "draft-with-ai"
+}

@@ -43,11 +43,31 @@ export class EmailingService {
     })
   }
 
+  generateAiDraftColdEmail$(from: string, to: string, companyName: string, jobDescription: string, templateType: string, jobUrls: string[]): Observable<AiDraftColdMail> {
+    const headers = new HttpHeaders();
+    headers.append("Content-Type", "application/json");
+
+    const payload = {
+      from,
+      to,
+      companyName,
+      jobDescription,
+      templateType,
+      jobUrls
+    };
+
+    return this.httpClient.post<AiDraftColdMail>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/draft-with-ai`, payload, { headers: headers });
+  }
+
   getReferralEmailByUuid$(uuid: string) {
     return this.httpClient.get<ReferralMailbox[]>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/sent-referrals?uuid=${uuid}`)
   }
 }
 
+export interface AiDraftColdMail {
+  mailSubject: string;
+  mailBody: string;
+}
 
 export interface ReferralMailbox {
   id: string;
