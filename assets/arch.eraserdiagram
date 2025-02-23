@@ -1,0 +1,26 @@
+cloud-architecture-diagram
+
+users [icon: users]
+frontend [icon: angular]
+backend [icon: go]
+
+workerpools [icon: gcp-cloud-tasks] {
+    worker1 [icon: cog]
+    worker2 [icon: cog]
+    worker3 [icon: cog]
+    worker4 [icon: cog]
+    worker5 [icon: cog]
+}
+
+mongo [icon: mongodb]
+storage [icon: gcp-cloud-storage]
+gemini-15-flash [icon: gcp-vertexai]
+
+users - frontend
+frontend - backend :JWT authentication
+backend - workerpools :on resume uploads
+backend - mongo
+workerpools - mongo
+
+workerpools - storage :stores resume
+workerpools - gemini-15-flash
