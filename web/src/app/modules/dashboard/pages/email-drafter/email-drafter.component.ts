@@ -6,6 +6,7 @@ import { EmailAutocompleteComponent } from "./components/email-autocomplete/emai
 import { BehaviorSubject, catchError, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { SubheroComponent } from "../shared/subhero/subhero.component";
+import { ApiProfileInformation, ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-email-drafter',
@@ -32,10 +33,25 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
     body: new FormControl(null, [Validators.required, Validators.minLength(30), Validators.maxLength(2000)]),
   });
 
-  constructor(private emailingService: EmailingService) { }
+  constructor(private readonly emailingService: EmailingService, private readonly profileService: ProfileService) { }
 
   ngOnInit(): void {
     this.editorBox = new Editor();
+
+    this.profileService.getProfileInformation$(`flock.sinasini@gmail.com`)
+      .pipe(
+        catchError(err => {
+          this.errorMessage = err.error.error || `Unable to fetch profile informations`;
+          return of(null);
+        })
+      )
+      .subscribe(data => {
+        if (data == null) return;
+        this.emailSenderForm.patchValue({
+          subject: `Interested for [Job Profile] Roles Interview Opportunity at [Company Name]`,
+          body: this.KickStartPrompt(data),
+        }, { emitEvent: true })
+      })
   }
   ngOnDestroy(): void {
     this.editorBox.destroy();
@@ -125,5 +141,40 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
     this.processing$.next(false);
     // return this.emailSenderForm.get('body')?.valueChanges;
     return this.emailSenderForm.valueChanges;
+  }
+
+
+  private KickStartPrompt(user: ApiProfileInformation) {
+    return `
+  <p>Hello [User],</p>
+
+  <p>Trust all is fine.</p>
+
+  <p>It has always been my dream to work as a <b>[Job Role]</b> at <b>[Company Name]</b>, and I was thrilled to see a job opening that perfectly matches my skills and expertise.</p>
+
+  <p>I kindly request that you review my resume and consider me for an interview if my qualifications align with your needs. Looking forward to hearing from you.</p>
+
+  <p>For your convenience, I have attached my resume and the job post link below:</p>
+
+  <ul>
+    <li><b>Resume:</b> Attached in the email.</li>
+    <li><b>Job Post:</b>
+      <ul class="job-list">
+        <li>Job Link #1</li>
+        <li>Job Link #2</li>
+        <li>Job Link #3</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p>Thank you,</p>
+
+  <div class="signature">
+    <b>${user.firstName} ${user.lastName}</b>
+    <p>${user.about}</p>
+    <hr>
+    <p>Email: ${user.email}</p>
+  </div>
+    `;
   }
 }
