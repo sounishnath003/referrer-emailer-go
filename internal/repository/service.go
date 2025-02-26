@@ -88,7 +88,10 @@ func (mc *MongoDBClient) FindUserByEmailAndPassword(email, password string) (*Us
 
 	// Set claims.
 	claims := token.Claims.(jwt.MapClaims)
+	claims["subject"] = u.Email
 	claims["email"] = u.Email
+	claims["iss"] = "referrer-emailer-service"
+	claims["iat"] = time.Now().Unix()
 	claims["exp"] = time.Now().Add(1 * time.Hour).Unix() // 1 Hour
 
 	// Generate encoded token and send it as response

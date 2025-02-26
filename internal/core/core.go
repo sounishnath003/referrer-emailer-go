@@ -51,6 +51,7 @@ func (co *Core) configureIndexesDB() {
 	co.createIndexHelper("referral_mailbox", "createdAt", false)
 	co.createIndexHelper("ai_email_drafts", "userEmailAddress", false)
 	co.createIndexHelper("ai_email_drafts", "from", false)
+	co.createIndexHelper("ai_email_drafts", "companyName", false)
 }
 
 func NewCore(opts *CoreOpts) *Core {

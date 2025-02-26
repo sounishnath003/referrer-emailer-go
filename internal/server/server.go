@@ -6,10 +6,12 @@ import (
 	"net/http"
 	"time"
 
+	echojwt "github.com/labstack/echo-jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sounishnath003/customgo-mailer-service/internal/core"
 	"github.com/sounishnath003/customgo-mailer-service/internal/handlers"
+	"github.com/sounishnath003/customgo-mailer-service/internal/utils"
 	"golang.org/x/time/rate"
 )
 
@@ -49,7 +51,15 @@ func (s *Server) Start() error {
 		AllowHeaders: []string{"X-API-TrackerId", echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAuthorization, echo.HeaderContentLength},
 		MaxAge:       time.Now().Add(1 * time.Hour).Second(),
 	}))
-	// e.Use(middleware.CORS())
+	e.Use(echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte(utils.GetStringFromEnv("JWT_SECRET_KEY", "Sec%&!*RT#*!@(89231%&!*RT#12345")),
+		Skipper: func(c echo.Context) bool {
+			if c.Path() == "/api/auth/login" || c.Path() == "/api/auth/signup" {
+				return true
+			}
+			return true
+		},
+	}))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(5))))
 

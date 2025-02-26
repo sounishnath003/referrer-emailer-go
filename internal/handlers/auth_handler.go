@@ -65,7 +65,7 @@ func LoginHandler(c echo.Context) error {
 	}
 
 	resp := map[string]any{
-		"user":        u,
+		// "user":        u,
 		"accessToken": u.Token,
 		"success":     true,
 	}
