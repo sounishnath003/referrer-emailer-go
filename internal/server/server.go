@@ -46,10 +46,11 @@ func (s *Server) Start() error {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:4200", "http://localhost:3000"},
-		AllowMethods: []string{echo.POST, echo.GET},
-		AllowHeaders: []string{"X-API-TrackerId", echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAuthorization, echo.HeaderContentLength},
-		MaxAge:       time.Now().Add(1 * time.Hour).Second(),
+		AllowOrigins:     []string{"http://localhost:4200"},
+		AllowMethods:     []string{echo.POST, echo.GET},
+		AllowCredentials: true,
+		AllowHeaders:     []string{"X-API-TrackerId", echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAuthorization, echo.HeaderContentLength},
+		MaxAge:           time.Now().Add(1 * time.Hour).Second(),
 	}))
 	e.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(utils.GetStringFromEnv("JWT_SECRET_KEY", "Sec%&!*RT#*!@(89231%&!*RT#12345")),
