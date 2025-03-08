@@ -218,7 +218,7 @@ func (mc *MongoDBClient) GetProfileAnalytics(userEmail string) (ProfileAnalytics
 			{"_id", 0},
 		}}},
 		bson.D{{"$sort", bson.D{{"totalEmails", -1}}}}, // ✅ Sort by totalEmails DESC
-
+		bson.D{{"$limit", 10}},
 	}
 
 	collection := mc.Database("referrer").Collection("ai_email_drafts")
