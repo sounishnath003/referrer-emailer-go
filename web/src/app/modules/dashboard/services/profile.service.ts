@@ -36,6 +36,18 @@ export interface Notifications {
   receiveEmails: boolean;
 }
 
+export interface ProfileAnalytics {
+  totalEmails: number;
+  companies: Company[];
+}
+
+export interface Company {
+  companyName: string;
+  totalEmails: number;
+  distinctUsersCount: number;
+}
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -69,5 +81,11 @@ export class ProfileService {
       headers,
       withCredentials: false
     })
+  }
+
+  getProfileAnalytics$(userEmail: string): Observable<ProfileAnalytics> {
+    const headers = new HttpHeaders();
+    headers.append("Content-Type", "application/json");
+    return this.httpClient.get<ProfileAnalytics>(`${this.API_URL}/api/profile/analytics?email=${userEmail}`, { headers });
   }
 }

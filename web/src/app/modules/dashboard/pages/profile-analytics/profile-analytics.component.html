@@ -1,0 +1,32 @@
+<div class="text-red-600 text-center font-medium" *ngIf="apiError"> Error: {{apiError}} </div>
+<app-subhero title="Referral Analytics" subtitle="Last 30 days tracking trends"></app-subhero>
+<div *ngIf="profileAnalytics$ | async as profileAnalytics; else temp">
+    <div class="-mt-10 mx-auto">
+        <div class="bg-white shadow-xl rounded-2xl p-6">
+            <div class="bg-blue-50 text-blue-800 p-4 rounded-xl mb-4 text-xl font-medium text-center">
+                Total Emails Sent: {{ profileAnalytics?.totalEmails }}
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse bg-white shadow-md rounded-xl">
+                    <thead class="">
+                        <tr class="bg-gray-200 text-gray-700">
+                            <th class="py-2 px-4 text-left text-sm font-sans">Company</th>
+                            <th class="py-2 px-4 text-left text-sm font-sans">Total Emails</th>
+                            <th class="py-2 px-4 text-left text-sm font-sans">Distinct users</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let company of profileAnalytics?.companies" class="border-b hover:bg-gray-100 cursor-pointer">
+                            <td class="py-2 px-4">{{ company.companyName }}</td>
+                            <td class="py-2 px-4">{{ company.totalEmails }}</td>
+                            <td class="py-2 px-4">{{ company.distinctUsersCount }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #temp>
+    <div class="text-red-600 text-medium">No response found</div>
+</ng-template>
