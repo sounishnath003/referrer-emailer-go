@@ -31,6 +31,7 @@ RUN apk --no-cache add shadow
 
 RUN useradd -m nonroot
 RUN mkdir -p /home/nonroot/storage
+ENV GOOGLE_APPLICATION_CREDENTIALS="/google-sa-credentials.json"
 
 # Copy Golang binary
 COPY --from=gobuilder /app/tmp/main /home/nonroot/main

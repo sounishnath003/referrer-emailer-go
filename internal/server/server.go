@@ -46,7 +46,7 @@ func (s *Server) Start() error {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://localhost:4200"},
+		AllowOrigins:     []string{"http://localhost:4200", "http://localhost:3000"},
 		AllowMethods:     []string{echo.POST, echo.GET},
 		AllowCredentials: true,
 		AllowHeaders:     []string{"X-API-TrackerId", echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAuthorization, echo.HeaderContentLength},
@@ -65,7 +65,13 @@ func (s *Server) Start() error {
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(5))))
 
 	// Serve static files from web/dist directory as per in docker container
-	e.Static("/", "web/dist")
+	// Handles the SPA page rotations
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Root: "web/dist",
+		Index: "index.html",
+		Browse: true,
+		HTML5: true,
+	}))
 
 	// Add routes
 	e.Add("GET", "health", func(c echo.Context) error {

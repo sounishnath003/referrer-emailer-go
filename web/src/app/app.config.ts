@@ -7,5 +7,5 @@ import { provideMarkdown } from 'ngx-markdown';
 import { corsInterceptor } from './shared/interceptors/cors.interceptor';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideHttpClient(withInterceptors([corsInterceptor])), provideMarkdown(),]
+  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideHttpClient(), provideMarkdown(),] // provideHttpClient(withInterceptors([corsInterceptor]))
 };
