@@ -25,6 +25,7 @@ all: build
 .PHONY: compose-up
 compose-up:
 	docker-compose down
+	docker rmi referrer-emailer
 	docker-compose up --build
 
 .PHONY: docker-build
