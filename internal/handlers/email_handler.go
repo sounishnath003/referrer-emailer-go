@@ -82,7 +82,7 @@ func GetReferralEmailsHandler(c echo.Context) error {
 	userEmail := c.QueryParam("email")
 	emailUuid := c.QueryParam("uuid")
 
-	if len(userEmail) == 0 || !isValidEmail(userEmail) {
+	if len(userEmail) > 0 && !isValidEmail(userEmail) {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or no email found."))
 	}
 
