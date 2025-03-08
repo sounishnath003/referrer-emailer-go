@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -227,10 +226,10 @@ func (mc *MongoDBClient) GetProfileAnalytics(userEmail string) (ProfileAnalytics
 	if err != nil {
 		return ProfileAnalytics{}, err
 	}
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(ctx)
 
 	var companyStats []CompanyEmailAggregate
-	if err = cursor.All(context.TODO(), &companyStats); err != nil {
+	if err = cursor.All(ctx, &companyStats); err != nil {
 		return ProfileAnalytics{}, err
 	}
 
