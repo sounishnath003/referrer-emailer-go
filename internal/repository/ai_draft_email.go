@@ -23,3 +23,15 @@ type AiDraftColdEmail struct {
 
 	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
 }
+
+type ProfileAnalytics struct {
+	TotalEmails int                     `json:"totalEmails" bson:"totalEmails"`
+	Companies   []CompanyEmailAggregate `json:"companies" bson:"companies"`
+}
+
+// CompanyEmailAggregate represents company-wise aggregation
+type CompanyEmailAggregate struct {
+	CompanyName        string `json:"companyName" bson:"companyName"`
+	TotalEmails        int    `json:"totalEmails" bson:"totalEmails"`
+	DistinctUsersCount int    `json:"distinctUsersCount" bson:"distinctUsersCount"`
+}

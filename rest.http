@@ -30,6 +30,10 @@ GET http://localhost:3000/api/profile?email=flock.sinasini@gmail.com HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZsb2NrLnNpbmFzaW5pQGdtYWlsLmNvbSIsImV4cCI6MTc0MDU5ODYzOSwiaWF0IjoxNzQwNTk1MDM5LCJpc3MiOiJyZWZlcnJlci1lbWFpbGVyLXNlcnZpY2UiLCJzdWJqZWN0IjoiZmxvY2suc2luYXNpbmlAZ21haWwuY29tIn0.V1TTWH7uGTKqLJEnMJuCnSYKBpmPyi9q5aGY3kasoKA
 
+GET http://localhost:3000/api/profile/analytics?email=flock.sinasini@gmail.com HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZsb2NrLnNpbmFzaW5pQGdtYWlsLmNvbSIsImV4cCI6MTc0MDU5ODYzOSwiaWF0IjoxNzQwNTk1MDM5LCJpc3MiOiJyZWZlcnJlci1lbWFpbGVyLXNlcnZpY2UiLCJzdWJqZWN0IjoiZmxvY2suc2luYXNpbmlAZ21haWwuY29tIn0.V1TTWH7uGTKqLJEnMJuCnSYKBpmPyi9q5aGY3kasoKA
+
 POST http://localhost:3000/api/send-email HTTP/1.1
 Content-Type: application/json
 

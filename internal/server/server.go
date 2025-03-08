@@ -55,7 +55,7 @@ func (s *Server) Start() error {
 	e.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(utils.GetStringFromEnv("JWT_SECRET_KEY", "Sec%&!*RT#*!@(89231%&!*RT#12345")),
 		Skipper: func(c echo.Context) bool {
-			if c.Path() == "/api/auth/login" || c.Path() == "/api/auth/signup" {
+			if c.Path() == "/api/auth/login" || c.Path() == "/api/auth/signup" || c.Path() == "" {
 				return true
 			}
 			return true
@@ -67,10 +67,10 @@ func (s *Server) Start() error {
 	// Serve static files from web/dist directory as per in docker container
 	// Handles the SPA page rotations
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root: "web/dist",
-		Index: "index.html",
+		Root:   "web/dist",
+		Index:  "index.html",
 		Browse: true,
-		HTML5: true,
+		HTML5:  true,
 	}))
 
 	// Add routes
@@ -86,6 +86,7 @@ func (s *Server) Start() error {
 	api.Add("POST", "/auth/login", handlers.LoginHandler)
 	// Profile endpoints.
 	api.Add("GET", "/profile", handlers.GetProfileHandler)
+	api.Add("GET", "/profile/analytics", handlers.ProfileAnalyticsHandler)
 	api.Add("POST", "/profile/information", handlers.ProfileInformationHandler)
 	// Draft Coldmails Ai endpoints.
 	api.Add("POST", "/draft-with-ai", handlers.DraftReferralEmailWithAiHandler)

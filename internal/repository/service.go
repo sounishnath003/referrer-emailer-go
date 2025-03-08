@@ -1,13 +1,15 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // CreateUser handles creating new user.
@@ -192,4 +194,56 @@ func (mc *MongoDBClient) CreateAiDraftEmail(from, to, companyName, templateType,
 	}
 
 	return draftEmail, nil
+}
+
+// GetProfileAnalytics helps to get the analytic query output
+func (mc *MongoDBClient) GetProfileAnalytics(userEmail string) (ProfileAnalytics, error) {
+	ctx, cancel := getContextWithTimeout(10)
+	defer cancel()
+
+	// Time param
+	now := time.Now()
+	last30Days := now.AddDate(0, 0, -30)
+
+	pipeline := mongo.Pipeline{
+		bson.D{{"$match", bson.D{{"userEmailAddress", userEmail}, {"createdAt", bson.D{{"$gte", last30Days}}}}}},
+		bson.D{{"$group", bson.D{
+			{"_id", "$companyName"},
+			{"totalEmails", bson.D{{"$sum", 1}}},                          // Count total emails per company
+			{"distinctUsers", bson.D{{"$addToSet", "$userEmailAddress"}}}, // Collect distinct users
+		}}},
+		bson.D{{"$project", bson.D{
+			{"companyName", "$_id"},
+			{"totalEmails", 1},
+			{"distinctUsersCount", bson.D{{"$size", "$distinctUsers"}}}, // Count distinct users
+			{"_id", 0},
+		}}},
+		bson.D{{"$sort", bson.D{{"totalEmails", -1}}}}, // ✅ Sort by totalEmails DESC
+
+	}
+
+	collection := mc.Database("referrer").Collection("ai_email_drafts")
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return ProfileAnalytics{}, err
+	}
+	defer cursor.Close(context.TODO())
+
+	var companyStats []CompanyEmailAggregate
+	if err = cursor.All(context.TODO(), &companyStats); err != nil {
+		return ProfileAnalytics{}, err
+	}
+
+	// Get total email count in last 30 days
+	countFilter := bson.D{{"userEmailAddress", userEmail}, {"createdAt", bson.D{{"$gte", last30Days}}}}
+	totalCount, err := collection.CountDocuments(ctx, countFilter)
+	if err != nil {
+		return ProfileAnalytics{}, err
+	}
+
+	// Return result in struct format
+	return ProfileAnalytics{
+		TotalEmails: int(totalCount),
+		Companies:   companyStats,
+	}, nil
 }

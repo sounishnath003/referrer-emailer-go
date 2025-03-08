@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // EmailSenderDto hold the DTO for the email sending data payload.
@@ -82,7 +82,7 @@ func GetReferralEmailsHandler(c echo.Context) error {
 	userEmail := c.QueryParam("email")
 	emailUuid := c.QueryParam("uuid")
 
-	if len(userEmail) > 0 && !isValidEmail(userEmail) {
+	if len(userEmail) == 0 || !isValidEmail(userEmail) {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or no email found."))
 	}
 
