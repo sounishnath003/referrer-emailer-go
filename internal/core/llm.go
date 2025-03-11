@@ -152,16 +152,16 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 
 			`, to, companyName, jobUrls, jobDescription, userProfileSummary),
 		),
-		genai.Text(fmt.Sprintf(`
-			You are a highly skilled career coach specializing in crafting effective cold email referrals. Your task is to generate a concise, professional cold email based on the provided job opportunity and candidate profile. Write it in "1st Person Candidate's View". While adding "JOB URLs add in Bullet list" manner.
+		genai.Text(fmt.Sprintf(`		
+			I am a [Your Role] with [Years of Experience] experience in [Industry/Area]. I'm writing to express my interest in [Job Title] at [Company Name]. I found the job posting on [Platform]. Write a cold email to the recruiter [ToEmail]. Highlight my relevant skills and experience and REQUESTING to SCHEDULE AN INTERVIEW!. with STAR method like "Performed X with Y and achieved Z%".
+			
+			Keep it under 200 words. Write it in "1st Person Candidate's View". While adding "JOB URLs add in Bullet list" manner.
 
 			**Specific Requirements:**
 
-			1.  The email must be precisely tailored to the "%s" topic and the skills and requirements mentioned in the job description.
-			2.  The email should highlight the candidate's relevant "Skills and Experience", drawing directly from their "Candidate Profile" in "Bullet points". Keep in mind - "Resume" is be attached in the "EMAIL".
-			3.  Maintain a short, professional tone.
-			4.  Include a candidate signature (Contact Details: (phone, email, linkedin, portfolio, etc), utilizing information from the "Candidate Profile."
-			5.  Format the entire output as "Markdown" format. 
+			1. Use more Bullet Points and Bold Keywords.
+			2.  Include a candidate signature (Contact Details: (phone, email, linkedin, portfolio, etc), utilizing information from the "Candidate Profile."
+			3.  Format the entire output as "Markdown" format. 
 		`, templateType)),
 	)
 
@@ -177,7 +177,7 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 	mailBody := fmt.Sprintf("%v", res.Candidates[0].Content.Parts[0])
 
 	res, err = co.llm.GenerateContent(ctx, genai.Text(mailBody), genai.Text(`
-		[Task]: Given "Referral Cold Email Body" in "HTML" format, targets for Which Type of Job (SWE, Backend Developer, Data Engineering, Data Analyst, etc).
+		[Task]: Given "Referral Cold Email Body" in "HTML" format, targets for Which Type of Job (Software Engineering, Backend Developer, Data Engineering, Data Analyst, etc).
 		Reply In One Word "TYPE OF THE JOB".
 	`))
 	if err != nil {
