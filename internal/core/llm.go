@@ -30,7 +30,7 @@ func (co *Core) initializeLLM() error {
 func (co *Core) ExtractResumeContentLLM(resumePath string) (string, error) {
 	co.Lo.Info("started extracting content", "resume", resumePath)
 
-	ctx, cancel := getContextWithTimeout(10)
+	ctx, cancel := getContextWithTimeout(30)
 	defer cancel()
 
 	part := genai.FileData{
@@ -78,7 +78,7 @@ func (co *Core) ExtractResumeContentLLM(resumePath string) (string, error) {
 // Returns:
 //   - error: An error if the summarization process fails or the AI model returns an empty response.
 func (co *Core) GenerateProfileSummaryLLM(content string) (string, error) {
-	ctx, cancel := getContextWithTimeout(10)
+	ctx, cancel := getContextWithTimeout(30)
 	defer cancel()
 
 	res, err := co.llm.GenerateContent(ctx, genai.Text(content), genai.Text(`
