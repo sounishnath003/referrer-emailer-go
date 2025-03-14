@@ -153,7 +153,7 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 			`, to, companyName, jobUrls, jobDescription, userProfileSummary),
 		),
 		genai.Text(fmt.Sprintf(`		
-			I am a [Your Role] with [Years of Experience] experience in [Industry/Area]. I'm writing to express my interest in [Job Title] at [Company Name]. I found the job posting on [Platform]. Write a cold email to the recruiter [ToEmail]. Highlight my relevant skills and experience and REQUESTING to SCHEDULE AN INTERVIEW!. with STAR method like "Performed X with Y and achieved Z%".
+			Write a cold email to the recruiter [ToEmail]. Highlight my relevant skills and experience and REQUESTING to SCHEDULE AN INTERVIEW!. with STAR method like "Performed X with Y and achieved Z%".
 			
 			Keep it under 200 words. Write it in "1st Person Candidate's View". While adding "JOB URLs add in Bullet list" manner.
 
