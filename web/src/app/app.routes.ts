@@ -23,10 +23,6 @@ export const routes: Routes = [
         loadChildren: async () => (await import('./modules/dashboard/dashboard.module')).DashboardModule
     },
     {
-        path: "craft-resume/:id",
-        component: TailoredResumeViewComponent
-    },
-    {
         path: "**",
         component: Error404Component
     }

@@ -15,8 +15,9 @@ import { AsyncPipe, NgIf } from '@angular/common';
 })
 export class DashboardComponent implements OnInit {
   sentReferrals: BehaviorSubject<ReferralMailbox[]> = new BehaviorSubject<ReferralMailbox[]>([]);
-  constructor(private readonly emailingService: EmailingService) { }
+  showSidebar: boolean = true;
 
+  constructor(private readonly emailingService: EmailingService) { }
 
   ngOnInit(): void {
     this.pollReferralMailbox();
@@ -34,5 +35,9 @@ export class DashboardComponent implements OnInit {
         this.sentReferrals.next(data || []);
       }
     )
+  }
+
+  toggleSidebar() {
+    this.showSidebar = !this.showSidebar;
   }
 }

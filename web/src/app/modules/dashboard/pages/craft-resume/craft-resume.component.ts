@@ -30,7 +30,7 @@ export class CraftResumeComponent {
         next: (res) => {
           this.loading = false;
           if (res.id) {
-            this.router.navigate([`/craft-resume/${res.id}`]);
+            this.router.navigate([`/dashboard/craft-resume/${res.id}`]);
           }
         },
         error: (err) => {
