@@ -4,10 +4,13 @@
             <app-sidebar-view [sentReferrals]="referrals"></app-sidebar-view>
         </div>
     </div>
-    <div class="mx-3">
-        <div class="flex justify-end">
-            <app-menu></app-menu>
+    <div class="mx-3 w-full">
+        <div class="w-full flex justify-center">
+            <div class="w-full max-w-3xl flex flex-row items-center justify-center gap-2 m-0 p-0">
+                <app-menu></app-menu>
+            </div>
         </div>
+
         <div class="flex flex-col items-center justify-center min-h-screen m-auto">
             <router-outlet></router-outlet>
         </div>
