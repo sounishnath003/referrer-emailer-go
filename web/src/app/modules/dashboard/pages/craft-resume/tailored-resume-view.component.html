@@ -21,7 +21,7 @@
         class="w-full p-6 bg-white rounded-lg shadow border border-gray-200 font-mono text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
         placeholder="Edit your resume in Markdown here..."></textarea>
     </div>
-    <div id="resume-pdf-content" class="mx-6 max-w-5xl bg-white rounded-lg prose notion-style shadow leading-relaxed">
+    <div id="resume-pdf-content" class="mx-6 max-w-5xl bg-white rounded-lg prose p-8 shadow leading-relaxed">
       <markdown [data]="editMode ? editableMarkdown : resume.resumeMarkdown"></markdown>
     </div>
   </ng-container>

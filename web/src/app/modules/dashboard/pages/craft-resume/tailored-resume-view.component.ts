@@ -61,14 +61,19 @@ export class TailoredResumeViewComponent implements OnInit {
 
     downloadPDF() {
         const element = document.getElementById('resume-pdf-content');
+        const removeClasses = ['p-8', 'sshadow'];
+
 
         if (element) {
-            html2pdf().from(element).set({
-                margin: 0.1,
+            element.classList.remove(...removeClasses);
+            element.style.fontSize = '9.7px';
+
+            html2pdf().set({
+                margin: 0,
                 filename: 'tailored-resume.pdf',
-                html2canvas: { scale: 0.9 },
+                // html2canvas: { scale: 4 },
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            }).toContainer().save();
+            }).from(element).save();
         }
     }
 } 

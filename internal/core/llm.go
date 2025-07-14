@@ -205,32 +205,29 @@ func (co *Core) TailorResumeWithJobDescriptionLLM(jobDescription, extractedConte
 	defer cancel()
 
 	prompt := genai.Text(`
-[Backstory]: You are an "Expert Resume Writer" and "ATS Optimization Specialist". Your job is to help candidates land interviews by tailoring their resumes to specific job descriptions, maximizing keyword relevance and ATS compatibility.
+You are an expert FAANG resume strategist.
 
-[Task]:
-- Given a "Job Description" and the candidate's "Extracted Resume Content", create a new, highly tailored, 1-page resume.
-- The resume must:
-  1. Start with the candidate's name and contact details (email, phone, LinkedIn, etc).
-  2. Include a "Professional Summary" that directly addresses the core requirements and keywords from the job description.
-  3. Highlight the most relevant skills, work experiences, and projects that match the job requirements.
-  4. Use bullet points, clear section headings, and concise language.
-  5. Omit irrelevant details and focus on what matters for this job.
-  6. Ensure the output is ATS-friendly (no tables, no images, use standard Markdown formatting).
-  7. Keep the resume to a single page (be concise, prioritize relevance).
-  8. Output only the resume in Markdown format—no extra commentary.
+Your task: Given a "Job Description" and "Extracted Resume Content", generate a concise, single-page, ATS-friendly Software Engineer resume in Markdown.
 
-[Important to note]:
-- Extract and use the most important keywords and requirements from the job description.
-- Rephrase and reorganize the candidate's content to maximize alignment with the job.
-- If information is missing, do not invent details—just omit.
-- Use strong action verbs and quantifiable achievements where possible.
-- The final output must be ready to copy-paste as a professional, ATS-optimized resume.
+Requirements:
+- Start with candidate's name as H1 and contact info (email, phone, LinkedIn).
+- Add a brief "Professional Summary" tailored to the job description, using relevant keywords.
+- List grouped skills (Languages, Frameworks, Cloud/DevOps, Tools) as bullet points.
+- Show up to 3 most relevant roles (reverse-chronological), each with 3-5 quantified, action-oriented bullets (STAR/XYZ style).
+- Focus only on content matching the job; omit unrelated details.
+- Use standard Markdown (no tables, no images, no extra commentary).
+- Use present tense for current role, past tense for previous.
+- Each bullet starts with a strong verb and includes metrics where possible.
+- Max 1 page, ≤650 words, highly relevant for SWE roles at FAANG-level companies.
+
+Output only the resume in Markdown, ready to copy-paste.
 `)
 
 	res, err := co.llm.GenerateContent(ctx,
 		genai.Text("[Job Description]:\n"+jobDescription+"\n[Extracted Resume Content]:\n"+extractedContent),
 		prompt,
 	)
+
 	if err != nil {
 		return "", fmt.Errorf("unable to generate tailored resume: %w", err)
 	}
