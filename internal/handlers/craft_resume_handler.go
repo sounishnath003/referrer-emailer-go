@@ -72,3 +72,29 @@ func GetTailoredResumeByIDHandler(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, tr)
 }
+
+// UpdateTailoredResumeHandler updates the resumeMarkdown of a tailored resume by ID
+func UpdateTailoredResumeHandler(c echo.Context) error {
+	hctx := c.(*HandlerContext)
+	type updateDto struct {
+		ID             string `json:"id"`
+		ResumeMarkdown string `json:"resumeMarkdown"`
+	}
+	var req updateDto
+	if err := c.Bind(&req); err != nil {
+		return SendErrorResponse(c, http.StatusBadRequest, err)
+	}
+	if req.ID == "" || req.ResumeMarkdown == "" {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("id and resumeMarkdown are required"))
+	}
+	id, err := primitive.ObjectIDFromHex(req.ID)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid id"))
+	}
+	ctx := context.Background()
+	err = hctx.GetCore().DB.UpdateTailoredResumeMarkdown(ctx, id, req.ResumeMarkdown)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, map[string]any{"success": true})
+}

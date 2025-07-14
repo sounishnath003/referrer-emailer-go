@@ -8,16 +8,21 @@
     <div class="flex justify-between items-center mb-4 px-8 pt-8">
       <h2 class="text-2xl font-bold">Tailored Resume</h2>
       <div class="flex gap-2">
-        <button (click)="toggleEdit()" class="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition">{{ editMode ? 'Preview' : 'Edit' }}</button>
-        <button (click)="downloadPDF()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Download PDF</button>
+        <button (click)="toggleEdit()"
+          class="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition">{{ editMode ? 'Preview' :
+          'Edit' }}</button>
+        <button (click)="downloadPDF()"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Download PDF</button>
       </div>
     </div>
     <div class="text-xs text-gray-400 mb-2 px-8">Created: {{ resume.createdAt | date:'medium' }}</div>
     <div *ngIf="editMode" class="px-8">
-      <textarea [(ngModel)]="editableMarkdown" rows="18" class="w-full p-6 bg-white rounded-lg shadow border border-gray-200 font-mono text-base focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Edit your resume in Markdown here..."></textarea>
+      <textarea [(ngModel)]="editableMarkdown" rows="18"
+        class="w-full p-6 bg-white rounded-lg shadow border border-gray-200 font-mono text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
+        placeholder="Edit your resume in Markdown here..."></textarea>
     </div>
-    <div id="resume-pdf-content" class="px-8 pb-8">
-      <markdown [data]="editMode ? editableMarkdown : resume.resumeMarkdown" class="bg-white p-8 rounded-lg shadow text-lg leading-relaxed notion-style"></markdown>
+    <div id="resume-pdf-content" class="max-w-4xl mx-auto bg-white rounded-lg prose notion-style shadow leading-relaxed">
+      <markdown [data]="editMode ? editableMarkdown : resume.resumeMarkdown"></markdown>
     </div>
   </ng-container>
-</div> 
+</div>

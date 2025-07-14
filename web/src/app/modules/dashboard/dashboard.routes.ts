@@ -31,11 +31,6 @@ export const routes: Routes = [
                 component: CraftResumeComponent
             },
             {
-                path: "craft-resume/:id",
-                pathMatch: "full",
-                component: TailoredResumeViewComponent
-            },
-            {
                 path: "profile/update",
                 pathMatch: "full",
                 component: ProfileComponent

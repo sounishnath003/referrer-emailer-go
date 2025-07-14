@@ -37,3 +37,10 @@ func (mc *MongoDBClient) GetTailoredResumeByID(ctx context.Context, id primitive
 	}
 	return &tr, nil
 }
+
+// UpdateTailoredResumeMarkdown updates the resumeMarkdown of a tailored resume by ID
+func (mc *MongoDBClient) UpdateTailoredResumeMarkdown(ctx context.Context, id primitive.ObjectID, resumeMarkdown string) error {
+	collection := mc.Database("referrer").Collection("tailored_resumes")
+	_, err := collection.UpdateOne(ctx, primitive.M{"_id": id}, primitive.M{"$set": primitive.M{"resumeMarkdown": resumeMarkdown}})
+	return err
+}

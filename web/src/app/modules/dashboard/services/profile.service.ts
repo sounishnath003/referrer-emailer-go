@@ -101,4 +101,11 @@ export class ProfileService {
   getTailoredResumeById$(id: string): Observable<any> {
     return this.httpClient.get<any>(`${this.API_URL}/api/profile/tailored-resume/${id}`);
   }
+
+  updateTailoredResumeMarkdown$(id: string, resumeMarkdown: string) {
+    return this.httpClient.patch<{ success: boolean }>(
+      `${this.API_URL}/api/profile/tailored-resume`,
+      { id, resumeMarkdown }
+    );
+  }
 }

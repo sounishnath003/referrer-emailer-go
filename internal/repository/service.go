@@ -234,7 +234,7 @@ func (mc *MongoDBClient) GetProfileAnalytics(userEmail string) (ProfileAnalytics
 	}
 
 	// Get total email count in last 30 days
-	countFilter := bson.D{{"userEmailAddress", userEmail}, {"createdAt", bson.D{{"$gte", last30Days}}}}
+	countFilter := bson.D{{Key: "userEmailAddress", Value: userEmail}, {"createdAt", bson.D{{"$gte", last30Days}}}}
 	totalCount, err := collection.CountDocuments(ctx, countFilter)
 	if err != nil {
 		return ProfileAnalytics{}, err
