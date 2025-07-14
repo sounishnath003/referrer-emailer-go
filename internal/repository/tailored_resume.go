@@ -29,7 +29,7 @@ func (mc *MongoDBClient) CreateTailoredResume(ctx context.Context, tr *TailoredR
 
 // GetTailoredResumeByID fetches a tailored resume by its ID
 func (mc *MongoDBClient) GetTailoredResumeByID(ctx context.Context, id primitive.ObjectID) (*TailoredResume, error) {
-	collection := mc.Database("referrer").Collection("tailored-resume")
+	collection := mc.Database("referrer").Collection("tailored_resumes")
 	var tr TailoredResume
 	err := collection.FindOne(ctx, primitive.M{"_id": id}).Decode(&tr)
 	if err != nil {

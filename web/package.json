@@ -18,6 +18,7 @@
     "@angular/platform-browser": "^19.1.5",
     "@angular/platform-browser-dynamic": "^19.1.5",
     "@angular/router": "^19.1.5",
+    "html2pdf.js": "^0.10.3",
     "ngx-editor": "^18.0.0",
     "ngx-markdown": "^19.1.0",
     "rxjs": "~7.8.0",

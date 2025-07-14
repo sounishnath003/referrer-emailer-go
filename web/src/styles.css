@@ -16,3 +16,30 @@ html,
     font-variation-settings:
         "wdth" 100;
 }
+
+.notion-style {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.notion-style h1,
+.notion-style h2,
+.notion-style h3 {
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.notion-style ul,
+.notion-style ol {
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.notion-style p {
+    margin-bottom: 1rem;
+}
