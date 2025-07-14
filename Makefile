@@ -7,7 +7,7 @@ install:
 
 .PHONY: build
 build:
-	CGO_ENABLED=0 GO_ARCH=amd64 go build -o ./tmp/main ./cmd/*.go
+	CGO_ENABLED=0 GO_ARCH=amd64 go build -ldflags "-s -w" -o ./tmp/main ./cmd/*.go
 
 .PHONY: run
 run: build
@@ -25,7 +25,7 @@ all: build
 .PHONY: compose-up
 compose-up:
 	docker-compose down
-	docker rmi referrer-emailer
+	# docker rmi referrer-emailer
 	docker-compose up --build
 
 .PHONY: docker-build

@@ -88,4 +88,17 @@ export class ProfileService {
     headers.append("Content-Type", "application/json");
     return this.httpClient.get<ProfileAnalytics>(`${this.API_URL}/api/profile/analytics?email=${userEmail}`, { headers });
   }
+
+  tailorResumeWithJobDescription$(jobDescription: string, userEmail: string): Observable<{ id: string }> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.httpClient.post<{ id: string }>(
+      `${this.API_URL}/api/profile/tailor-resume`,
+      { jobDescription, userEmail },
+      { headers }
+    );
+  }
+
+  getTailoredResumeById$(id: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.API_URL}/api/profile/tailored-resume/${id}`);
+  }
 }

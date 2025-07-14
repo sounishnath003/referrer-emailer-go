@@ -88,6 +88,9 @@ func (s *Server) Start() error {
 	api.Add("GET", "/profile", handlers.GetProfileHandler)
 	api.Add("GET", "/profile/analytics", handlers.ProfileAnalyticsHandler)
 	api.Add("POST", "/profile/information", handlers.ProfileInformationHandler)
+	// Tailor Resume endpoint
+	api.Add("POST", "/profile/tailor-resume", handlers.TailorResumeWithJobDescriptionHandler)
+	api.Add("GET", "/profile/tailored-resume/:id", handlers.GetTailoredResumeByIDHandler)
 	// Draft Coldmails Ai endpoints.
 	api.Add("POST", "/draft-with-ai", handlers.DraftReferralEmailWithAiHandler)
 	// Email endpoints.

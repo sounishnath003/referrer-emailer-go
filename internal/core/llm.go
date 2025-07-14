@@ -198,3 +198,47 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 
 	return mailSubject, mailBody, nil
 }
+
+// TailorResumeWithJobDescriptionLLM generates a tailored, ATS-friendly resume in Markdown format using the job description and user's extracted content.
+func (co *Core) TailorResumeWithJobDescriptionLLM(jobDescription, extractedContent string) (string, error) {
+	ctx, cancel := getContextWithTimeout(30)
+	defer cancel()
+
+	prompt := genai.Text(`
+[Backstory]: You are an "Expert Resume Writer" and "ATS Optimization Specialist". Your job is to help candidates land interviews by tailoring their resumes to specific job descriptions, maximizing keyword relevance and ATS compatibility.
+
+[Task]:
+- Given a "Job Description" and the candidate's "Extracted Resume Content", create a new, highly tailored, 1-page resume.
+- The resume must:
+  1. Start with the candidate's name and contact details (email, phone, LinkedIn, etc).
+  2. Include a "Professional Summary" that directly addresses the core requirements and keywords from the job description.
+  3. Highlight the most relevant skills, work experiences, and projects that match the job requirements.
+  4. Use bullet points, clear section headings, and concise language.
+  5. Omit irrelevant details and focus on what matters for this job.
+  6. Ensure the output is ATS-friendly (no tables, no images, use standard Markdown formatting).
+  7. Keep the resume to a single page (be concise, prioritize relevance).
+  8. Output only the resume in Markdown format—no extra commentary.
+
+[Important to note]:
+- Extract and use the most important keywords and requirements from the job description.
+- Rephrase and reorganize the candidate's content to maximize alignment with the job.
+- If information is missing, do not invent details—just omit.
+- Use strong action verbs and quantifiable achievements where possible.
+- The final output must be ready to copy-paste as a professional, ATS-optimized resume.
+`)
+
+	res, err := co.llm.GenerateContent(ctx,
+		genai.Text("[Job Description]:\n"+jobDescription+"\n[Extracted Resume Content]:\n"+extractedContent),
+		prompt,
+	)
+	if err != nil {
+		return "", fmt.Errorf("unable to generate tailored resume: %w", err)
+	}
+
+	if len(res.Candidates) == 0 || len(res.Candidates[0].Content.Parts) == 0 {
+		return "", errors.New("empty response from model")
+	}
+
+	llmContent := fmt.Sprintf("%v", res.Candidates[0].Content.Parts[0])
+	return llmContent, nil
+}

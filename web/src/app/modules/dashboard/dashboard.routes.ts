@@ -7,6 +7,8 @@ import { ResumeViewComponent } from './pages/resume-view/resume-view.component';
 import { SentReferralsComponent } from './pages/sent-referrals/sent-referrals.component';
 import { DraftWithAiComponent } from './pages/draft-with-ai/draft-with-ai.component';
 import { ProfileAnalyticsComponent } from './pages/profile-analytics/profile-analytics.component';
+import { CraftResumeComponent } from './pages/craft-resume/craft-resume.component';
+import { TailoredResumeViewComponent } from './pages/craft-resume/tailored-resume-view.component';
 
 export const routes: Routes = [
     {
@@ -22,6 +24,16 @@ export const routes: Routes = [
                 path: "email-drafter",
                 pathMatch: "full",
                 component: EmailDrafterComponent
+            },
+            {
+                path: "craft-resume",
+                pathMatch: "full",
+                component: CraftResumeComponent
+            },
+            {
+                path: "craft-resume/:id",
+                pathMatch: "full",
+                component: TailoredResumeViewComponent
             },
             {
                 path: "profile/update",
