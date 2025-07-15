@@ -205,22 +205,22 @@ func (co *Core) TailorResumeWithJobDescriptionLLM(jobDescription, extractedConte
 	defer cancel()
 
 	prompt := genai.Text(`
+[Backstory]:
 You are an expert FAANG resume strategist.
 
-Your task: Given a "Job Description" and "Extracted Resume Content", generate a concise, single-page, ATS-friendly Software Engineer resume in Markdown.
+[Task]: Given a "Job Description" and "Extracted Resume Content", generate a concise, single-page, ATS-friendly Software Engineer resume in Markdown.
 
-Requirements:
+[Requirements]:
 - Start with candidate's name as H1 and contact info (email, phone, LinkedIn).
 - Add a brief "Professional Summary" tailored to the job description, using relevant keywords.
 - List grouped skills (Languages, Frameworks, Cloud/DevOps, Tools) as bullet points.
 - Show up to 3 most relevant roles (reverse-chronological), each with 3-5 quantified, action-oriented bullets (STAR/XYZ style).
+- Select and include up to 2 personal projects that are most relevant to the job description. For each, paraphrase the project description and impact to closely align with the job requirements and keywords. Present each project with a title and 2-3 concise, action-oriented bullet points, emphasizing technologies, outcomes, and relevance to the target role.
 - Focus only on content matching the job; omit unrelated details.
 - Use standard Markdown (no tables, no images, no extra commentary).
 - Use present tense for current role, past tense for previous.
 - Each bullet starts with a strong verb and includes metrics where possible.
 - Max 1 page, ≤650 words, highly relevant for SWE roles at FAANG-level companies.
-
-Output only the resume in Markdown, ready to copy-paste.
 `)
 
 	res, err := co.llm.GenerateContent(ctx,

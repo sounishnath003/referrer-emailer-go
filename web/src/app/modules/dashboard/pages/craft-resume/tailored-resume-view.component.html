@@ -11,8 +11,8 @@
         <button (click)="toggleEdit()"
           class="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition">{{ editMode ? 'Preview' :
           'Edit' }}</button>
-        <button (click)="downloadPDF()"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Download PDF</button>
+        <button (click)="downloadPDF()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">{{
+          downloadLoading ? 'Processing...' : 'Download PDF' }}</button>
       </div>
     </div>
     <div class="text-xs text-gray-400 mb-2 px-8">Created: {{ resume.createdAt | date:'medium' }}</div>

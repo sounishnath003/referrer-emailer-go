@@ -3,7 +3,10 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
@@ -97,4 +100,41 @@ func UpdateTailoredResumeHandler(c echo.Context) error {
 		return SendErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	return c.JSON(http.StatusOK, map[string]any{"success": true})
+}
+
+// Generate the PDF using NodeJS Puppeteer service
+func GeneratePDFHandler(c echo.Context) error {
+	// Http client with 10 second time out
+	client := &http.Client{Timeout: 10 * time.Second}
+	// Take out the resumeContent from JSON request body
+	var reqBody struct {
+		ResumeContent string `json:"resumeContent"`
+	}
+	if err := c.Bind(&reqBody); err != nil {
+		return SendErrorResponse(c, http.StatusBadRequest, err)
+	}
+	// NOTE: The PDF service expects HTML in the body as plain text
+	req, err := http.NewRequest(http.MethodPost, "http://0.0.0.0:3001/generate-pdf", strings.NewReader(reqBody.ResumeContent))
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "text/plain")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("[Failed]: PDF Service returned status: %s", resp.Status)
+	}
+
+	// Read the PDF buffer
+	pdfData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return c.Blob(http.StatusOK, "application/pdf", pdfData)
 }

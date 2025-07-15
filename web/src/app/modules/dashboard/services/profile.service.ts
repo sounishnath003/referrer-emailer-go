@@ -108,4 +108,8 @@ export class ProfileService {
       { id, resumeMarkdown }
     );
   }
+
+  downloadResumeAsPDF$(parsedResumeContent: string): Observable<Blob> {
+    return this.httpClient.post<Blob>(`${this.API_URL}/api/profile/export-pdf`, { resumeContent: parsedResumeContent }, { responseType: 'blob' as any })
+  }
 }

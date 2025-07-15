@@ -4,7 +4,6 @@ import { ProfileService } from '../../services/profile.service';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgIf, DatePipe, } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import jsPDF from 'jspdf';
 import { marked } from 'marked';
 
 @Component({
@@ -16,6 +15,7 @@ import { marked } from 'marked';
 export class TailoredResumeViewComponent implements OnInit {
     resume: any = null;
     loading = true;
+    downloadLoading = false;
     error: string | null = null;
     editMode = false;
     editableMarkdown = '';
@@ -60,42 +60,28 @@ export class TailoredResumeViewComponent implements OnInit {
         }
     }
 
-    /**
-     * Download the resume as a PDF, preserving the on-screen Tailwind/CSS styling.
-     * This method captures the actual rendered HTML (with all styles applied) and converts it to PDF.
-     * It uses html2pdf.js, which leverages html2canvas and jsPDF under the hood.
-     * 
-     * Note: html2pdf.js must be installed and available (npm install html2pdf.js).
-     * If using Angular, you may need to import it dynamically to avoid SSR/build issues.
-     */
-    async downloadPDF() {
-        // Dynamically import html2pdf.js to avoid SSR/build issues
-        const html2pdf = (await import('html2pdf.js')).default;
-
+    downloadPDF() {
         // Get the actual rendered resume content (with Tailwind/CSS applied)
-        const element = document.getElementById('resume-pdf-content');
+        this.downloadLoading = true;
+        const element = marked(this.resume.resumeMarkdown, { async: false, });
         if (!element) {
-            this.error = 'Resume content not found for PDF export.';
+            this.error = 'Please try again!';
+            this.downloadLoading = false;
             return;
         }
 
-        // Optional: temporarily remove box-shadow or adjust styles for PDF clarity
-        element.classList.remove('p-8');
-        element.classList.add('print-pdf', 'p-2');
-        element.style.fontSize = '12px';
-
-        // Configure PDF options for resume look (Letter, margins, scale, etc)
-        const opt = {
-            margin: 0,
-            filename: 'tailored-resume.pdf',
-            html2canvas: { scale: 5, useCORS: true, backgroundColor: '#fff' },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        // Use html2pdf to generate and save the PDF
-        html2pdf().set(opt).from(element).save().finally(() => {
-            element.classList.remove('print-pdf');
-        });
+        this.profileService.downloadResumeAsPDF$(element).subscribe({
+            next: (blob) => {
+                this.downloadLoading = false;
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'resume.pdf';
+                link.click();
+            },
+            error: (err) => {
+                this.error = err.error?.error || 'Failed to download resume as pdf.';
+            }
+        })
     }
 }
