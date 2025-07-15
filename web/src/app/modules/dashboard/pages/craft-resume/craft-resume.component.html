@@ -4,11 +4,11 @@
     <form (ngSubmit)="tailorResume(userEmailInput.value)" class="flex flex-col gap-4">
         <label for="jobDescription" class="font-semibold text-gray-700">Paste Job Description:</label>
         <textarea id="jobDescription" [(ngModel)]="jobDescription" name="jobDescription" rows="8" required
-            maxlength="2000"
+            maxlength="6000"
             class="w-full min-h-[120px] p-3 rounded-md border border-gray-300 text-base resize-vertical focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
         <div class="text-sm text-right"
-            [ngClass]="{'text-red-600 font-semibold': jobDescription.length >= 2000, 'text-gray-500': jobDescription.length < 2000}">
-            {{ jobDescription.length }}/2000
+            [ngClass]="{'text-red-600 font-semibold': jobDescription.length >= 6000, 'text-gray-500': jobDescription.length < 6000}">
+            {{ jobDescription.length }}/6000
         </div>
         <label for="userEmail" class="font-semibold text-gray-700">Your Email:</label>
         <input id="userEmail" #userEmailInput type="email" required placeholder="Enter your email"

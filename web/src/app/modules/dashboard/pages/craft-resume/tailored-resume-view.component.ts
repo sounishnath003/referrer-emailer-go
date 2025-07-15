@@ -81,14 +81,14 @@ export class TailoredResumeViewComponent implements OnInit {
 
         // Optional: temporarily remove box-shadow or adjust styles for PDF clarity
         element.classList.remove('p-8');
-        element.classList.add('print-pdf');
+        element.classList.add('print-pdf', 'p-2');
         element.style.fontSize = '12px';
 
         // Configure PDF options for resume look (Letter, margins, scale, etc)
         const opt = {
             margin: 0,
             filename: 'tailored-resume.pdf',
-            html2canvas: { scale: 4, useCORS: true, backgroundColor: '#fff' },
+            html2canvas: { scale: 5, useCORS: true, backgroundColor: '#fff' },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
             pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
