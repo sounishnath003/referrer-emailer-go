@@ -39,6 +39,19 @@ services:
       GOOGLE_APPLICATION_CREDENTIALS: /google-sa-credentials.json
     volumes:
       - /Users/sounishnath/sounish-cloud-workstation-ac143dfffa26.json:/google-sa-credentials.json
+  
+  # pdf-puppeter-service:
+  #   image: pdf-puppeter-service:latest
+  #   restart: always
+  #   build:
+  #     context: pdf-service
+  #     dockerfile: Dockerfile
+  #   # ports:
+  #   #   - 3001:3001
+  #   environment:
+  #     GOOGLE_APPLICATION_CREDENTIALS: /google-sa-credentials.json
+  #   volumes:
+  #     - /Users/sounishnath/sounish-cloud-workstation-ac143dfffa26.json:/google-sa-credentials.json
 
 networks:
   referrer-mailer-subnet:

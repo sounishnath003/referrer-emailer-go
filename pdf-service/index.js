@@ -30,7 +30,6 @@ app.post('/generate-pdf', async (req, res) => {
             format: 'Letter',
             printBackground: true,
             displayHeaderFooter: true,
-            // margin: { top: '1in', bottom: '1in', left: '1in', right: '1in' },
             margin: { top: '0.12in', bottom: '0.12in', left: '0.15in', right: '0.15in' }
         });
 
