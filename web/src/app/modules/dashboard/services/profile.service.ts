@@ -112,4 +112,12 @@ export class ProfileService {
   downloadResumeAsPDF$(parsedResumeContent: string): Observable<Blob> {
     return this.httpClient.post<Blob>(`${this.API_URL}/api/profile/export-pdf`, { resumeContent: parsedResumeContent }, { responseType: 'blob' as any })
   }
+
+  getLatestTailoredResumes$(userEmail: string, companyName?: string) {
+    let url = `${this.API_URL}/api/profile/tailored-resumes?email=${userEmail}`;
+    if (companyName && companyName.trim().length > 0) {
+      url += `&companyName=${encodeURIComponent(companyName.trim())}`;
+    }
+    return this.httpClient.get<any[]>(url);
+  }
 }

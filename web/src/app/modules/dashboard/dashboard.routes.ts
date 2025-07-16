@@ -9,6 +9,7 @@ import { DraftWithAiComponent } from './pages/draft-with-ai/draft-with-ai.compon
 import { ProfileAnalyticsComponent } from './pages/profile-analytics/profile-analytics.component';
 import { CraftResumeComponent } from './pages/craft-resume/craft-resume.component';
 import { TailoredResumeViewComponent } from './pages/craft-resume/tailored-resume-view.component';
+import { TailoredResumeListComponent } from './pages/craft-resume/tailored-resume-list.component';
 
 export const routes: Routes = [
     {
@@ -34,6 +35,11 @@ export const routes: Routes = [
                 path: "craft-resume/:id",
                 pathMatch: "full",
                 component: TailoredResumeViewComponent
+            },
+            {
+                path: "craft-resume-list",
+                pathMatch: "full",
+                component: TailoredResumeListComponent
             },
             {
                 path: "profile/update",

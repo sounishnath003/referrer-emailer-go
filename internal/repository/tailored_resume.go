@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type TailoredResume struct {
@@ -45,4 +46,33 @@ func (mc *MongoDBClient) UpdateTailoredResumeMarkdown(ctx context.Context, id pr
 	collection := mc.Database("referrer").Collection("tailored_resumes")
 	_, err := collection.UpdateOne(ctx, primitive.M{"_id": id}, primitive.M{"$set": primitive.M{"resumeMarkdown": resumeMarkdown}})
 	return err
+}
+
+// GetLatestTailoredResumesByUser fetches the latest 10 tailored resumes for a user by userId, optionally filtered by companyName
+func (mc *MongoDBClient) GetLatestTailoredResumesByUser(ctx context.Context, userId string, companyName string) ([]*TailoredResume, error) {
+	collection := mc.Database("referrer").Collection("tailored_resumes")
+	filter := primitive.M{"userId": userId}
+	if companyName != "" {
+		filter["companyName"] = primitive.M{"$regex": companyName, "$options": "i"}
+	}
+	findOptions := options.Find().SetSort(primitive.M{"createdAt": -1}).SetLimit(10)
+
+	cursor, err := collection.Find(ctx, filter, findOptions)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var resumes []*TailoredResume
+	for cursor.Next(ctx) {
+		var tr TailoredResume
+		if err := cursor.Decode(&tr); err != nil {
+			return nil, err
+		}
+		resumes = append(resumes, &tr)
+	}
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+	return resumes, nil
 }

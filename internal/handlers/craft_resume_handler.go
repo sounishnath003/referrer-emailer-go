@@ -142,3 +142,23 @@ func GeneratePDFHandler(c echo.Context) error {
 
 	return c.Blob(http.StatusOK, "application/pdf", pdfData)
 }
+
+// GetLatestTailoredResumesHandler fetches the latest 10 tailored resumes for a user by email
+func GetLatestTailoredResumesHandler(c echo.Context) error {
+	hctx := c.(*HandlerContext)
+	email := c.QueryParam("email")
+	companyName := c.QueryParam("companyName")
+	if email == "" {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("missing email parameter"))
+	}
+	u, err := hctx.GetCore().DB.GetProfileByEmail(email)
+	if err != nil || u == nil {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("unable to fetch user: %w", err))
+	}
+	ctx := context.Background()
+	resumes, err := hctx.GetCore().DB.GetLatestTailoredResumesByUser(ctx, u.ID.Hex(), companyName)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, resumes)
+}

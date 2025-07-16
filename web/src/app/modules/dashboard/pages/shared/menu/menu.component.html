@@ -1,12 +1,12 @@
-<div class="my-2 min-w-full flex flex-col sm:flex-row gap-2 sm:gap-4 items-center sm:items-center">
+<div class="w-full flex flex-row items-center">
     <ng-container *ngFor="let item of [
         { label: 'Home', link: '/dashboard', queryParams: null },
         { label: 'Preview Resume', link: 'profile/resume', queryParams: null },
         { label: 'Profile Analytics', link: 'profile/analytics', queryParams: null },
         { label: 'Update Profile', link: 'profile/update', queryParams: {email: 'flock.sinasini@gmail.com'} },
-
+        { label: 'Tailored Resumes', link: 'craft-resume-list', queryParams: null },
     ]">
-        <a class="items-center text font-sans text-blue-700 hover:bg-blue-50 px-4 py-1 rounded-lg transition"
+        <a class="text-md text-center font-sans text-blue-700 hover:bg-blue-50 mx-5 py-3 rounded-none transition"
             [routerLink]="item.link" [queryParams]="item.queryParams">
             &bull; <span>{{ item.label }}</span>
         </a>
