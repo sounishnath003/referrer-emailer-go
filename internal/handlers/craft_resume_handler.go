@@ -20,13 +20,15 @@ func TailorResumeWithJobDescriptionHandler(c echo.Context) error {
 	type requestDto struct {
 		JobDescription string `json:"jobDescription"`
 		UserEmail      string `json:"userEmail"`
+		CompanyName    string `json:"companyName"`
+		JobRole        string `json:"jobRole"`
 	}
 	var req requestDto
 	if err := c.Bind(&req); err != nil {
 		return SendErrorResponse(c, http.StatusBadRequest, err)
 	}
-	if len(req.JobDescription) == 0 || len(req.UserEmail) == 0 {
-		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("jobDescription and userEmail are required"))
+	if len(req.JobDescription) == 0 || len(req.UserEmail) == 0 || len(req.CompanyName) == 0 || len(req.JobRole) == 0 {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("jobDescription, userEmail, companyName, and jobRole are required"))
 	}
 
 	u, err := hctx.GetCore().DB.GetProfileByEmail(req.UserEmail)
@@ -37,7 +39,7 @@ func TailorResumeWithJobDescriptionHandler(c echo.Context) error {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("user has no extracted resume content"))
 	}
 
-	resumeMarkdown, err := hctx.GetCore().TailorResumeWithJobDescriptionLLM(req.JobDescription, u.ExtractedContent)
+	resumeMarkdown, err := hctx.GetCore().TailorResumeWithJobDescriptionLLM(req.JobDescription, u.ExtractedContent, req.CompanyName, req.JobRole)
 	if err != nil {
 		return SendErrorResponse(c, http.StatusInternalServerError, err)
 	}
@@ -47,6 +49,8 @@ func TailorResumeWithJobDescriptionHandler(c echo.Context) error {
 		UserID:         u.ID.Hex(),
 		JobDescription: req.JobDescription,
 		ResumeMarkdown: resumeMarkdown,
+		CompanyName:    req.CompanyName,
+		JobRole:        req.JobRole,
 	}
 	ctx := context.Background()
 	insertedID, err := hctx.GetCore().DB.CreateTailoredResume(ctx, tr)

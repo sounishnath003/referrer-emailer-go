@@ -18,6 +18,8 @@ export class CraftResumeComponent {
   resumeMarkdown: string | null = null;
   loading = false;
   error: string | null = null;
+  companyName = '';
+  jobRole = '';
 
   constructor(private profileService: ProfileService, private router: Router) { }
 
@@ -25,7 +27,7 @@ export class CraftResumeComponent {
     this.loading = true;
     this.error = null;
     this.resumeMarkdown = null;
-    this.profileService.tailorResumeWithJobDescription$(this.jobDescription, userEmail)
+    this.profileService.tailorResumeWithJobDescription$(this.jobDescription, userEmail, this.companyName, this.jobRole)
       .subscribe({
         next: (res) => {
           this.loading = false;

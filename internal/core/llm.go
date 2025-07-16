@@ -199,8 +199,8 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 	return mailSubject, mailBody, nil
 }
 
-// TailorResumeWithJobDescriptionLLM generates a tailored, ATS-friendly resume in Markdown format using the job description and user's extracted content.
-func (co *Core) TailorResumeWithJobDescriptionLLM(jobDescription, extractedContent string) (string, error) {
+// TailorResumeWithJobDescriptionLLM generates a tailored, ATS-friendly resume in Markdown format using the job description, user's extracted content, company name, and job role.
+func (co *Core) TailorResumeWithJobDescriptionLLM(jobDescription, extractedContent, companyName, jobRole string) (string, error) {
 	ctx, cancel := getContextWithTimeout(30)
 	defer cancel()
 
@@ -208,23 +208,25 @@ func (co *Core) TailorResumeWithJobDescriptionLLM(jobDescription, extractedConte
 [Backstory]:
 You are an expert FAANG resume strategist.
 
-[Task]: Given a "Job Description" and "Extracted Resume Content", generate a concise, single-page, ATS-friendly Software Engineer resume in Markdown.
+[Task]: Given a "Job Description", "Company Name", "Job Role", and "Extracted Resume Content", generate a concise, single-page, ATS-friendly Software Engineer resume in Markdown.
 
 [Requirements]:
 - Start with candidate's name as H1 and contact info (email, phone, LinkedIn).
-- Add a brief "Professional Summary" tailored to the job description, using relevant keywords.
+- Add a brief "Professional Summary" tailored to the job description, company, and job role, using relevant keywords.
 - List grouped skills (Languages, Frameworks, Cloud/DevOps, Tools) as bullet points.
 - Show up to 3 most relevant roles (reverse-chronological), each with 3-5 quantified, action-oriented bullets (STAR/XYZ style).
-- Select and include up to 2 personal projects that are most relevant to the job description. For each, paraphrase the project description and impact to closely align with the job requirements and keywords. Present each project with a title and 2-3 concise, action-oriented bullet points, emphasizing technologies, outcomes, and relevance to the target role.
-- Focus only on content matching the job; omit unrelated details.
+- Select and include up to 2 personal projects that are most relevant to the job description and company. For each, paraphrase the project description and impact to closely align with the job requirements, company, and keywords. Present each project with a title and 2-3 concise, action-oriented bullet points, emphasizing technologies, outcomes, and relevance to the target role and company.
+- Focus only on content matching the job, company, and role; omit unrelated details.
 - Use standard Markdown (no tables, no images, no extra commentary).
 - Use present tense for current role, past tense for previous.
 - Each bullet starts with a strong verb and includes metrics where possible.
 - Max 1 page, ≤650 words, highly relevant for SWE roles at FAANG-level companies.
 `)
 
+	input := "[Job Description]:\n" + jobDescription + "\n[Company Name]:\n" + companyName + "\n[Job Role]:\n" + jobRole + "\n[Extracted Resume Content]:\n" + extractedContent
+
 	res, err := co.llm.GenerateContent(ctx,
-		genai.Text("[Job Description]:\n"+jobDescription+"\n[Extracted Resume Content]:\n"+extractedContent),
+		genai.Text(input),
 		prompt,
 	)
 

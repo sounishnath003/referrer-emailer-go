@@ -17,8 +17,13 @@ run: build
 web:
 	cd web && npm start
 
+.PHONY: pdf-service
+pdf-service:
+	cd pdf-service && npm run dev
+
 .PHONY: all
 all: build
+	cd pdf-service && npm run dev &
 	source .env && make run &
 	cd web && npm start
 

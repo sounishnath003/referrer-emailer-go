@@ -12,6 +12,8 @@ type TailoredResume struct {
 	UserID         string             `bson:"userId" json:"userId"`
 	JobDescription string             `bson:"jobDescription" json:"jobDescription"`
 	ResumeMarkdown string             `bson:"resumeMarkdown" json:"resumeMarkdown"`
+	CompanyName    string             `bson:"companyName" json:"companyName"`
+	JobRole        string             `bson:"jobRole" json:"jobRole"`
 	CreatedAt      time.Time          `bson:"createdAt" json:"createdAt"`
 	// Add more metadata fields as needed
 }
