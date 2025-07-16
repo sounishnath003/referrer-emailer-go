@@ -15,6 +15,26 @@ app.post('/generate-pdf', async (req, res) => {
         return res.status(400).send('Missing HTML content');
     }
 
+    const updatedStyledResumeHtml = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sounish Naths Resume</title>
+    </head>
+    <body>
+        <style>
+            *, body {
+                font-size: 11.3pt;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            }
+            h1 { margin-block: 0.83em; font-size: 1.50em; }
+        </style>
+        ${html}
+    </body>
+    </html>`;
+
     try {
         console.log(`[${new Date().toISOString()}] Launching Puppeteer browser`);
         const browser = await puppeteer.launch({
@@ -23,7 +43,7 @@ app.post('/generate-pdf', async (req, res) => {
         });
         const page = await browser.newPage();
         console.log(`[${new Date().toISOString()}] Setting page content`);
-        await page.setContent(html, { waitUntil: 'networkidle0' });
+        await page.setContent(updatedStyledResumeHtml, { waitUntil: 'networkidle0' });
 
         console.log(`[${new Date().toISOString()}] Generating PDF`);
         const pdfBuffer = await page.pdf({
