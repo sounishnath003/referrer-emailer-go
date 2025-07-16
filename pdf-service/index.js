@@ -26,7 +26,7 @@ app.post('/generate-pdf', async (req, res) => {
     <body>
         <style>
             *, body {
-                font-size: 11.3pt;
+                font-size: 11.1pt;
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             }
             h1 { margin-block: 0.83em; font-size: 1.50em; }
