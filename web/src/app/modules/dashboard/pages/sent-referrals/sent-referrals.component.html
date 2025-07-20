@@ -18,7 +18,7 @@
         <div class="text-sm">Mail sent: <span class="text-indigo-700 font-semibold">{{ item.createdAt | date : 'dd MMMM,
                 YYYY' }}</span>
         </div>
-        <div class="min-w-full p-3 rounded-lg prose bg-gray-50" [innerHTML]="item.body">
+        <div class="min-w-full bg-white prose py-3 leading-relaxed" [innerHTML]="item.body">
         </div>
     </div>
     }

@@ -3,14 +3,16 @@
 <div class="max-w-2xl mx-auto mt-8 p-8 bg-white rounded-xl shadow-lg">
     <form (ngSubmit)="tailorResume(userEmailInput.value)" class="flex flex-col gap-4">
         <label for="companyName" class="font-semibold text-gray-700">Company Name:</label>
-        <input id="companyName" [(ngModel)]="companyName" name="companyName" type="text" required
-            placeholder="Enter company name"
+        <input aria-autocomplete="none" autocomplete="off" id="companyName" [(ngModel)]="companyName" name="companyName"
+            type="text" required placeholder="Enter company name"
             class="w-full p-2 rounded-md border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
         <label for="jobRole" class="font-semibold text-gray-700">Job Role:</label>
-        <input id="jobRole" [(ngModel)]="jobRole" name="jobRole" type="text" required placeholder="Enter job role/title"
+        <input aria-autocomplete="none" autocomplete="off" id="jobRole" [(ngModel)]="jobRole" name="jobRole" type="text"
+            required placeholder="Enter job role/title"
             class="w-full p-2 rounded-md border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
         <label for="userEmail" class="font-semibold text-gray-700">Your Email:</label>
-        <input id="userEmail" #userEmailInput type="email" required placeholder="Enter your email"
+        <input aria-autocomplete="none" autocomplete="off" id="userEmail" #userEmailInput type="email" required
+            placeholder="Enter your email"
             class="w-full p-2 rounded-md border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
 
         <label for="jobDescription" class="font-semibold text-gray-700">Paste Job Description:</label>
