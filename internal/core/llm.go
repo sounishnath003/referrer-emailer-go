@@ -215,7 +215,10 @@ You are an expert FAANG resume strategist.
 [Task]: Given a "Job Description", "Company Name", "Job Role", and "Extracted Resume Content", generate a concise, single-page, ATS-friendly Software Engineer resume in Markdown.
 
 [Requirements]:
-- Start with candidate's name as H1 and contact info (email, phone, LinkedIn).
+- Start with candidate's name as H1 and contact info (email, phone, LinkedIn, GitHub).
+- The LinkedIn in the contact info MUST be a Markdown hyperlink with the full https URL, using the format: [complete.url](https://complete.url). Do NOT just write the URL or plain text; strictly use the Markdown hyperlink format.
+- Add GitHub in the contact info MUST be a Markdown hyperlink with the full https URL, using the format: [github.com/sounishnath003](https://github.com/sounishnath003). Do NOT just write the URL or plain text; strictly use the Markdown hyperlink format.
+- Email Address, LinkedIn, GitHub and Contact Number, must be in single Line. Separated by '|'.
 - Add a brief "Professional Summary" tailored to the job description, company, and job role, using relevant keywords.
 - List grouped skills (Languages, Frameworks, Cloud/DevOps, Tools) as bullet points.
 - Show up to 3 most relevant roles (reverse-chronological), each with 3-5 quantified, action-oriented bullets (STAR/XYZ style).
