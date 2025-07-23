@@ -196,6 +196,10 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 	// Store the draft into DB
 	_, err = co.DB.CreateAiDraftEmail(from, to, companyName, templateType, jobDescription, userProfileSummary, mailSubject, mailSubject, jobUrls)
 
+	if err != nil {
+		return "", "", err
+	}
+
 	return mailSubject, mailBody, nil
 }
 
@@ -228,6 +232,7 @@ You are an expert FAANG resume strategist.
 	res, err := co.llm.GenerateContent(ctx,
 		genai.Text(input),
 		prompt,
+		genai.Text("\n\nNote: Remove and Replace any Repeatative action verbs/words, Always Use unique action verbsin the Work experiences or Project sections."),
 	)
 
 	if err != nil {
