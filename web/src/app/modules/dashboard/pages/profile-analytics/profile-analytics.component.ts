@@ -1,8 +1,19 @@
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ProfileAnalytics, ProfileService } from '../../services/profile.service';
+import { ProfileService } from '../../services/profile.service';
 import { catchError, Observable, of } from 'rxjs';
 import { SubheroComponent } from "../shared/subhero/subhero.component";
+
+export interface ProfileAnalytics {
+  totalEmails: number;
+  companies: Array<{
+    companyName: string;
+    totalEmails: number;
+    distinctUsersCount: number;
+  }>;
+  tailoredResumeCount: number;
+  referralEmailCount: number;
+}
 
 @Component({
   selector: 'app-profile-analytics',

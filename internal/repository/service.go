@@ -196,8 +196,16 @@ func (mc *MongoDBClient) CreateAiDraftEmail(from, to, companyName, templateType,
 	return draftEmail, nil
 }
 
+// ProfileAnalytics struct is in ai_draft_email.go, but we can extend it here for now for clarity.
+type ExtendedProfileAnalytics struct {
+	TotalEmails         int                     `json:"totalEmails" bson:"totalEmails"`
+	Companies           []CompanyEmailAggregate `json:"companies" bson:"companies"`
+	TailoredResumeCount int                     `json:"tailoredResumeCount" bson:"tailoredResumeCount"`
+	ReferralEmailCount  int                     `json:"referralEmailCount" bson:"referralEmailCount"`
+}
+
 // GetProfileAnalytics helps to get the analytic query output
-func (mc *MongoDBClient) GetProfileAnalytics(userEmail string) (ProfileAnalytics, error) {
+func (mc *MongoDBClient) GetProfileAnalytics(userEmail string) (ExtendedProfileAnalytics, error) {
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
 
@@ -205,45 +213,63 @@ func (mc *MongoDBClient) GetProfileAnalytics(userEmail string) (ProfileAnalytics
 	now := time.Now()
 	last30Days := now.AddDate(0, 0, -30)
 
+	// --- AI Draft Emails (existing logic) ---
 	pipeline := mongo.Pipeline{
 		bson.D{{"$match", bson.D{{"userEmailAddress", userEmail}, {"createdAt", bson.D{{"$gte", last30Days}}}}}},
 		bson.D{{"$group", bson.D{
 			{"_id", "$companyName"},
-			{"totalEmails", bson.D{{"$sum", 1}}},                          // Count total emails per company
-			{"distinctUsers", bson.D{{"$addToSet", "$userEmailAddress"}}}, // Collect distinct users
+			{"totalEmails", bson.D{{"$sum", 1}}},
+			{"distinctUsers", bson.D{{"$addToSet", "$userEmailAddress"}}},
 		}}},
 		bson.D{{"$project", bson.D{
 			{"companyName", "$_id"},
 			{"totalEmails", 1},
-			{"distinctUsersCount", bson.D{{"$size", "$distinctUsers"}}}, // Count distinct users
+			{"distinctUsersCount", bson.D{{"$size", "$distinctUsers"}}},
 			{"_id", 0},
 		}}},
-		bson.D{{"$sort", bson.D{{"totalEmails", -1}}}}, // ✅ Sort by totalEmails DESC
+		bson.D{{"$sort", bson.D{{"totalEmails", -1}}}},
 		bson.D{{"$limit", 15}},
 	}
 
 	collection := mc.Database("referrer").Collection("ai_email_drafts")
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		return ProfileAnalytics{}, err
+		return ExtendedProfileAnalytics{}, err
 	}
 	defer cursor.Close(ctx)
 
 	var companyStats []CompanyEmailAggregate
 	if err = cursor.All(ctx, &companyStats); err != nil {
-		return ProfileAnalytics{}, err
+		return ExtendedProfileAnalytics{}, err
 	}
 
 	// Get total email count in last 30 days
 	countFilter := bson.D{{Key: "userEmailAddress", Value: userEmail}, {"createdAt", bson.D{{"$gte", last30Days}}}}
 	totalCount, err := collection.CountDocuments(ctx, countFilter)
 	if err != nil {
-		return ProfileAnalytics{}, err
+		return ExtendedProfileAnalytics{}, err
 	}
 
-	// Return result in struct format
-	return ProfileAnalytics{
-		TotalEmails: int(totalCount),
-		Companies:   companyStats,
+	// --- Tailored Resume Count ---
+	resumeCollection := mc.Database("referrer").Collection("tailored_resumes")
+	resumeCountFilter := bson.D{{Key: "userId", Value: userEmail}, {"createdAt", bson.D{{"$gte", last30Days}}}}
+	tailoredResumeCount, err := resumeCollection.CountDocuments(ctx, resumeCountFilter)
+	if err != nil {
+		tailoredResumeCount = 0 // fallback
+	}
+
+	// --- Referral Email Count ---
+	mailboxCollection := mc.Database("referrer").Collection("referral_mailbox")
+	referralCountFilter := bson.D{{Key: "from", Value: userEmail}, {"createdAt", bson.D{{"$gte", last30Days}}}}
+	referralEmailCount, err := mailboxCollection.CountDocuments(ctx, referralCountFilter)
+	if err != nil {
+		referralEmailCount = 0 // fallback
+	}
+
+	return ExtendedProfileAnalytics{
+		TotalEmails:         int(totalCount),
+		Companies:           companyStats,
+		TailoredResumeCount: int(tailoredResumeCount),
+		ReferralEmailCount:  int(referralEmailCount),
 	}, nil
 }

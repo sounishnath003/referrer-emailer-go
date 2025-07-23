@@ -39,6 +39,8 @@ export interface Notifications {
 export interface ProfileAnalytics {
   totalEmails: number;
   companies: Company[];
+  tailoredResumeCount: number;
+  referralEmailCount: number;
 }
 
 export interface Company {
