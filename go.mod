@@ -9,6 +9,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/labstack/echo-jwt v0.0.0-20221127215225-c84d41a71003
 	github.com/labstack/echo/v4 v4.13.3
+	github.com/yuin/goldmark v1.4.13
 	go.mongodb.org/mongo-driver v1.17.2
 	golang.org/x/time v0.8.0
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22

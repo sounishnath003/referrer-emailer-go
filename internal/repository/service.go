@@ -168,7 +168,7 @@ func (mc *MongoDBClient) GetLatestEmailsByFilter(filterCondn bson.M) ([]*Referra
 	return mails, nil
 }
 
-func (mc *MongoDBClient) CreateAiDraftEmail(from, to, companyName, templateType, jobDescription, userProfileSummary, mailSubject, mailBody string, jobUrls []string) (*AiDraftColdEmail, error) {
+func (mc *MongoDBClient) CreateAiDraftEmail(from, to, companyName, templateType, jobDescription, userProfileSummary, mailSubject, mailBody, tailoredResumeID string, jobUrls []string) (*AiDraftColdEmail, error) {
 	// Get context
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
@@ -183,6 +183,7 @@ func (mc *MongoDBClient) CreateAiDraftEmail(from, to, companyName, templateType,
 		TemplateType:     templateType,
 		MailSubject:      mailSubject,
 		Mailbody:         mailBody,
+		TailoredResumeID: tailoredResumeID,
 		CreatedAt:        time.Now(),
 	}
 

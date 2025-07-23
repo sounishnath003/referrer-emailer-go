@@ -21,6 +21,8 @@ type AiDraftColdEmail struct {
 	MailSubject string `json:"mailSubject,omitempty" bson:"mailSubject"`
 	Mailbody    string `json:"mailBody,omitempty" bson:"mailBody"`
 
+	TailoredResumeID string `json:"tailoredResumeId,omitempty" bson:"tailoredResumeId"`
+
 	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
 }
 

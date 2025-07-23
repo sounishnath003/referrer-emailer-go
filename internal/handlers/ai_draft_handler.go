@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
 )
 
 type ReferralColdmailRequestDto struct {
@@ -52,8 +53,41 @@ func DraftReferralEmailWithAiHandler(c echo.Context) error {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("unable to generated draft email %s: %w", rmailDto.From, err))
 	}
 
+	// Step03: Generate tailored resume and store it
+	resumeMarkdown, tErr := hctx.GetCore().TailorResumeWithJobDescriptionLLM(rmailDto.JobDescription, u.ExtractedContent, rmailDto.CompanyName, rmailDto.TemplateType)
+	var tailoredResumeID string
+	if tErr == nil {
+		tr := &repository.TailoredResume{
+			UserID:         u.ID.Hex(),
+			JobDescription: rmailDto.JobDescription,
+			ResumeMarkdown: resumeMarkdown,
+			CompanyName:    rmailDto.CompanyName,
+			JobRole:        rmailDto.TemplateType,
+		}
+		ctx := c.Request().Context()
+		insertedID, err := hctx.GetCore().DB.CreateTailoredResume(ctx, tr)
+		if err == nil {
+			tailoredResumeID = insertedID.Hex()
+		}
+	}
+
+	// Step04: Store the draft email with tailoredResumeID
+	_, _ = hctx.GetCore().DB.CreateAiDraftEmail(
+		rmailDto.From,
+		rmailDto.To,
+		rmailDto.CompanyName,
+		rmailDto.TemplateType,
+		rmailDto.JobDescription,
+		u.ProfileSummary,
+		mailSubject,
+		mailBody,
+		tailoredResumeID,
+		rmailDto.JobUrls,
+	)
+
 	return c.JSON(http.StatusOK, map[string]string{
-		"mailSubject": mailSubject,
-		"mailBody":    mailBody,
+		"mailSubject":      mailSubject,
+		"mailBody":         mailBody,
+		"tailoredResumeId": tailoredResumeID,
 	})
 }

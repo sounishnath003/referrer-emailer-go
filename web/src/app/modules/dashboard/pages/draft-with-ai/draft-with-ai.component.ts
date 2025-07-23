@@ -23,6 +23,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
 
   apiErrorMsg: string | null = null;
   loading: boolean = false;
+  tailoredResumeId: string | null = null;
 
   emailReferralForm: FormGroup = new FormGroup({
     from: new FormControl('flock.sinasini@gmail.com', [Validators.required, Validators.email]),
@@ -81,7 +82,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
         subject: data.mailSubject,
         body: this.html
       }, { emitEvent: true });
-
+      this.tailoredResumeId = data.tailoredResumeId || null;
       this.loading = false;
       this.apiErrorMsg = null;
     })
@@ -94,7 +95,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
 
     this.processing$.next(true);
 
-    this.emailService.sendEmail$(from, [to, from], subject, body).pipe(
+    this.emailService.sendEmail$(from, [to, from], subject, body, this.tailoredResumeId || undefined).pipe(
       catchError(err => {
         this.apiErrorMsg = err.error.error || `Something went wrong`;
         return of(null);

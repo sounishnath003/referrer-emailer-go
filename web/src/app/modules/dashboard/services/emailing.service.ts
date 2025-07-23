@@ -10,13 +10,16 @@ export class EmailingService {
   private API_URL = environment.NG_REFERRER_BACKEND_API_URL;
   constructor(private readonly httpClient: HttpClient) { }
 
-  sendEmail$(from: string, to: string[], subject: string, body: string) {
-    const payload = {
+  sendEmail$(from: string, to: string[], subject: string, body: string, tailoredResumeId?: string) {
+    const payload: any = {
       from,
       to,
       subject,
       body
     };
+    if (tailoredResumeId) {
+      payload.tailoredResumeId = tailoredResumeId;
+    }
     const httpHeaders = new HttpHeaders();
     httpHeaders.append('Content-Type', 'application/json')
 
@@ -67,6 +70,7 @@ export class EmailingService {
 export interface AiDraftColdMail {
   mailSubject: string;
   mailBody: string;
+  tailoredResumeId?: string;
 }
 
 export interface ReferralMailbox {

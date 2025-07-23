@@ -194,7 +194,7 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 	// mailSubject := strings.Split(mailBody, "\n\n")[0]
 
 	// Store the draft into DB
-	_, err = co.DB.CreateAiDraftEmail(from, to, companyName, templateType, jobDescription, userProfileSummary, mailSubject, mailSubject, jobUrls)
+	_, err = co.DB.CreateAiDraftEmail(from, to, companyName, templateType, jobDescription, userProfileSummary, mailSubject, mailBody, mailSubject, jobUrls)
 
 	if err != nil {
 		return "", "", err
