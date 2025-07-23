@@ -232,7 +232,7 @@ You are an expert FAANG resume strategist.
 	res, err := co.llm.GenerateContent(ctx,
 		genai.Text(input),
 		prompt,
-		genai.Text("\n\nNote: Remove and Replace any Repeatative action verbs/words, Always Use unique action verbsin the Work experiences or Project sections."),
+		genai.Text("\n\nNote: DO NOT USE Repeatative Action Verbs/words, Always Use unique action verbsin the Work experiences or Project sections."),
 	)
 
 	if err != nil {

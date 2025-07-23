@@ -76,7 +76,7 @@ export class TailoredResumeViewComponent implements OnInit {
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'resume.pdf';
+                link.download = `resume_${new Date().getTime()}.pdf`;
                 link.click();
             },
             error: (err) => {

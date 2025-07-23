@@ -58,7 +58,7 @@ app.post('/generate-pdf', async (req, res) => {
 
         res.set({
             'Content-Type': 'application/pdf',
-            'Content-Disposition': 'attachment; filename=resume.pdf',
+            'Content-Disposition': $`attachment; filename=resume_${new Date().getTime()}.pdf`,
         });
 
         res.send(pdfBuffer);
