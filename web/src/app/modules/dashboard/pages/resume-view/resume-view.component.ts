@@ -19,7 +19,7 @@ export class ResumeViewComponent implements OnInit {
   constructor(private readonly profileService: ProfileService, private readonly markdownService: MarkdownService) { }
 
   ngOnInit(): void {
-    this.profileInformation$ = this.profileService.getProfileInformation$('flock.sinasini@gmail.com').pipe(
+    this.profileInformation$ = this.profileService.getProfileInformation$('sounish.nath17@gmail.com').pipe(
       catchError(err => {
         this.errorMessage = err.error?.error || `No matches found.`;
         return of(null);

@@ -54,7 +54,7 @@ export class TailoredResumeListComponent implements OnInit {
   }
 
   fetchResumes() {
-    const userEmail = localStorage.getItem('userEmail') || 'flock.sinasini@gmail.com';
+    const userEmail = localStorage.getItem('userEmail') || 'sounish.nath17@gmail.com';
     this.loading = true;
     this.profileService.getLatestTailoredResumes$(userEmail, this.companyFilter).subscribe({
       next: (res) => {

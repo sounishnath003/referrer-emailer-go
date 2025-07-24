@@ -19,7 +19,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
   editorBox!: Editor;
   html: string = "";
   toEmailIds: string[] = [];
-  suggestions: string[] = ['example1@example.com', 'flock.sinasini@gmail.com', 'example3@example.com']; // Example suggestions
+  suggestions: string[] = ['example1@example.com', 'sounish.nath17@gmail.com', 'example3@example.com']; // Example suggestions
   filteredSuggestions: string[] = [];
   processing$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -28,7 +28,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
 
   emailSenderForm: FormGroup = new FormGroup({
     to: new FormControl(null, [Validators.required, Validators.email]),
-    from: new FormControl('flock.sinasini@gmail.com', [Validators.required, Validators.email]),
+    from: new FormControl('sounish.nath17@gmail.com', [Validators.required, Validators.email]),
     subject: new FormControl(null, [Validators.required, Validators.maxLength(40)]),
     body: new FormControl(null, [Validators.required, Validators.minLength(30), Validators.maxLength(2000)]),
   });
@@ -38,7 +38,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.editorBox = new Editor();
 
-    this.profileService.getProfileInformation$(`flock.sinasini@gmail.com`)
+    this.profileService.getProfileInformation$(`sounish.nath17@gmail.com`)
       .pipe(
         catchError(err => {
           this.errorMessage = err.error.error || `Unable to fetch profile informations`;

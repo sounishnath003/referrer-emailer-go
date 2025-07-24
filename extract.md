@@ -3,7 +3,7 @@
 **1. Contact Information:**
 
 *   **Mobile:** +918017204855
-*   **Email:** flock.sinasini@gmail.com
+*   **Email:** sounish.nath17@gmail.com
 *   **Website/Portfolio:** sounishnath.netlify.app
 *   **GitHub:** sounishnath003, sounishnath
 

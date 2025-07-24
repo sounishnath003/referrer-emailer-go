@@ -12,7 +12,7 @@ func main() {
 	co := core.NewCore(&core.CoreOpts{
 		Port:             utils.GetNumberFromEnv("PORT", 3000),
 		SmtpAddr:         "smtp.gmail.com",
-		MailAddr:         utils.GetStringFromEnv("MAIL_ADDR", "flock.sinasini@gmail.com"),
+		MailAddr:         utils.GetStringFromEnv("MAIL_ADDR", "sounish.nath17@gmail.com"),
 		MailSecret:       utils.GetStringFromEnv("MAIL_SECRET", "P@55w0Rd5!"),
 		MongoDbUri:       utils.GetStringFromEnv("MONGO_DB_URI", "localhost"),
 		GcpProjectID:     utils.GetStringFromEnv("GCP_PROJECT_ID", "sounish-cloud-workstation"),

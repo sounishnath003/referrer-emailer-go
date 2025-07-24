@@ -235,7 +235,7 @@ You are an expert FAANG resume strategist.
 	res, err := co.llm.GenerateContent(ctx,
 		genai.Text(input),
 		prompt,
-		genai.Text("\n\nNote: DO NOT USE Repeatative Action Verbs/words, Always Use unique action verbsin the Work experiences or Project sections."),
+		genai.Text("\n\nIMPORTANT: Only return the resume in Markdown format. Do NOT include any additional explanation, commentary, or clarification. The output must be the resume Markdown only."),
 	)
 
 	if err != nil {
