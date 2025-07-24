@@ -177,19 +177,19 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 	mailBody := fmt.Sprintf("%v", res.Candidates[0].Content.Parts[0])
 
 	res, err = co.llm.GenerateContent(ctx, genai.Text(mailBody), genai.Text(`
-		[Task]: Given "Referral Cold Email Body" in "HTML" format, targets for Which Type of Job (Software Engineering, Backend Developer, Data Engineering, Data Analyst, etc).
-		Reply In One Word "TYPE OF THE JOB".
+		[Task]: Based on the "Referral Cold Email Body" and the job description, generate a concise, professional, and attention-grabbing email subject line (Mail Heading) that would make a recruiter want to open the email. The subject should clearly reflect the candidate's intent and the job opportunity, and be tailored to the content of the cold email and the job/company context. 
+		Reply ONLY with the subject line, no extra commentary or formatting.
 	`))
 	if err != nil {
-		return "", "", fmt.Errorf("unable to generate type.Of.Job contents: %w", err)
+		return "", "", fmt.Errorf("unable to generate mail subject: %w", err)
 	}
 
 	if len(res.Candidates) == 0 ||
 		len(res.Candidates[0].Content.Parts) == 0 {
-		return "", "", errors.New("empty response type.Of.Job from model")
+		return "", "", errors.New("empty response mail subject from model")
 	}
 
-	mailSubject := fmt.Sprintf("Interested for %s Roles Opportunities at %s", res.Candidates[0].Content.Parts[0], companyName)
+	mailSubject := fmt.Sprintf("%v", res.Candidates[0].Content.Parts[0])
 
 	// mailSubject := strings.Split(mailBody, "\n\n")[0]
 
