@@ -152,7 +152,7 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 
 			`, to, companyName, jobUrls, jobDescription, userProfileSummary),
 		),
-		genai.Text(fmt.Sprintf(`		
+		genai.Text(`		
 			Write a cold email to the recruiter [ToEmail]. Highlight my relevant skills and experience and REQUESTING to SCHEDULE AN INTERVIEW!. with STAR method like "Performed X with Y and achieved Z%".
 			
 			Keep it under 200 words. Write it in "1st Person Candidate's View". While adding "JOB URLs add in Bullet list" manner.
@@ -162,7 +162,7 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 			1. Use more Bullet Points and Bold Keywords.
 			2.  Include a candidate signature (Contact Details: (phone, email, linkedin, portfolio, etc), utilizing information from the "Candidate Profile."
 			3.  Format the entire output as "Markdown" format. 
-		`, templateType)),
+		`),
 	)
 
 	if err != nil {

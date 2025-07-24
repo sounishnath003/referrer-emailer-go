@@ -90,7 +90,7 @@ func NewCore(opts *CoreOpts) *Core {
 
 	// Initialize Storage Client (GCS Bucket).
 	if err := co.initializeGCSClient(); err != nil {
-		co.Lo.Error("error occured during GCS storage client inisialization:", "error", fmt.Errorf("Unable to create GCS storage client: %w\n", err))
+		co.Lo.Error("error occured during GCS storage client inisialization:", "error", fmt.Errorf("unable to create GCS storage client: %w", err))
 		panic(err)
 	}
 
@@ -108,7 +108,7 @@ func (co *Core) initializeGCSClient() error {
 	storageClient, err := storage.NewClient(ctx)
 
 	if err != nil {
-		return fmt.Errorf("Unable to create GCS storage client: %w\n", err)
+		return fmt.Errorf("unable to create GCS storage client: %w", err)
 	}
 
 	co.storageClient = storageClient
@@ -138,7 +138,7 @@ func (co *Core) UploadFileToGCSBucket(file *multipart.FileHeader) (string, error
 
 	src, err := file.Open()
 	if err != nil {
-		return "", fmt.Errorf("error opening file: %w\n", err)
+		return "", fmt.Errorf("error opening file: %w", err)
 	}
 	defer src.Close()
 
@@ -238,7 +238,7 @@ func (co *Core) SubmitResumeToJobQueue(userEmailAddress, resumeGCSPath string) e
 	}
 	_, err := collection.InsertOne(ctx, job)
 	if err != nil {
-		return fmt.Errorf("not able to process resume: %w\n", err)
+		return fmt.Errorf("not able to process resume: %w", err)
 	}
 
 	return nil

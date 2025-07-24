@@ -102,7 +102,11 @@ func (co *Core) InvokeSendMail(from string, to []string, subject, body string) e
 		to,
 		[]byte(mailBody),
 	)
-
+	
+	if err != nil {
+		return  err
+	}
+	
 	// Store the email into database.
 	err = co.DB.CreateEmailInMailbox(from, to, subject, body)
 	if err != nil {
