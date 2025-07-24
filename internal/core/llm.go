@@ -181,12 +181,12 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 		Reply ONLY with the subject line, no extra commentary or formatting.
 	`))
 	if err != nil {
-		return "", "", fmt.Errorf("unable to generate mail subject: %w", err)
+		return "", "", fmt.Errorf("unable to generate type.Of.Job contents: %w", err)
 	}
 
 	if len(res.Candidates) == 0 ||
 		len(res.Candidates[0].Content.Parts) == 0 {
-		return "", "", errors.New("empty response mail subject from model")
+		return "", "", errors.New("empty response type.Of.Job from model")
 	}
 
 	mailSubject := fmt.Sprintf("%v", res.Candidates[0].Content.Parts[0])
