@@ -23,7 +23,7 @@ func SignupHandler(c echo.Context) error {
 
 	// Check validation.
 	if len(u.Email) == 0 || len(u.Password) == 0 || !isValidEmail(u.Email) {
-		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or password."))
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or password"))
 	}
 
 	// Save the user.

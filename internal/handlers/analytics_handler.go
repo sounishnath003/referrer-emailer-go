@@ -13,7 +13,7 @@ func ProfileAnalyticsHandler(c echo.Context) error {
 
 	userEmail := c.QueryParam("email")
 	if len(userEmail) == 0 || !isValidEmail(userEmail) {
-		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or no email found."))
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or no email found"))
 	}
 
 	analytics, err := hctx.GetCore().DB.GetProfileAnalytics(userEmail)

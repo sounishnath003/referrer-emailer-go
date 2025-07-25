@@ -152,7 +152,7 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 
 			`, to, companyName, jobUrls, jobDescription, userProfileSummary),
 		),
-		genai.Text(`		
+		genai.Text(fmt.Sprintf(`		
 			Write a cold email to the recruiter [ToEmail]. Highlight my relevant skills and experience and REQUESTING to SCHEDULE AN INTERVIEW!. with STAR method like "Performed X with Y and achieved Z%".
 			
 			Keep it under 200 words. Write it in "1st Person Candidate's View". While adding "JOB URLs add in Bullet list" manner.
@@ -162,7 +162,8 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 			1. Use more Bullet Points and Bold Keywords.
 			2.  Include a candidate signature (Contact Details: (phone, email, linkedin, portfolio, etc), utilizing information from the "Candidate Profile."
 			3.  Format the entire output as "Markdown" format. 
-		`),
+			4. No Need of providing a Subject Line.
+		`, templateType)),
 	)
 
 	if err != nil {
@@ -189,7 +190,7 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 		return "", "", errors.New("empty response type.Of.Job from model")
 	}
 
-	mailSubject := fmt.Sprintf("%v", res.Candidates[0].Content.Parts[0])
+	mailSubject := fmt.Sprintf("%s at %s", res.Candidates[0].Content.Parts[0], companyName)
 
 	// mailSubject := strings.Split(mailBody, "\n\n")[0]
 
@@ -215,14 +216,14 @@ You are an expert FAANG resume strategist.
 [Task]: Given a "Job Description", "Company Name", "Job Role", and "Extracted Resume Content", generate a concise, single-page, ATS-friendly Software Engineer resume in Markdown.
 
 [Requirements]:
-- Start with candidate's name as H1 and contact info (email, phone, LinkedIn, GitHub).
+- Start with candidate's name as H1 and contact info (email, LinkedIn, GitHub, phone).
 - The LinkedIn in the contact info MUST be a Markdown hyperlink with the full https URL, using the format: [complete.url](https://complete.url). Do NOT just write the URL or plain text; strictly use the Markdown hyperlink format.
 - Add GitHub in the contact info MUST be a Markdown hyperlink with the full https URL, using the format: [github.com/sounishnath003](https://github.com/sounishnath003). Do NOT just write the URL or plain text; strictly use the Markdown hyperlink format.
 - Email Address, LinkedIn, GitHub and Contact Number, must be in single Line. Separated by '|'.
 - Add a brief "Professional Summary" tailored to the job description, company, and job role, using relevant keywords.
 - List grouped skills (Languages, Frameworks, Cloud/DevOps, Tools) as bullet points.
 - Show up to 3 most relevant roles (reverse-chronological), each with 3-5 quantified, action-oriented bullets (STAR/XYZ style).
-- Select and include up to 2 personal projects that are most relevant to the job description and company. For each, paraphrase the project description and impact to closely align with the job requirements, company, and keywords. Present each project with a title and 2-3 concise, action-oriented bullet points, emphasizing technologies, outcomes, and relevance to the target role and company.
+- Select and include up to 2 personal projects that are most relevant to the job description and company. For each, paraphrase the project description and impact to closely align with the job requirements, company, and keywords. Present each project with a title and 2-3 concise, action-oriented bullet points, emphasizing technologies, outcomes, and relevance to the target role and company. Must Hyperlink Project Demo URL, if exists like [Github | YouTube | Link](https://complete.url).
 - Focus only on content matching the job, company, and role; omit unrelated details.
 - Use standard Markdown (no tables, no images, no extra commentary).
 - Use present tense for current role, past tense for previous.
@@ -235,7 +236,7 @@ You are an expert FAANG resume strategist.
 	res, err := co.llm.GenerateContent(ctx,
 		genai.Text(input),
 		prompt,
-		genai.Text("\n\nIMPORTANT: Only return the resume in Markdown format. Do NOT include any additional explanation, commentary, or clarification. The output must be the resume Markdown only."),
+		genai.Text("\n\nNote: DO NOT USE Repeatative Action Verbs/words, Always Use unique action verbsin the Work experiences or Project sections."),
 	)
 
 	if err != nil {

@@ -53,7 +53,7 @@ func saveResumeIntoDisk(file *multipart.FileHeader, c echo.Context) (string, boo
 	dstPath := filepath.Join("storage", file.Filename)
 	dst, err := os.Create(dstPath)
 	if err != nil {
-		return "", true, SendErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("Failed to upload resume. Something went wrong."))
+		return "", true, SendErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("failed to upload resume. Something went wrong"))
 	}
 	defer dst.Close()
 
@@ -68,7 +68,7 @@ func saveResumeIntoDisk(file *multipart.FileHeader, c echo.Context) (string, boo
 func isFileUnder2MB(file *multipart.FileHeader) error {
 	const MAX_LIMIT = (2 * 1024 * 1024) // 2 MB
 	if file.Size > MAX_LIMIT {
-		return fmt.Errorf("file exceeds 2 MB limit.")
+		return fmt.Errorf("file exceeds 2 MB limit")
 	}
 	return nil
 }
@@ -76,7 +76,7 @@ func isFileUnder2MB(file *multipart.FileHeader) error {
 // isFilePDF check the file type of the upload file object
 func isFilePDF(file *multipart.FileHeader) error {
 	if file.Header.Get("Content-Type") != "application/pdf" {
-		return fmt.Errorf("only pdf files are allowed.")
+		return fmt.Errorf("only pdf files are allowed")
 	}
 	return nil
 }

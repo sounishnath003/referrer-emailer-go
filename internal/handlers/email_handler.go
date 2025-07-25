@@ -152,7 +152,7 @@ func GetReferralEmailsHandler(c echo.Context) error {
 	emailUuid := c.QueryParam("uuid")
 
 	if len(userEmail) > 0 && !isValidEmail(userEmail) {
-		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or no email found."))
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or no email found"))
 	}
 
 	emails, err := hctx.GetCore().DB.GetLatestEmailsByFilter(bson.M{
