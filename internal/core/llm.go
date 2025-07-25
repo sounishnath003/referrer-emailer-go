@@ -190,7 +190,7 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 		return "", "", errors.New("empty response type.Of.Job from model")
 	}
 
-	mailSubject := fmt.Sprintf("%s at %s", res.Candidates[0].Content.Parts[0], companyName)
+	mailSubject := fmt.Sprintf("%s to %s", res.Candidates[0].Content.Parts[0], companyName)
 
 	// mailSubject := strings.Split(mailBody, "\n\n")[0]
 
