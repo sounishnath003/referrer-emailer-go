@@ -178,7 +178,8 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 	mailBody := fmt.Sprintf("%v", res.Candidates[0].Content.Parts[0])
 
 	res, err = co.llm.GenerateContent(ctx, genai.Text(mailBody), genai.Text(fmt.Sprintf(`
-		[Task]: Based on the "Referral Cold Email Body", job description, and the company name "%s", generate a concise, professional subject line that clearly signals a referral or interest in an interview opportunity. The subject line MUST explicitly mention the company name ("%s"). Reply ONLY with the subject line, no extra commentary or formatting.
+		[Task]: Based on the "Referral Cold Email Body" and the job description, and the company name "%s", generate a concise, professional, and attention-grabbing email subject line (Mail Heading) that would make a recruiter want to open the email. The subject should clearly reflect the candidate's intent and the job opportunity, and be tailored to the content of the cold email and the job/company context.  The subject line MUST explicitly mention the company name ("%s").
+		Reply ONLY with the subject line, no extra commentary or formatting.
 	`, companyName, companyName)))
 	if err != nil {
 		return "", "", fmt.Errorf("unable to generate type.Of.Job contents: %w", err)
