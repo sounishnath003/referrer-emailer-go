@@ -3,7 +3,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { EmailingService } from '../../services/emailing.service';
 import { Editor, NgxEditorModule } from 'ngx-editor';
 import { EmailAutocompleteComponent } from "./components/email-autocomplete/email-autocomplete.component";
-import { BehaviorSubject, catchError, of } from 'rxjs';
+import { BehaviorSubject, catchError, debounceTime, distinctUntilChanged, filter, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { SubheroComponent } from "../shared/subhero/subhero.component";
 import { ApiProfileInformation, ProfileService } from '../../services/profile.service';
@@ -19,8 +19,8 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
   editorBox!: Editor;
   html: string = "";
   toEmailIds: string[] = [];
-  suggestions: string[] = ['example1@example.com', 'sounish.nath17@gmail.com', 'example3@example.com']; // Example suggestions
   filteredSuggestions: string[] = [];
+  private destroy$ = new Subject<void>();
   processing$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   successMessage: string | null = null;
@@ -51,32 +51,54 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
           subject: `Interested for [Job Profile] Roles Interview Opportunity at [Company Name]`,
           body: this.KickStartPrompt(data),
         }, { emitEvent: true })
-      })
+      });
+
+    // Update the Email form whenever the value changes
+    this.emailSenderForm.get('to')?.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter((value: string) => typeof value === 'string' && value.startsWith('@')),
+      switchMap((value: string) => {
+        const query = value.split('@').pop() || '';
+        return this.profileService.searchPeople$(query);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: res => {
+        this.filteredSuggestions = [...res.users];
+      },
+      error: err => {
+        console.error(err);
+        this.filteredSuggestions = [];
+      }
+    });
+
+
   }
   ngOnDestroy(): void {
     this.editorBox.destroy();
     this.toEmailIds = [];
     this.emailSenderForm.reset();
-  }
 
-  onEmailInput(event: Event): void {
-    const input = (event.target as HTMLInputElement).value;
-    if (input.startsWith('@')) {
-      const prefix = input.split('@').pop() || "";
-      this.filteredSuggestions = this.suggestions.filter(s => s.startsWith(prefix));
-    } else {
-      this.filteredSuggestions = [];
-    }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onSuggestionSelected(suggestion: string | undefined): void {
-    if (suggestion === undefined) return;
-    const currentTo = this.emailSenderForm.get('to')?.value;
-    const newTo = currentTo.replace(/@\w*$/, `${suggestion}`);
-    this.emailSenderForm.get('to')?.setValue(newTo);
-    this.addEmail();
+    if (!suggestion) return;
+
+    const inputControl = this.emailSenderForm.get('to');
+    const currentValue = inputControl?.value || '';
+
+    // Replace everything after the '@' with the selected suggestion
+    const newValue = currentValue.replace(/@\w*$/, suggestion);
+    inputControl?.setValue(newValue.trim());
+
+    this.addEmail(); // move to chip
     this.filteredSuggestions = [];
   }
+
+
 
   // Function to handle email addition
   addEmail(): void {

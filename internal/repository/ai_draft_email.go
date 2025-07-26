@@ -8,7 +8,7 @@ import (
 
 type AiDraftColdEmail struct {
 	ID               bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	UserEmailAddress string        `json:"userEmailAddress,omitempty" bson:"userEmailAddress" bson:"userEmailAddress"`
+	UserEmailAddress string        `json:"userEmailAddress,omitempty" bson:"userEmailAddress"`
 
 	To   string `json:"to,omitempty" bson:"to"`
 	From string `json:"from,omitempty" bson:"from"`

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -272,4 +273,49 @@ func (mc *MongoDBClient) GetProfileAnalytics(userEmail string) (ExtendedProfileA
 		TailoredResumeCount: int(tailoredResumeCount),
 		ReferralEmailCount:  int(referralEmailCount),
 	}, nil
+}
+
+// SearchPeople searches for people by email or company name in AI-drafted emails.
+// It returns a list of unique email addresses from the 'to' field.
+func (mc *MongoDBClient) SearchPeople(query string) ([]string, error) {
+	ctx, cancel := getContextWithTimeout(10)
+	defer cancel()
+
+	// Optional: Escape regex metacharacters if query is user-provided
+	safeQuery := regexp.QuoteMeta(query)
+
+	pipeline := mongo.Pipeline{
+		bson.D{{"$match", bson.D{
+			{"$or", bson.A{
+				bson.D{{"to", bson.D{{"$regex", safeQuery}, {"$options", "i"}}}},
+				bson.D{{"companyName", bson.D{{"$regex", safeQuery}, {"$options", "i"}}}},
+			}},
+		}}},
+		bson.D{{"$group", bson.D{
+			{"_id", "$to"},
+		}}},
+		bson.D{{"$sort", bson.D{{"_id", 1}}}},
+		bson.D{{"$limit", 15}},
+	}
+
+	var results []bson.M
+	collection := mc.Database("referrer").Collection("ai_email_drafts")
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &results); err != nil {
+		return nil, err
+	}
+
+	emails := []string{}
+	for _, result := range results {
+		if email, ok := result["_id"].(string); ok {
+			emails = append(emails, email)
+		}
+	}
+
+	return emails, nil
 }

@@ -1,5 +1,5 @@
     .autocomplete-list {
-        @apply border border-gray-300 max-h-40 max-w-[720px] overflow-y-auto bg-white absolute w-full z-10;
+        @apply border border-gray-300 max-h-60 max-w-[720px] overflow-y-auto bg-white absolute w-full z-10;
     }
 
     .autocomplete-list li {

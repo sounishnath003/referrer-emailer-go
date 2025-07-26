@@ -98,3 +98,20 @@ func GetProfileHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, u)
 }
+
+// PeopleSearchHandler helps to find out persons/users who belongs to certain filters.
+// Filters like companyName, Email
+func PeopleSearchHandler(c echo.Context) error {
+	// Get the core
+	hctx := c.(*HandlerContext)
+
+	queryParam := c.QueryParam("query")
+	hctx.GetCore().Lo.Info("Received search Param", "query", queryParam)
+
+	emails, err := hctx.GetCore().DB.SearchPeople(queryParam)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, map[string][]string{"users": emails})
+}
