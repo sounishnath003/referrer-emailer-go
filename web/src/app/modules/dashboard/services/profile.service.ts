@@ -65,11 +65,11 @@ export class ProfileService {
     return this.httpClient.get<ApiProfileInformation>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/profile?email=${email}`, { headers })
   }
 
-  searchPeople$(query: string): Observable<{ users: string[] }> {
+  searchPeople$(query: string): Observable<{ email: string, companyName: string }[]> {
     const headers = new HttpHeaders();
     headers.append("Content-Type", "application/json");
 
-    return this.httpClient.get<{ users: string[] }>(`${this.API_URL}/api/profile/search-people?query=${query}`, { headers: headers, withCredentials: false })
+    return this.httpClient.get<{ email: string, companyName: string }[]>(`${this.API_URL}/api/profile/search-people?query=${query}`, { headers: headers, withCredentials: false })
   }
 
   updateProfileInformation$(profileInfo: ProfileInformation): Observable<ApiProfileInformation> {

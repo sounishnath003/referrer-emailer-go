@@ -276,29 +276,34 @@ func (mc *MongoDBClient) GetProfileAnalytics(userEmail string) (ExtendedProfileA
 }
 
 // SearchPeople searches for people by email or company name in AI-drafted emails.
-// It returns a list of unique email addresses from the 'to' field.
-func (mc *MongoDBClient) SearchPeople(query string) ([]string, error) {
+// It returns a list of unique combinations of email and companyName.
+func (mc *MongoDBClient) SearchPeople(query string) ([]map[string]string, error) {
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
 
-	// Optional: Escape regex metacharacters if query is user-provided
 	safeQuery := regexp.QuoteMeta(query)
 
 	pipeline := mongo.Pipeline{
+		// Match documents where 'to' or 'companyName' contains the query
 		bson.D{{"$match", bson.D{
 			{"$or", bson.A{
 				bson.D{{"to", bson.D{{"$regex", safeQuery}, {"$options", "i"}}}},
 				bson.D{{"companyName", bson.D{{"$regex", safeQuery}, {"$options", "i"}}}},
 			}},
 		}}},
+		// Group by 'to' and 'companyName' to get unique combinations
 		bson.D{{"$group", bson.D{
-			{"_id", "$to"},
+			{"_id", bson.D{
+				{"email", "$to"},
+				{"companyName", "$companyName"},
+			}},
 		}}},
-		bson.D{{"$sort", bson.D{{"_id", 1}}}},
+		// Sort by email alphabetically
+		bson.D{{"$sort", bson.D{{"_id.email", 1}}}},
+		// Limit to 15 results
 		bson.D{{"$limit", 15}},
 	}
 
-	var results []bson.M
 	collection := mc.Database("referrer").Collection("ai_email_drafts")
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
@@ -306,16 +311,22 @@ func (mc *MongoDBClient) SearchPeople(query string) ([]string, error) {
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &results); err != nil {
+	var results []bson.M
+	if err := cursor.All(ctx, &results); err != nil {
 		return nil, err
 	}
 
-	emails := []string{}
+	output := []map[string]string{}
 	for _, result := range results {
-		if email, ok := result["_id"].(string); ok {
-			emails = append(emails, email)
+		if id, ok := result["_id"].(bson.M); ok {
+			email, _ := id["email"].(string)
+			company, _ := id["companyName"].(string)
+			output = append(output, map[string]string{
+				"email":       email,
+				"companyName": company,
+			})
 		}
 	}
 
-	return emails, nil
+	return output, nil
 }

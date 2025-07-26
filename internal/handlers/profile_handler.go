@@ -108,10 +108,10 @@ func PeopleSearchHandler(c echo.Context) error {
 	queryParam := c.QueryParam("query")
 	hctx.GetCore().Lo.Info("Received search Param", "query", queryParam)
 
-	emails, err := hctx.GetCore().DB.SearchPeople(queryParam)
+	results, err := hctx.GetCore().DB.SearchPeople(queryParam)
 	if err != nil {
 		return SendErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, map[string][]string{"users": emails})
+	return c.JSON(http.StatusOK, results)
 }

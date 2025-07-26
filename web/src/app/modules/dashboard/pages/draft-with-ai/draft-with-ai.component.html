@@ -6,12 +6,16 @@
     <form [formGroup]="emailReferralForm" class="space-y-4" autocomplete="off" (ngSubmit)="sendEmail()">
         <div>
             <label for="to-users" class="block text-sm font-medium text-gray-700 mb-2">To Users</label>
-            <input type="email" formControlName="to" id="to-users" name="to-users" class="form-control-input-box"
-                placeholder="Enter recipient email addresses">
+            <input for="to-users" type="email" formControlName="to" id="to-users" name="to-users"
+                class="form-control-input-box" placeholder="Type @ to search people or company..." />
+            <app-email-autocomplete [suggestions]="filteredSuggestions"
+                (suggestionSelected)="onSuggestionSelected($event)"></app-email-autocomplete>
+
             <div class="form-control-errors" *ngIf="formErrors.to">
                 <span *ngIf="formErrors.to.required">* Email required</span>
                 <span *ngIf="formErrors.to.email">* Not a valid email address</span>
             </div>
+
         </div>
 
         <div>

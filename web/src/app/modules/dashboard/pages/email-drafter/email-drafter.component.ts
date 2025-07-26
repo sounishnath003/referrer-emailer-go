@@ -19,7 +19,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
   editorBox!: Editor;
   html: string = "";
   toEmailIds: string[] = [];
-  filteredSuggestions: string[] = [];
+  filteredSuggestions: { email: string, companyName: string }[] = [];
   private destroy$ = new Subject<void>();
   processing$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -59,13 +59,13 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       filter((value: string) => typeof value === 'string' && value.startsWith('@')),
       switchMap((value: string) => {
-        const query = value.split('@').pop() || '';
+        const query = value.trim().split('@').pop() || '';
         return this.profileService.searchPeople$(query);
       }),
       takeUntil(this.destroy$)
     ).subscribe({
       next: res => {
-        this.filteredSuggestions = [...res.users];
+        this.filteredSuggestions = [...res];
       },
       error: err => {
         console.error(err);
@@ -84,14 +84,14 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSuggestionSelected(suggestion: string | undefined): void {
+  onSuggestionSelected(suggestion: { email: string, companyName: string } | undefined): void {
     if (!suggestion) return;
 
     const inputControl = this.emailSenderForm.get('to');
     const currentValue = inputControl?.value || '';
 
     // Replace everything after the '@' with the selected suggestion
-    const newValue = currentValue.replace(/@\w*$/, suggestion);
+    const newValue = currentValue.replace(/@\w*$/, suggestion.email);
     inputControl?.setValue(newValue.trim());
 
     this.addEmail(); // move to chip

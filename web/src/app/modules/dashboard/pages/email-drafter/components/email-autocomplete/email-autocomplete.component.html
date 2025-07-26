@@ -1,7 +1,7 @@
 <ul *ngIf="suggestions.length > 0" class="autocomplete-list">
     @for (suggestion of suggestions; track $index) {
-    <li (click)="selectSuggestion(suggestion)">
-        {{ suggestion }}
+    <li (click)="selectSuggestion(suggestion)" class="text-md">
+        {{ suggestion.email }} - <span class="text-sm font-semibold">{{suggestion.companyName}}</span>
     </li>
     }
 </ul>

@@ -5,12 +5,14 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { ActivatedRoute, Router } from '@angular/router';
 import { AsyncPipe, JsonPipe, NgIf } from '@angular/common';
 import { EmailingService } from '../../services/emailing.service';
-import { BehaviorSubject, catchError, of } from 'rxjs';
+import { BehaviorSubject, catchError, debounceTime, distinctUntilChanged, filter, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { MarkdownModule, MarkdownService } from 'ngx-markdown';
+import { EmailAutocompleteComponent } from '../email-drafter/components/email-autocomplete/email-autocomplete.component';
+import { ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-draft-with-ai',
-  imports: [SubheroComponent, NgxEditorModule, FormsModule, ReactiveFormsModule, NgIf, MarkdownModule, AsyncPipe],
+  imports: [SubheroComponent, NgxEditorModule, FormsModule, ReactiveFormsModule, NgIf, MarkdownModule, AsyncPipe, EmailAutocompleteComponent],
   providers: [EmailingService, MarkdownService],
   templateUrl: './draft-with-ai.component.html',
   styleUrls: ['./draft-with-ai.component.css']
@@ -20,6 +22,9 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
   html: string = "";
   formErrors: any = {};
   template: string | null = null;
+
+  filteredSuggestions: { email: string, companyName: string }[] = [];
+  private destroy$ = new Subject<void>();
 
   apiErrorMsg: string | null = null;
   loading: boolean = false;
@@ -41,7 +46,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
 
 
-  constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly emailService: EmailingService, private readonly markdownService: MarkdownService) { }
+  constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly emailService: EmailingService, private readonly markdownService: MarkdownService, private readonly profileService: ProfileService) { }
 
   ngOnInit(): void {
     this.editorBox = new Editor();
@@ -55,10 +60,44 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
       this.emailReferralForm.patchValue({ templateType: t }, { emitEvent: true });
     });
     this.emailReferralForm.valueChanges.subscribe(() => this.onFormValueChange());
+
+    // Update the Email form whenever the value changes
+    this.emailReferralForm.get('to')?.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter((value: string) => typeof value === 'string' && value.startsWith('@')),
+      switchMap((value: string) => {
+        const query = value.trim().split('@').pop() || '';
+        return this.profileService.searchPeople$(query);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: res => {
+        this.filteredSuggestions = [...res];
+      },
+      error: err => {
+        console.error(err);
+        this.filteredSuggestions = [];
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.editorBox.destroy();
+    // Destroy the event cycl.
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  onSuggestionSelected(suggestion: { email: string, companyName: string } | undefined): void {
+    if (!suggestion) return;
+
+    // PatchValues
+    this.emailReferralForm.patchValue({
+      to: suggestion.email.trim(),
+      companyName: suggestion.companyName.trim(),
+    });
+    this.filteredSuggestions = [];
   }
 
   generateAiEmail() {
