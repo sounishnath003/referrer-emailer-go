@@ -53,21 +53,25 @@ func DraftReferralEmailWithAiHandler(c echo.Context) error {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("unable to generated draft email %s: %w", rmailDto.From, err))
 	}
 
-	// Step03: Generate tailored resume and store it
-	resumeMarkdown, tErr := hctx.GetCore().TailorResumeWithJobDescriptionLLM(rmailDto.JobDescription, u.ExtractedContent, rmailDto.CompanyName, rmailDto.TemplateType)
 	var tailoredResumeID string
-	if tErr == nil {
-		tr := &repository.TailoredResume{
-			UserID:         u.ID.Hex(),
-			JobDescription: rmailDto.JobDescription,
-			ResumeMarkdown: resumeMarkdown,
-			CompanyName:    rmailDto.CompanyName,
-			JobRole:        rmailDto.TemplateType,
-		}
-		ctx := c.Request().Context()
-		insertedID, err := hctx.GetCore().DB.CreateTailoredResume(ctx, tr)
-		if err == nil {
-			tailoredResumeID = insertedID.Hex()
+
+	// If Jobdescription has been provided, then only generate a tailored resume
+	if len(rmailDto.JobDescription) > 0 {
+		// Step03: Generate tailored resume and store it
+		resumeMarkdown, tErr := hctx.GetCore().TailorResumeWithJobDescriptionLLM(rmailDto.JobDescription, u.ExtractedContent, rmailDto.CompanyName, rmailDto.TemplateType)
+		if tErr == nil {
+			tr := &repository.TailoredResume{
+				UserID:         u.ID.Hex(),
+				JobDescription: rmailDto.JobDescription,
+				ResumeMarkdown: resumeMarkdown,
+				CompanyName:    rmailDto.CompanyName,
+				JobRole:        rmailDto.TemplateType,
+			}
+			ctx := c.Request().Context()
+			insertedID, err := hctx.GetCore().DB.CreateTailoredResume(ctx, tr)
+			if err == nil {
+				tailoredResumeID = insertedID.Hex()
+			}
 		}
 	}
 
