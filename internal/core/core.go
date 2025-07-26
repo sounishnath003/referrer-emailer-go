@@ -18,11 +18,12 @@ import (
 )
 
 type CoreOpts struct {
-	Port       int
-	MailAddr   string
-	MailSecret string
-	SmtpAddr   string
-	MongoDbUri string
+	Port          int
+	MailAddr      string
+	MailSecret    string
+	SmtpAddr      string
+	MongoDbUri    string
+	PdfServiceUri string
 
 	ModelName        string
 	GcpProjectID     string
@@ -32,9 +33,10 @@ type CoreOpts struct {
 
 // Core defines the core construct of the service.
 type Core struct {
-	Port int
-	DB   *repository.MongoDBClient
-	Lo   *slog.Logger
+	Port          int
+	DB            *repository.MongoDBClient
+	Lo            *slog.Logger
+	PdfServiceUri string
 
 	opts          *CoreOpts
 	smtpAuth      smtp.Auth
@@ -57,9 +59,10 @@ func (co *Core) configureIndexesDB() {
 func NewCore(opts *CoreOpts) *Core {
 
 	co := &Core{
-		opts: opts,
-		Port: opts.Port,
-		Lo:   slog.Default(),
+		opts:          opts,
+		Port:          opts.Port,
+		Lo:            slog.Default(),
+		PdfServiceUri: opts.PdfServiceUri,
 	}
 
 	// Initialize the database

@@ -1,8 +1,10 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
+app.use(cors({ origin: '*' }));
 app.use(bodyParser.text({ limit: '5mb' }));
 
 app.post('/generate-pdf', async (req, res) => {
@@ -25,9 +27,17 @@ app.post('/generate-pdf', async (req, res) => {
     </head>
     <body>
         <style>
+            @font-face {
+                font-family: 'Inter';
+                src: url('/usr/share/fonts/truetype/inter/Inter.ttf') format('truetype');
+                font-weight: normal;
+                font-style: normal;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
             *, body {
-                font-size: 11.1pt;
-                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                font-size: 10.6pt;
+                font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             }
             h1 { margin-block: 0.83em; font-size: 1.50em; }
         </style>
@@ -38,7 +48,7 @@ app.post('/generate-pdf', async (req, res) => {
     try {
         console.log(`[${new Date().toISOString()}] Launching Puppeteer browser`);
         const browser = await puppeteer.launch({
-            headless: 'new',
+            headless: 'shell',
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         const page = await browser.newPage();
@@ -58,7 +68,7 @@ app.post('/generate-pdf', async (req, res) => {
 
         res.set({
             'Content-Type': 'application/pdf',
-            'Content-Disposition': $`attachment; filename=resume_${new Date().getTime()}.pdf`,
+            'Content-Disposition': `attachment; filename=resume_${new Date().getTime()}.pdf`,
         });
 
         res.send(pdfBuffer);
@@ -69,5 +79,5 @@ app.post('/generate-pdf', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = +process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`[${new Date().toISOString()}] PDF service running on port ${PORT}`));

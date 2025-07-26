@@ -108,6 +108,8 @@ func UpdateTailoredResumeHandler(c echo.Context) error {
 
 // Generate the PDF using NodeJS Puppeteer service
 func GeneratePDFHandler(c echo.Context) error {
+	// Get context
+	hctx := c.(*HandlerContext)
 	// Http client with 10 second time out
 	client := &http.Client{Timeout: 10 * time.Second}
 	// Take out the resumeContent from JSON request body
@@ -118,7 +120,7 @@ func GeneratePDFHandler(c echo.Context) error {
 		return SendErrorResponse(c, http.StatusBadRequest, err)
 	}
 	// NOTE: The PDF service expects HTML in the body as plain text
-	req, err := http.NewRequest(http.MethodPost, "http://0.0.0.0:3001/generate-pdf", strings.NewReader(reqBody.ResumeContent))
+	req, err := http.NewRequest(http.MethodPost, hctx.GetCore().PdfServiceUri+"/generate-pdf", strings.NewReader(reqBody.ResumeContent))
 	if err != nil {
 		return err
 	}

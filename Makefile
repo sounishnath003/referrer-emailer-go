@@ -23,7 +23,6 @@ pdf-service:
 
 .PHONY: all
 all: build
-	cd pdf-service && npm run dev &
 	source .env && make run &
 	cd web && npm start
 
@@ -36,7 +35,9 @@ compose-up:
 .PHONY: docker-build
 docker-build:
 	docker rmi -f $$(docker images referrer-emailer -qa)
+	docker rmi -f $$(docker images pdf-service -qa)
 	docker build -t referrer-emailer -f Dockerfile .
+	cd pdf-service && npm run build:docker
 	docker images
 
 .PHONY: docker-run

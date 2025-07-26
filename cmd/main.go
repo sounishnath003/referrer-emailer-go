@@ -10,11 +10,13 @@ import (
 func main() {
 
 	co := core.NewCore(&core.CoreOpts{
-		Port:             utils.GetNumberFromEnv("PORT", 3000),
-		SmtpAddr:         "smtp.gmail.com",
-		MailAddr:         utils.GetStringFromEnv("MAIL_ADDR", "sounish.nath17@gmail.com"),
-		MailSecret:       utils.GetStringFromEnv("MAIL_SECRET", "P@55w0Rd5!"),
-		MongoDbUri:       utils.GetStringFromEnv("MONGO_DB_URI", "localhost"),
+		Port:          utils.GetNumberFromEnv("PORT", 3000),
+		SmtpAddr:      "smtp.gmail.com",
+		MailAddr:      utils.GetStringFromEnv("MAIL_ADDR", "sounish.nath17@gmail.com"),
+		MailSecret:    utils.GetStringFromEnv("MAIL_SECRET", "P@55w0Rd5!"),
+		MongoDbUri:    utils.GetStringFromEnv("MONGO_DB_URI", "localhost"),
+		PdfServiceUri: utils.GetStringFromEnv("PDF_SERVICE_URI", "http://0.0.0.0:3001"),
+
 		GcpProjectID:     utils.GetStringFromEnv("GCP_PROJECT_ID", "sounish-cloud-workstation"),
 		GcpLocation:      utils.GetStringFromEnv("GCP_PROJECT_LOCATION", "asia-south1"),
 		ModelName:        utils.GetStringFromEnv("GCP_VERTEX_AI_LLM", "gemini-1.5-flash-002"),

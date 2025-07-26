@@ -66,7 +66,7 @@ func SendEmailHandler(c echo.Context) error {
 			}
 			htmlContent := htmlBuf.String()
 			// Call PDF service to generate PDF from HTML
-			pdfResp, pdfErr := generatePDFfromResume(htmlContent)
+			pdfResp, pdfErr := generatePDFfromResume(hctx.GetCore().PdfServiceUri, htmlContent)
 			if pdfErr != nil {
 				errChan <- pdfErr
 				return
@@ -122,9 +122,9 @@ func SendEmailHandler(c echo.Context) error {
 }
 
 // Helper to call the PDF service (simulate the logic from craft_resume_handler.go)
-func generatePDFfromResume(resumeContent string) ([]byte, error) {
+func generatePDFfromResume(pdfServiceUri, resumeContent string) ([]byte, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
-	req, err := http.NewRequest(http.MethodPost, "http://0.0.0.0:3001/generate-pdf", strings.NewReader(resumeContent))
+	req, err := http.NewRequest(http.MethodPost, pdfServiceUri+"/generate-pdf", strings.NewReader(resumeContent))
 	if err != nil {
 		return nil, err
 	}
