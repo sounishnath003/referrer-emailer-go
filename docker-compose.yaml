@@ -24,22 +24,22 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://root:P455w0Rd!@mongo:27017/
       ME_CONFIG_BASICAUTH: false
 
-  # referrer-emailer:
-  #   image: referrer-emailer:latest
-  #   restart: always
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 3000:3000
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     MONGO_DB_URI: mongodb://root:P455w0Rd!@mongo:27017
-  #     PDF_SERVICE_URI: http://pdf-service:3001
-  #     GOOGLE_APPLICATION_CREDENTIALS: /google-sa-credentials.json
-  #   volumes:
-  #     - /Users/sounishnath/sounish-cloud-workstation-ac143dfffa26.json:/google-sa-credentials.json
+  referrer-emailer:
+    image: referrer-emailer:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    environment:
+      MONGO_DB_URI: mongodb://root:P455w0Rd!@mongo:27017
+      PDF_SERVICE_URI: http://pdf-service:3001
+      GOOGLE_APPLICATION_CREDENTIALS: /google-sa-credentials.json
+    volumes:
+      - /Users/sounishnath/sounish-cloud-workstation-ac143dfffa26.json:/google-sa-credentials.json
   
   pdf-service:
     image: pdf-service:latest
