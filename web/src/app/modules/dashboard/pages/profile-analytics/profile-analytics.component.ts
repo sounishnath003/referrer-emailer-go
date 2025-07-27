@@ -29,7 +29,7 @@ export class ProfileAnalyticsComponent implements OnInit {
   constructor(private readonly profileService: ProfileService) { }
 
   ngOnInit(): void {
-    this.profileAnalytics$ = this.profileService.getProfileAnalytics$(`sounish.nath17@gmail.com`).pipe(
+    this.profileAnalytics$ = this.profileService.getProfileAnalytics$(this.profileService.ownerEmailAddress).pipe(
       catchError(err => {
         this.apiError = err.error.error || `Something went wrong. No response from backend`;
         return of(null);

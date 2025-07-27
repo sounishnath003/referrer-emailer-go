@@ -58,6 +58,11 @@ export class ProfileService {
   private API_URL = environment.NG_REFERRER_BACKEND_API_URL;
   constructor(private readonly httpClient: HttpClient) { }
 
+  get ownerEmailAddress(): string {
+    // Returns the owner email address of the service
+    return environment.ownerEmailAddress;
+  }
+
   getProfileInformation$(email: string): Observable<ApiProfileInformation> {
     const headers = new HttpHeaders();
     headers.append("Content-Type", "multipart/form-data");

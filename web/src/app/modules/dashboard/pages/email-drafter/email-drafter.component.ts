@@ -28,7 +28,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
 
   emailSenderForm: FormGroup = new FormGroup({
     to: new FormControl(null, [Validators.required, Validators.email]),
-    from: new FormControl('sounish.nath17@gmail.com', [Validators.required, Validators.email]),
+    from: new FormControl(null, [Validators.required, Validators.email]),
     subject: new FormControl(null, [Validators.required, Validators.maxLength(40)]),
     body: new FormControl(null, [Validators.required, Validators.minLength(30), Validators.maxLength(2000)]),
   });
@@ -37,8 +37,10 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.editorBox = new Editor();
+    // Update the sender from with owner email address
+    this.emailSenderForm.patchValue({ from: this.profileService.ownerEmailAddress });
 
-    this.profileService.getProfileInformation$(`sounish.nath17@gmail.com`)
+    this.profileService.getProfileInformation$(this.profileService.ownerEmailAddress)
       .pipe(
         catchError(err => {
           this.errorMessage = err.error.error || `Unable to fetch profile informations`;
@@ -136,7 +138,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
 
     // Call Api
     this.processing$.next(true);
-    this.emailingService.sendEmail$(emailFormValue["from"], emailFormValue["to"], emailFormValue["subject"], emailFormValue["body"]).pipe(
+    this.emailingService.sendEmail$(this.profileService.ownerEmailAddress, emailFormValue["to"], emailFormValue["subject"], emailFormValue["body"]).pipe(
       catchError(err => {
         this.errorMessage = err.error.error;
         return of(null);

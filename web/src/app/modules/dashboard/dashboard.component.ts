@@ -5,6 +5,7 @@ import { MenuComponent } from "./pages/shared/menu/menu.component";
 import { EmailingService, ReferralMailbox } from './services/emailing.service';
 import { BehaviorSubject, catchError, of } from 'rxjs';
 import { AsyncPipe, NgIf } from '@angular/common';
+import { ProfileService } from './services/profile.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,14 +18,14 @@ export class DashboardComponent implements OnInit {
   sentReferrals: BehaviorSubject<ReferralMailbox[]> = new BehaviorSubject<ReferralMailbox[]>([]);
   showSidebar: boolean = true;
 
-  constructor(private readonly emailingService: EmailingService) { }
+  constructor(private readonly emailingService: EmailingService, private readonly profileService: ProfileService) { }
 
   ngOnInit(): void {
     this.pollReferralMailbox();
   }
 
   pollReferralMailbox() {
-    this.emailingService.pollReferralMailbox$(`sounish.nath17@gmail.com`).pipe(
+    this.emailingService.pollReferralMailbox$(this.profileService.ownerEmailAddress).pipe(
       catchError(err => {
         console.error(err);
         this.sentReferrals.next([]);

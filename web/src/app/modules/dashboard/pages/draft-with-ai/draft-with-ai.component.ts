@@ -31,7 +31,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
   tailoredResumeId: string | null = null;
 
   emailReferralForm: FormGroup = new FormGroup({
-    from: new FormControl('sounish.nath17@gmail.com', [Validators.required, Validators.email]),
+    from: new FormControl(null, [Validators.required, Validators.email]),
     to: new FormControl(null, [Validators.required, Validators.email]),
     jobUrls: new FormControl(null, [Validators.required, Validators.pattern(/(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g)]),
     jobDescription: new FormControl(null, [Validators.maxLength(2000)]),
@@ -57,7 +57,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
         return;
       }
       this.template = t;
-      this.emailReferralForm.patchValue({ templateType: t }, { emitEvent: true });
+      this.emailReferralForm.patchValue({ templateType: t, from: this.profileService.ownerEmailAddress }, { emitEvent: true });
     });
     this.emailReferralForm.valueChanges.subscribe(() => this.onFormValueChange());
 
