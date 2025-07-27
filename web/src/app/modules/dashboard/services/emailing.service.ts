@@ -15,7 +15,7 @@ export class EmailingService {
       from,
       to,
       subject,
-      body
+      body,
     };
     if (tailoredResumeId) {
       payload.tailoredResumeId = tailoredResumeId;

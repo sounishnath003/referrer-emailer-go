@@ -11,7 +11,15 @@
             class="w-10" />
 
         <div class="flex flex-col gap-1">
-            <div><span class="text-xs font-semibold text-blue-800">&bull; {{ item.subject | titlecase }}</span></div>
+            <div>
+                <span class="text-xs font-semibold text-blue-800" style="line-height: 1;">
+                    &bull;
+                    {{
+                    (item.subject.length > 60 ? (item.subject | titlecase).slice(0, 60) + '...' : (item.subject |
+                    titlecase))
+                    }}
+                </span>
+            </div>
         </div>
 
     </div>
