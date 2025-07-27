@@ -100,7 +100,7 @@ func SendEmailHandler(c echo.Context) error {
 		}
 
 		// Invoke the SendMail with Attachment.
-		errChan <- hctx.GetCore().InvokeSendMailWithAttachment(emailSenderDto.From, emailSenderDto.To, emailSenderDto.Sub, emailSenderDto.Body, localDst)
+		errChan <- hctx.GetCore().InvokeSendMailWithAttachment(emailSenderDto.From, emailSenderDto.To, emailSenderDto.Sub, emailSenderDto.Body, emailSenderDto.TailoredResumeID, localDst)
 
 		// Purge the Local file
 		if err := os.Remove(localDst); err != nil {

@@ -80,5 +80,6 @@ export interface ReferralMailbox {
   to: string[];
   subject: string;
   body: string;
+  tailoredResumeId: string | undefined;
   createdAt: Date;
 }

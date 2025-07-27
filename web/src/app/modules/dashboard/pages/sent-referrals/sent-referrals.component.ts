@@ -13,6 +13,9 @@ import { AsyncPipe, DatePipe, TitleCasePipe } from '@angular/common';
 export class SentReferralsComponent implements OnInit {
   apiErrorMessage: string | null = null;
   referralEmails: ReferralMailbox[] = [];
+  resendButtonText: string = 'Resend email';
+  isResending: boolean = false;
+
   constructor(private readonly route: ActivatedRoute, private readonly emailService: EmailingService) { }
 
   ngOnInit(): void {
@@ -29,5 +32,29 @@ export class SentReferralsComponent implements OnInit {
         this.apiErrorMessage = null;
         console.log(data);
       })
+  }
+
+  onResendEmail() {
+    if (!this.referralEmails.length) return;
+    const { from, to, subject, body, tailoredResumeId } = this.referralEmails[0];
+    this.isResending = true;
+    this.resendButtonText = 'Resending...';
+    this.emailService.sendEmail$(from, to, subject, body, tailoredResumeId).pipe(
+      catchError(err => {
+        this.resendButtonText = 'Failed! Try again';
+        this.isResending = false;
+        setTimeout(() => {
+          this.resendButtonText = 'Resend email';
+        }, 2000);
+        return of(null);
+      })
+    ).subscribe(data => {
+      if (data === null) return;
+      this.resendButtonText = 'Resent!';
+      setTimeout(() => {
+        this.resendButtonText = 'Resend email';
+        this.isResending = false;
+      }, 2000);
+    });
   }
 }

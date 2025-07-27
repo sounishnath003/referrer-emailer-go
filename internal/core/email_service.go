@@ -13,7 +13,7 @@ import (
 )
 
 // InvokeSendMail invokes Gmail SMTP configuration to send an email with an optional attachment.
-func (co *Core) InvokeSendMailWithAttachment(from string, to []string, subject, body, attachmentPath string) error {
+func (co *Core) InvokeSendMailWithAttachment(from string, to []string, subject, body, tailoredResumeID, attachmentPath string) error {
 	// Create a new multipart writer
 	var buf bytes.Buffer
 	writer := multipart.NewWriter(&buf)
@@ -77,7 +77,7 @@ func (co *Core) InvokeSendMailWithAttachment(from string, to []string, subject, 
 	}
 
 	// Store the email into the database
-	err = co.DB.CreateEmailInMailbox(from, to, subject, body)
+	err = co.DB.CreateEmailInMailbox(from, to, subject, body, tailoredResumeID)
 	if err != nil {
 		co.Lo.Error("error saving referral email into mailbox", "error", err)
 		return err
@@ -87,7 +87,7 @@ func (co *Core) InvokeSendMailWithAttachment(from string, to []string, subject, 
 }
 
 // InvokeSendMail invokes Gmail SMTP configuration to be email sending process.
-func (co *Core) InvokeSendMail(from string, to []string, subject, body string) error {
+func (co *Core) InvokeSendMail(from string, to []string, subject, body, tailoredResumeID string) error {
 	// Use of HTML Meta tags for MIME context setups.
 	headers := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";"
 
@@ -102,13 +102,13 @@ func (co *Core) InvokeSendMail(from string, to []string, subject, body string) e
 		to,
 		[]byte(mailBody),
 	)
-	
+
 	if err != nil {
-		return  err
+		return err
 	}
-	
+
 	// Store the email into database.
-	err = co.DB.CreateEmailInMailbox(from, to, subject, body)
+	err = co.DB.CreateEmailInMailbox(from, to, subject, body, tailoredResumeID)
 	if err != nil {
 		co.Lo.Error("error saving referral email into mailbox", "error", err)
 		return err

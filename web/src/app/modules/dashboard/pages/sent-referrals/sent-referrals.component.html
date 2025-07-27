@@ -23,10 +23,28 @@
     </div>
     }
 
-    <div class="my-4 text-right">
-        <div routerLink="/dashboard"
-            class="px-8 py-2 bg-indigo-50 hover:bg-indigo-200 cursor-pointer font-sans inline-flex rounded-lg"> &larr;
-            Back</div>
+    <div class="flex gap-4 items-center justify-end my-4 text-right">
+
+        <button>
+            <div routerLink="/dashboard"
+                class="px-8 py-2 bg-indigo-50 hover:bg-gray-200 cursor-pointer font-sans inline-flex rounded-lg font-medium">
+                &larr;
+                Back</div>
+        </button>
+
+        <button>
+            <button type="button" (click)="onResendEmail()" [disabled]="referralEmails.length === 0"
+                [ariaDisabled]="referralEmails.length"
+                class="px-8 py-2 bg-indigo-50 hover:bg-indigo-200 cursor-pointer font-sans inline-flex items-center gap-2 rounded-lg font-medium">
+                {{resendButtonText}}
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+                    </svg>
+                </span>
+            </button>
+        </button>
     </div>
 </div>
 }

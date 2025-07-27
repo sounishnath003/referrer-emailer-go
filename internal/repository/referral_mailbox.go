@@ -7,11 +7,12 @@ import (
 )
 
 type ReferralMailbox struct {
-	ID        bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Uuid      string        `json:"uuid" bson:"uuid"`
-	From      string        `json:"from" bson:"from"`
-	To        []string      `json:"to" bson:"to"`
-	Subject   string        `json:"subject" bson:"subject"`
-	Body      string        `json:"body" bson:"body"`
-	CreatedAt time.Time     `json:"createdAt" bson:"createdAt"`
+	ID               bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Uuid             string        `json:"uuid" bson:"uuid"`
+	From             string        `json:"from" bson:"from"`
+	To               []string      `json:"to" bson:"to"`
+	Subject          string        `json:"subject" bson:"subject"`
+	Body             string        `json:"body" bson:"body"`
+	TailoredResumeID string        `json:"tailoredResumeId" bson:"tailoredResumeId"`
+	CreatedAt        time.Time     `json:"createdAt" bson:"createdAt"`
 }

@@ -110,18 +110,19 @@ func (mc *MongoDBClient) FindUserByEmailAndPassword(email, password string) (*Us
 }
 
 // CreateEmailInMailbox stores the email into mailbox
-func (mc *MongoDBClient) CreateEmailInMailbox(from string, to []string, subject, body string) error {
+func (mc *MongoDBClient) CreateEmailInMailbox(from string, to []string, subject, body, tailoredResumeId string) error {
 	// Get context
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
 
 	mail := ReferralMailbox{
-		Uuid:      uuid.New().String(),
-		From:      from,
-		To:        to,
-		Subject:   subject,
-		Body:      body,
-		CreatedAt: time.Now(),
+		Uuid:             uuid.New().String(),
+		From:             from,
+		To:               to,
+		Subject:          subject,
+		Body:             body,
+		TailoredResumeID: tailoredResumeId,
+		CreatedAt:        time.Now(),
 	}
 
 	collection := mc.Database("referrer").Collection("referral_mailbox")
@@ -143,11 +144,12 @@ func (mc *MongoDBClient) GetLatestEmailsByFilter(filterCondn bson.M) ([]*Referra
 	fmt.Println(filterCondn)
 
 	cursor, err := collection.Find(ctx, filterCondn, options.Find().SetLimit(10).SetSort(bson.M{"createdAt": -1}))
-	defer cursor.Close(ctx)
 
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
+
 	if err := cursor.Err(); err != nil {
 		return mails, nil
 	}
