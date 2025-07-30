@@ -38,7 +38,7 @@ export class SentReferralsComponent implements OnInit {
     if (!this.referralEmails.length) return;
     const { from, to, subject, body, tailoredResumeId } = this.referralEmails[0];
     this.isResending = true;
-    this.resendButtonText = 'Resending...';
+    this.resendButtonText = 'Preparing';
     this.emailService.sendEmail$(from, to, subject, body, tailoredResumeId).pipe(
       catchError(err => {
         this.resendButtonText = 'Failed! Try again';
