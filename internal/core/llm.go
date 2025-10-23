@@ -39,7 +39,7 @@ func printResponse(res *genai.GenerateContentResponse) string {
 	for _, cand := range res.Candidates {
 		if cand.Content != nil {
 			for _, part := range cand.Content.Parts {
-				result += fmt.Sprint(part)
+				result += fmt.Sprint(part.Text)
 			}
 		}
 	}
@@ -146,7 +146,7 @@ func (co *Core) ConvertResumeToJSONStructLLM(content string) (string, error) {
 
 // DraftColdEmailMessageLLM helps to generate a draft email and returns (mailSubject, mailBody, error).
 func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jobDescription, userProfileSummary string, jobUrls []string) (string, string, error) {
-	ctx, cancel := getContextWithTimeout(15)
+	ctx, cancel := getContextWithTimeout(60)
 	defer cancel()
 
 	res, err := co.llm.Models.GenerateContent(ctx, co.opts.ModelName, []*genai.Content{{
@@ -166,7 +166,7 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 
 			`, to, companyName, jobUrls, jobDescription, userProfileSummary)},
 			{Text: fmt.Sprintf(`		
-			Write a cold email to the recruiter [ToEmail]. Highlight my relevant skills and experience and REQUESTING to SCHEDULE AN INTERVIEW!. with STAR method like "Performed X with Y and achieved Z%%".
+			Write a cold email to the recruiter [ToEmail]. Highlight my relevant skills and experience and REQUESTING to SCHEDULE AN INTERVIEW!. with STAR method like "Performed X with Y and achieved Z%".
 			
 			Keep it under 200 words. Write it in "1st Person Candidate's View". While adding "JOB URLs add in Bullet list" manner.
 
