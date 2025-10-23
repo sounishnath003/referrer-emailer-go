@@ -1,5 +1,5 @@
 # Build Golang API
-FROM golang:1.23-alpine AS gobuilder
+FROM golang:1.25-alpine AS gobuilder
 
 WORKDIR /app
 RUN apk --no-cache add ca-certificates make

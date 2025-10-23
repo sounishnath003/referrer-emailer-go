@@ -13,8 +13,8 @@ import (
 
 	"cloud.google.com/go/storage"
 
-	"cloud.google.com/go/vertexai/genai"
 	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
+	"google.golang.org/genai"
 )
 
 type CoreOpts struct {
@@ -41,7 +41,7 @@ type Core struct {
 	opts          *CoreOpts
 	smtpAuth      smtp.Auth
 	storageClient *storage.Client
-	llm           *genai.GenerativeModel
+	llm           *genai.Client
 }
 
 // configureIndexesDB helps to configure database level constraints and checks.
