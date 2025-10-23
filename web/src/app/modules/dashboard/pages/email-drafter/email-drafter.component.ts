@@ -38,7 +38,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.editorBox = new Editor();
     // Update the sender from with owner email address
-    this.emailSenderForm.patchValue({ from: this.profileService.ownerEmailAddress });
+    this.emailSenderForm.patchValue({ from: this.profileService.ownerEmailAddress }, { emitEvent: true });
 
     this.profileService.getProfileInformation$(this.profileService.ownerEmailAddress)
       .pipe(

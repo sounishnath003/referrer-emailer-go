@@ -20,14 +20,17 @@ export class CraftResumeComponent {
   error: string | null = null;
   companyName = '';
   jobRole = '';
+  userEmail: string = '';
 
-  constructor(private profileService: ProfileService, private router: Router) { }
+  constructor(private profileService: ProfileService, private router: Router) {
+    this.userEmail = this.profileService.ownerEmailAddress;
+  }
 
-  tailorResume(userEmail: string) {
+  tailorResume() {
     this.loading = true;
     this.error = null;
     this.resumeMarkdown = null;
-    this.profileService.tailorResumeWithJobDescription$(this.jobDescription, userEmail, this.companyName, this.jobRole)
+    this.profileService.tailorResumeWithJobDescription$(this.jobDescription, this.userEmail, this.companyName, this.jobRole)
       .subscribe({
         next: (res) => {
           this.loading = false;
