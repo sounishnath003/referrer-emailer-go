@@ -15,7 +15,7 @@ func (co *Core) initializeLLM() error {
 	defer cancel()
 
 	// Correct client initialization for Vertex AI
-	timeDuration := 120 * time.Second
+	timeDuration := 60 * time.Second
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		HTTPOptions: genai.HTTPOptions{
 			APIVersion: "v1",
@@ -24,7 +24,7 @@ func (co *Core) initializeLLM() error {
 				"X-Vertex-AI-LLM-Request-Type": []string{"shared"},
 			},
 		},
-		Project: co.opts.GcpProjectID, Location: co.opts.GcpLocation},
+		Project: co.opts.GcpProjectID, Location: co.opts.GcpLocation, Backend: genai.BackendVertexAI,},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create genai client: %w", err)

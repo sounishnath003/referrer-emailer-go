@@ -23,15 +23,16 @@ pdf-service:
 
 .PHONY: all
 all: build
+	docker-compose -f docker-compose.dev.yaml down
 	docker-compose -f docker-compose.dev.yaml up &
 	source .env && make run &
 	cd web && npm start
 
 .PHONY: compose-up
 compose-up:
-	docker-compose down
+	docker-compose -f docker-compose.prod.yaml down
 	# docker rmi referrer-emailer
-	docker-compose up --build
+	docker-compose -f docker-compose.prod.yaml up --build
 
 .PHONY: docker-build
 docker-build:
