@@ -19,7 +19,7 @@ func main() {
 
 		GcpProjectID:     utils.GetStringFromEnv("GCP_PROJECT_ID", "sounish-cloud-workstation"),
 		GcpLocation:      utils.GetStringFromEnv("GCP_PROJECT_LOCATION", "asia-south1"),
-		ModelName:        utils.GetStringFromEnv("GCP_VERTEX_AI_LLM", "gemini-1.5-flash-002"),
+		ModelName:        utils.GetStringFromEnv("GCP_VERTEX_AI_LLM", "gemini-2.5-flash"),
 		GcpStorageBucket: utils.GetStringFromEnv("GCP_STORAGE_BUCKET", "sounish-cloud-workstation"),
 	})
 

@@ -15,11 +15,11 @@ func (co *Core) initializeLLM() error {
 	defer cancel()
 
 	// Correct client initialization for Vertex AI
-	timeDuration := 60 * time.Second
+	timeDuration := 120 * time.Second
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		HTTPOptions: genai.HTTPOptions{
 			APIVersion: "v1",
-			Timeout: &timeDuration,
+			Timeout:    &timeDuration,
 			Headers: http.Header{
 				"X-Vertex-AI-LLM-Request-Type": []string{"shared"},
 			},

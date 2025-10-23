@@ -23,6 +23,7 @@ pdf-service:
 
 .PHONY: all
 all: build
+	docker-compose -f docker-compose.dev.yaml up &
 	source .env && make run &
 	cd web && npm start
 

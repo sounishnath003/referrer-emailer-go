@@ -157,8 +157,8 @@ func GetReferralEmailsHandler(c echo.Context) error {
 
 	emails, err := hctx.GetCore().DB.GetLatestEmailsByFilter(bson.M{
 		"$or": []bson.M{
-			bson.M{"from": userEmail},
-			bson.M{"uuid": emailUuid},
+			{"from": userEmail},
+			{"uuid": emailUuid},
 		},
 	})
 	if err != nil {
