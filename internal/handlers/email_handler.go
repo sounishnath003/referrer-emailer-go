@@ -150,17 +150,25 @@ func GetReferralEmailsHandler(c echo.Context) error {
 
 	userEmail := c.QueryParam("email")
 	emailUuid := c.QueryParam("uuid")
+	company := c.QueryParam("company")
 
 	if len(userEmail) > 0 && !isValidEmail(userEmail) {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or no email found"))
 	}
 
-	emails, err := hctx.GetCore().DB.GetLatestEmailsByFilter(bson.M{
-		"$or": []bson.M{
-			{"from": userEmail},
-			{"uuid": emailUuid},
-		},
-	})
+	filter := bson.M{}
+	if emailUuid != "" {
+		filter["uuid"] = emailUuid
+	} else if userEmail != "" {
+		filter["from"] = userEmail
+		if company != "" {
+			filter["subject"] = bson.M{"$regex": primitive.Regex{Pattern: company, Options: "i"}}
+		}
+	} else {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("either email or uuid must be provided"))
+	}
+
+	emails, err := hctx.GetCore().DB.GetLatestEmailsByFilter(filter)
 	if err != nil {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("failed to fetch mails: %w", err))
 	}

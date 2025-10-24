@@ -1,54 +1,55 @@
-<div class="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
-    <form class="space-y-6" [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()">
-        <div>
-            <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address:</label>
-            <div class="mt-2">
-                <input formControlName="email" type="email" name="email" id="email" autocomplete="email" required
-                    placeholder="sounishnath@microsoft.com" class="form-control-input-box placeholder: text-gray-400">
-                <div *ngIf="formErrors.email" class="form-control-errors">
-                    <span *ngIf="formErrors.email.required">Email is required.</span>
-                    <span *ngIf="formErrors.email.email">Invalid email format.</span>
+<div class="flex min-h-screen items-center justify-center bg-gray-50">
+    <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-lg">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-gray-900">
+                Create an Account
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Join us and start your journey.
+            </p>
+        </div>
+        <form class="space-y-6" [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                <div class="mt-1">
+                    <input formControlName="email" type="email" name="email" id="email" autocomplete="email" required
+                        placeholder="you@example.com"
+                        class="w-full px-4 py-3 text-gray-700 bg-gray-100 border border-gray-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    <div *ngIf="formErrors.email" class="mt-1 text-xs text-red-600">
+                        <span *ngIf="formErrors.email.required">Email is required.</span>
+                        <span *ngIf="formErrors.email.email">Invalid email format.</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div>
-            <div class="flex items-center justify-between">
-                <label for="password" class="block text-sm/6 font-medium text-gray-900">Password:</label>
-                <div class="text-sm">
-                    <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <div class="mt-1">
+                    <input formControlName="password" type="password" name="password" id="password"
+                        autocomplete="new-password" required placeholder="••••••••"
+                        class="w-full px-4 py-3 text-gray-700 bg-gray-100 border border-gray-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    <div *ngIf="formErrors.password" class="mt-1 text-xs text-red-600">
+                        <span *ngIf="formErrors.password.required">Password is required.</span>
+                        <span *ngIf="formErrors.password.minlength">Password must be at least 6 characters long.</span>
+                    </div>
                 </div>
             </div>
-            <div class="mt-2">
-                <input formControlName="password" type="password" name="password" id="password"
-                    autocomplete="current-password" required placeholder="*******"
-                    class="form-control-input-box placeholder: text-gray-400">
-                <div *ngIf="formErrors.password" class="form-control-errors">
-                    <span *ngIf="formErrors.password.required">Password is required.</span>
-                    <span *ngIf="formErrors.password.minlength">Password must be at least 6 characters long.</span>
+
+            <div>
+                <button [disabled]="signupForm.invalid" type="submit"
+                    class="w-full py-3 px-4 text-white bg-indigo-600 rounded-lg font-semibold text-center shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
+                    Create an account &rarr;
+                </button>
+                <div *ngIf="errorMessage" class="mt-4 text-sm text-center text-red-600 bg-red-100 p-3 rounded-lg">
+                    {{ errorMessage | titlecase }}
                 </div>
             </div>
-        </div>
-
-        <div>
-            @if (errorMessage) {
-            <button type="reset"
-                class="flex w-full justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                {{errorMessage | titlecase}}</button>
-            } @else {
-            <button [disabled]="signupForm.invalid" type="submit"
-                class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Create
-                an account &rarr;</button>
-            }
-        </div>
-
-    </form>
-
-    <div>
-        <p class="mt-10 text-center text-sm/6 text-gray-500">
+        </form>
+        <p class="text-sm text-center text-gray-500">
             Already have an account?
-            <a routerLink="/auth/login" class="font-semibold text-indigo-600 hover:text-indigo-500 underline">
-                Login to your account</a>
+            <a routerLink="/auth/login" class="font-semibold text-indigo-600 hover:text-indigo-500">
+                Login to your account
+            </a>
         </p>
     </div>
 </div>

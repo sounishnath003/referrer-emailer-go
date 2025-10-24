@@ -1,33 +1,35 @@
-<div class="send-emailer-users flex flex-col gap-3 m-2 overflow-y-scroll h-screen">
-    <div class="cursor-pointer text-blue-800" routerLink="/dashboard">
-        <p class="my-2">✉️ Referrals Sent Box</p>
+<div class="p-4">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Sent Referrals</h2>
+    <div class="mb-4">
+        <input type="text" placeholder="Search by company..." [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)"
+            class="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+    </div>
+    <div class="flex flex-col gap-2">
+        <a routerLink="/dashboard" class="flex items-center gap-2 p-2 rounded-lg text-gray-700 hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM5.5 9a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM10 14a4 4 0 110-8 4 4 0 010 8zm4.5-5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
+            </svg>
+            <span>Inbox</span>
+        </a>
         <hr />
-    </div>
-
-    @if (sentReferrals.length) {
-    @for (item of sentReferrals; track $index) {
-    <div class="email-users" [routerLink]="['sent-referrals', item.uuid]">
-        <img src='https://avataaars.io/?avatarStyle=Circle&topType=LongHairDreads&accessoriesType=Prescription01&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Happy&eyebrowType=DefaultNatural&mouthType=Smile&skinColor=Light'
-            class="w-10" />
-
-        <div class="flex flex-col gap-1">
-            <div>
-                <span class="text-xs font-semibold text-blue-800" style="line-height: 1;">
-                    &bull;
-                    {{
-                    (item.subject.length > 60 ? (item.subject | titlecase).slice(0, 60) + '...' : (item.subject |
-                    titlecase))
-                    }}
-                </span>
-            </div>
+        <div class="overflow-y-auto h-screen">
+            @if (sentReferrals && sentReferrals.length > 0) {
+                @for (item of sentReferrals; track item.uuid) {
+                    <a [routerLink]="['sent-referrals', item.uuid]"
+                        class="flex items-start gap-3 p-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-semibold text-gray-800">{{ getCompanyName(item.subject) }}</span>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <span>To: {{ getEmailPrefix(item.to[0]) }}</span>
+                                <span class="text-gray-300">•</span>
+                                <span>{{ item.createdAt | date:'MMM d' }}</span>
+                            </div>
+                        </div>
+                    </a>
+                }
+            } @else {
+                <div class="text-center text-sm text-gray-500 mt-4">No referrals found.</div>
+            }
         </div>
-
     </div>
-
-    }
-    } @else {
-    <div class="mt-5 text-indigo-700 text-center text-xs rounded-md p-2 bg-indigo-100 text-semibold">No referrals asked
-        yet.
-    </div>
-    }
 </div>

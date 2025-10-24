@@ -24,8 +24,8 @@ export class DashboardComponent implements OnInit {
     this.pollReferralMailbox();
   }
 
-  pollReferralMailbox() {
-    this.emailingService.pollReferralMailbox$(this.profileService.ownerEmailAddress).pipe(
+  pollReferralMailbox(company?: string) {
+    this.emailingService.pollReferralMailbox$(this.profileService.ownerEmailAddress, company).pipe(
       catchError(err => {
         console.error(err);
         this.sentReferrals.next([]);

@@ -29,20 +29,18 @@ export class EmailingService {
     })
   }
 
-  pollReferralMailbox$(userEmailAddress: string): Observable<ReferralMailbox[]> {
+  pollReferralMailbox$(userEmailAddress: string, company?: string): Observable<ReferralMailbox[]> {
     const headers = new HttpHeaders();
     headers.append("Content-Type", "application/json");
 
-    // return timer(0, 3000).pipe(
-    //   switchMap(() => this.httpClient.get<ReferralMailbox[]>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/sent-referrals`, {
-    //     headers: headers,
-    //     params: { email: userEmailAddress }
-    //   }))
-    // )
+    let params: { [key: string]: string } = { email: userEmailAddress };
+    if (company) {
+      params['company'] = company;
+    }
 
     return this.httpClient.get<ReferralMailbox[]>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/sent-referrals`, {
       headers: headers,
-      params: { email: userEmailAddress }
+      params: params
     })
   }
 

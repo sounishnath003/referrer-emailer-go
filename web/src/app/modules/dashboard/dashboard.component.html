@@ -1,24 +1,13 @@
-<div class="grid auto-cols-[minmax(0, 3fr)] grid-flow-col content-center rounded-lg">
-    <div *ngIf="sentReferrals|async as referrals" class="relative">
-        <button
-            class="md:block hidden left-2 top-2 z-20 bg-white text-sm font-medium focus:outline-none transition hover:bg-gray-100 opacity-1"
-            (click)="toggleSidebar()" [attr.aria-pressed]="showSidebar">
-            <span *ngIf="showSidebar; else showText">← Hide Sidebar</span>
-            <ng-template #showText>→ Show Sidebar</ng-template>
-        </button>
-        <div class="md:block hidden max-w-xs bg-gray-100 transition-all duration-200 min-h-screen" *ngIf="showSidebar">
-            <app-sidebar-view [sentReferrals]="referrals"></app-sidebar-view>
-        </div>
+<div class="flex h-screen bg-gray-50">
+    <div class="w-64 bg-white shadow-md">
+        <app-sidebar-view [sentReferrals]="(sentReferrals | async) || []" (searchTermChange)="pollReferralMailbox($event)"></app-sidebar-view>
     </div>
-    <div class="mx-3 w-full">
-        <div class="w-full flex justify-center">
-            <div class="w-full max-w-3xl flex flex-row items-center justify-center gap-2 m-0 p-0">
-                <app-menu></app-menu>
-            </div>
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="bg-white shadow-sm">
+            <app-menu></app-menu>
         </div>
-
-        <div class="flex flex-col items-center justify-center min-h-screen m-auto">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4">
             <router-outlet></router-outlet>
-        </div>
+        </main>
     </div>
 </div>
