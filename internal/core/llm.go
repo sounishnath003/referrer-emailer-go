@@ -57,19 +57,32 @@ func (co *Core) ExtractResumeContentLLM(resumePath string) (string, error) {
 		Parts: []*genai.Part{
 			{FileData: &genai.FileData{MIMEType: "application/pdf", FileURI: resumePath}},
 			{Text: `
-		[Backstory]: You are a very "Professional Hiring Manager Specialist" of a Company. You have to screen candidate based on their resume.
+		[Role]: You are an expert HR Tech Specialist responsible for parsing and structuring resume data.
 
-		[Task]: 
-		- Given a "Resume", You have to extract all the "Key Informations" of this candidate. 
-		- Start with "## Candidate Name" . DO NOT ADD ANYTHING ELSE.
+		[Task]:
+		Extract all key information from the provided resume and structure it for a database.
 
-		[Important to note]:
-    	1. Extract all the Social Links (Linkedin, Github, MobileNo, EmailAdress etc).
-		2. Extract the "Skillsets" which are important for a Job description to match.
-		3. Extract all "Work Experiences" of this candidate in Chronological Order. Along with the "Key Performance" highlights.
-		4. Extract all "Projects / Personal Projects" candidate has mentioned. Capture the "Technologies has been used", "Project Demo links" (Github, Youtube, Or similar) etc.
-		5. Extract "Achievements" of this candidates if present. Else "SKIP".
-		6. Extract "Latest Education" (College, Institutions), Year of Graduation Tenure. "SKIP" the Class "10th, 12th" portions.
+		[Instructions]:
+		1.  **Candidate Name**: Start with "## Candidate Name". Do not add any text before it.
+		2.  **Contact Information**: Extract email, phone number, and personal website/portfolio.
+		3.  **Social Links**: Extract all social media links (e.g., LinkedIn, GitHub, Twitter).
+		4.  **Skillsets**:
+			-   Categorize skills into: 'Programming Languages', 'Frameworks & Libraries', 'Databases', 'Cloud & DevOps', and 'Tools'.
+			-   List skills under their respective categories.
+		5.  **Work Experience**:
+			-   Detail all work experiences in reverse chronological order.
+			-   For each role, include: 'Job Title', 'Company', 'Location', 'Dates of Employment', and 3-5 bullet points describing key responsibilities and quantifiable achievements (e.g., "Increased API response time by 30%").
+		6.  **Projects**:
+			-   List all personal or professional projects.
+			-   For each project, include: 'Project Name', 'Technologies Used', and links to demos or source code (e.g., GitHub, live URL).
+		7.  **Achievements**: If any awards or recognitions are mentioned, extract them. If not, omit this section.
+		8.  **Education**:
+			-   Extract the most recent educational qualifications.
+			-   Include: 'University', 'Degree', 'Field of Study', and 'Graduation Year'.
+			-   Omit high school details.
+
+		[Output Format]:
+		The output must be a well-structured markdown document.
 	`},
 		},
 	}}, nil)
@@ -94,13 +107,14 @@ func (co *Core) GenerateProfileSummaryLLM(content string) (string, error) {
 		Parts: []*genai.Part{
 			{Text: content},
 			{Text: `
-			[Backstory]: You are a very "Professional Content Generation Manager Specialist".
-			[Task]: Given a "Resume Content", Please summarize the content into "BULLET POINTS".
-			
-			[Important to note]:
-			1. Give more attention to the "Professional Work, Skills, Project and Achievements".
-			2. Must Keep the Contact Details (phone, email, linkedin, portfolio, etc) in your summary.
-			3. Output must be "Markdown" format
+			[Role]: You are a Professional Content Generation Specialist.
+
+			[Task]: Summarize the given resume content into concise bullet points.
+
+			[Instructions]:
+			1.  Focus on professional work experience, skills, projects, and achievements.
+			2.  Ensure contact details (phone, email, LinkedIn, portfolio, etc.) are included in the summary.
+			3.  The entire output must be in Markdown format.
 	`},
 		},
 	}}, nil)
@@ -124,11 +138,17 @@ func (co *Core) ConvertResumeToJSONStructLLM(content string) (string, error) {
 		Parts: []*genai.Part{
 			{Text: content},
 			{Text: `
-		[Backstory]: You are a "Senior Data Entry Specialist". Your task is to MAP the "Content" into "JSON" structure.
-		[Task]: Given a "Resume" content, Generate output Provided Below - 
+		[Role]: You are a Senior Data Entry Specialist.
 
+		[Task]: Convert the provided resume content into a structured JSON format.
+
+		[Instructions]:
+		1.  Adhere strictly to the JSON schema provided below.
+		2.  The JSON output must be a single line of text without any special characters or formatting.
+		3.  Do not include any explanatory text or markdown formatting in your response.
+
+		[JSON Schema]:
 		'{"fullName":"string","email":"string","skills":{"programmingLanguages":["string"],"toolsAndTechnologies":["string"],"frameworks":["string"],"cloudPlatforms":["string"],"miscellenous":["string"]},"socialLinks":[{"type":"string","value":"string"}],"workExperiences":[{"organizationName":"string","location":"string","tenure":"string","experiences":"string"}],"personalProjects":[{"name":"string","projectDemos":[{"type":"string","value":"string"}],"features":"string"}],"educations":[{"institutionName":"string","marksObtained":"string"}],"achievements":[{"details":"string"}]}'
-
 	`},
 		},
 	}}, nil)
@@ -165,17 +185,25 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 				%s
 
 			`, to, companyName, jobUrls, jobDescription, userProfileSummary)},
-			{Text: fmt.Sprintf(`		
-			Write a cold email to the recruiter [ToEmail]. Highlight my relevant skills and experience and REQUESTING to SCHEDULE AN INTERVIEW!. with STAR method like "Performed X with Y and achieved Z%".
-			
-			Keep it under 200 words. Write it in "1st Person Candidate's View". While adding "JOB URLs add in Bullet list" manner.
+			{Text: fmt.Sprintf(`
+			[Role]: You are a professional career coach and expert cold-email copywriter drafting an email on behalf of a candidate.
 
-			**Specific Requirements:**
+			[Task]: Write a compelling cold email to a recruiter to secure an interview for a job opportunity.
 
-			1. Use more Bullet Points and Bold Keywords.
-			2.  Include a candidate signature (Contact Details: (phone, email, linkedin, portfolio, etc), utilizing information from the "Candidate Profile."
-			3.  Format the entire output as "Markdown" format. 
-			4. No Need of providing a Subject Line.
+			[Instructions]:
+			1.  **Tone and Style**: Write in the first person from the candidate's perspective. The tone must be professional, concise, and genuinely enthusiastic.
+			2.  **Structure**:
+				- **Opening**: Start with a strong opening that grabs the recruiter's attention.
+				- **Body**: Highlight the candidate's most relevant skills and experiences, directly aligning them with the job description. Use the STAR method (Situation, Task, Action, Result) to frame 1-2 key achievements (e.g., "Achieved X by doing Y, resulting in Z").
+				- **Call to Action**: End with a clear and confident call to action, suggesting a brief chat.
+				- **Signature**: Include a professional signature with the candidate's full contact details (phone, email, LinkedIn, portfolio).
+			3.  **Formatting**:
+				- Use Markdown for clear formatting.
+				- Emphasize key skills and achievements with bold keywords.
+				- List the "JOB URLs" as a bulleted list if applicable.
+			4.  **Constraints**:
+				- The email body must be under 200 words to ensure it gets read.
+				- Do not include the subject line in the output.
 		`, templateType)},
 		},
 	}}, nil)
@@ -195,8 +223,14 @@ func (co *Core) DraftColdEmailMessageLLM(from, to, companyName, templateType, jo
 		Parts: []*genai.Part{
 			{Text: mailBody},
 			{Text: fmt.Sprintf(`
-		[Task]: Based on the "Referral Cold Email Body" and the job description, and the company name "%s", generate a concise, professional, and attention-grabbing email subject line (Mail Heading) that would make a recruiter want to open the email. The subject should clearly reflect the candidate's intent and the job opportunity, and be tailored to the content of the cold email and the job/company context.  The subject line MUST explicitly mention the company name ("%s").
-		Reply ONLY with the subject line, no extra commentary or formatting.
+		[Role]: You are an expert copywriter specializing in email marketing.
+
+		[Task]: Generate a concise, professional, and attention-grabbing email subject line based on the provided email body and job details.
+
+		[Instructions]:
+		1.  The subject line must be tailored to the email content, job description, and company.
+		2.  It must explicitly mention the company name: "%s".
+		3.  The output should ONLY be the subject line itself, without any extra text, quotes, or formatting.
 	`, companyName, companyName)},
 		},
 	}}, nil)
@@ -231,27 +265,40 @@ func (co *Core) TailorResumeWithJobDescriptionLLM(jobDescription, extractedConte
 		Parts: []*genai.Part{
 			{Text: "[Job Description]:\n" + jobDescription + "\n[Company Name]:\n" + companyName + "\n[Job Role]:\n" + jobRole + "\n[Extracted Resume Content]:\n" + extractedContent},
 			{Text: `
-[Backstory]:
-You are an expert FAANG resume strategist.
+[Role]: You are an expert FAANG resume strategist and ATS optimization specialist.
 
-[Task]: Given a "Job Description", "Company Name", "Job Role", and "Extracted Resume Content", generate a concise, single-page, ATS-friendly Software Engineer resume in Markdown.
+[Task]: Generate a concise, single-page, and strictly ATS-friendly Software Engineer resume in Markdown. The resume must be tailored to the provided job description, company, and role.
 
-[Requirements]:
-- Start with candidate's name as H1 and contact info (email, LinkedIn, GitHub, phone).
-- The LinkedIn in the contact info MUST be a Markdown hyperlink with the full https URL, using the format: [complete.url](https://complete.url). Do NOT just write the URL or plain text; strictly use the Markdown hyperlink format.
-- Add GitHub in the contact info MUST be a Markdown hyperlink with the full https URL, using the format: [github.com/sounishnath003](https://github.com/sounishnath003). Do NOT just write the URL or plain text; strictly use the Markdown hyperlink format.
-- Email Address, LinkedIn, GitHub and Contact Number, must be in single Line. Separated by '|'.
-- Add a brief "Professional Summary" tailored to the job description, company, and job role, using relevant keywords.
-- List grouped skills (Languages, Frameworks, Cloud/DevOps, Tools) as bullet points.
-- Show up to 3 most relevant roles (reverse-chronological), each with 3-5 quantified, action-oriented bullets (STAR/XYZ style).
-- Select and include up to 2 personal projects that are most relevant to the job description and company. For each, paraphrase the project description and impact to closely align with the job requirements, company, and keywords. Present each project with a title and 2-3 concise, action-oriented bullet points, emphasizing technologies, outcomes, and relevance to the target role and company. Must Hyperlink Project Demo URL, if exists like [Github | YouTube | Link](https://complete.url).
-- Focus only on content matching the job, company, and role; omit unrelated details.
-- Use standard Markdown (no tables, no images, no extra commentary).
-- Use present tense for current role, past tense for previous.
-- Each bullet starts with a strong verb and includes metrics where possible.
-- Max 1 page, ≤650 words, highly relevant for SWE roles at FAANG-level companies.
+[Instructions]:
+1.  **ATS-Friendliness is Priority**: Use standard formatting. Avoid tables, columns, and images. Use standard bullet points.
+2.  **Header**:
+    - Start with the candidate's name as an H1 heading.
+    - Follow with contact information (Email, LinkedIn, GitHub, Phone) on a single line, separated by '|'.
+    - LinkedIn and GitHub links MUST be in Markdown hyperlink format (e.g., [LinkedIn](https://linkedin.com/in/user)).
+3.  **Professional Summary**:
+    - Write a brief, impactful summary (2-3 sentences) tailored to the job, highlighting key skills and years of experience.
+4.  **Skills**:
+    - Group skills into logical categories (e.g., Languages, Frameworks, Cloud/DevOps, Tools).
+    - List skills as bullet points, matching keywords from the job description where appropriate.
+5.  **Work Experience**:
+    - List up to 3 of the most relevant roles in reverse-chronological order.
+    - For each role, provide 3-5 bullet points using the STAR or XYZ method to quantify achievements (e.g., "Increased performance by 20% by implementing X").
+    - Use strong, unique action verbs and metrics. Use present tense for the current role and past tense for previous roles.
+6.  **Projects**:
+    - Include up to 2 of the most relevant personal projects.
+    - For each project, provide a title and 2-3 bullet points describing the project, technologies used, and its relevance to the job.
+    - Hyperlink project demo URLs where available (e.g., [GitHub](https://github.com/user/project)).
+
+[Output Format]:
+- The entire output must be in standard Markdown.
+- Do not include any commentary or explanations outside of the resume content.
+
+[Constraints]:
+- **Strictly One Page**: The resume must not exceed one page (approximately 650 words).
+- **No Exaggeration**: Present skills and achievements accurately and honestly. Do not invent or overstate qualifications.
+- **Relevance is Key**: Omit any information not directly relevant to the target role.
 `},
-			{Text: "\n\nNote: DO NOT USE Repeatative Action Verbs/words, Always Use unique action verbsin the Work experiences or Project sections."},
+			{Text: "\n\nNote: Do not use repetitive action verbs. Ensure variety in the language used in the work experience and project sections."},
 		},
 	}}, nil)
 
