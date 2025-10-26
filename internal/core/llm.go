@@ -24,7 +24,7 @@ func (co *Core) initializeLLM() error {
 				"X-Vertex-AI-LLM-Request-Type": []string{"shared"},
 			},
 		},
-		Project: co.opts.GcpProjectID, Location: co.opts.GcpLocation, Backend: genai.BackendVertexAI,},
+		Project: co.opts.GcpProjectID, Location: co.opts.GcpLocation, Backend: genai.BackendVertexAI},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create genai client: %w", err)
