@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ReferralMailbox } from '../../../modules/dashboard/services/emailing.service';
-import { CommonModule, SlicePipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -8,7 +8,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sidebar-view',
-  imports: [RouterLink, CommonModule, SlicePipe, FormsModule, DatePipe],
+  imports: [RouterLink, CommonModule, FormsModule, DatePipe],
   templateUrl: './sidebar-view.component.html',
   styleUrl: './sidebar-view.component.css'
 })

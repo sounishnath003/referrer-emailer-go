@@ -1,10 +1,8 @@
-import { UpperCasePipe } from '@angular/common';
 import { Component } from '@angular/core';
-import { FooterComponent } from "../../shared/components/footer/footer.component";
 
 @Component({
   selector: 'app-landing',
-  imports: [UpperCasePipe],
+  imports: [],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css'
 })

@@ -4,12 +4,12 @@ import { SidebarViewComponent } from '../../shared/components/sidebar-view/sideb
 import { MenuComponent } from "./pages/shared/menu/menu.component";
 import { EmailingService, ReferralMailbox } from './services/emailing.service';
 import { BehaviorSubject, catchError, of } from 'rxjs';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ProfileService } from './services/profile.service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterOutlet, SidebarViewComponent, MenuComponent, MenuComponent, AsyncPipe, NgIf],
+  imports: [RouterOutlet, SidebarViewComponent, MenuComponent, MenuComponent, AsyncPipe],
   providers: [EmailingService],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
