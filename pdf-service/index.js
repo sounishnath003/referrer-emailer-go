@@ -36,7 +36,7 @@ app.post('/generate-pdf', async (req, res) => {
                 -moz-osx-font-smoothing: grayscale;
             }
             *, body {
-                font-size: 9.7pt;
+                font-size: 9.6pt;
                 font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             }
             h1 { margin-block: 0.83em; font-size: 1.50em; }

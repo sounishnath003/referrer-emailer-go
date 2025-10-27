@@ -11,8 +11,7 @@ services:
     expose:
       - 27017
     volumes:
-      # - $HOME/Documents/referrer-emailer-db-primary-mongostore:/data/db
-      - ./mongostore:/data/db
+      - $HOME/Documents/referrer-emailer-db-primary-mongostore:/data/db
 
   mongo-express:
     image: mongo-express
