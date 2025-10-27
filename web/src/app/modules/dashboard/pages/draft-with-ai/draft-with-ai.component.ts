@@ -57,7 +57,14 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
         return;
       }
       this.template = t;
-      this.emailReferralForm.patchValue({ templateType: t, from: this.profileService.ownerEmailAddress }, { emitEvent: true });
+      this.tailoredResumeId = params.get('tailoredResumeId');
+      const companyName = params.get('companyName');
+
+      this.emailReferralForm.patchValue({
+        templateType: t,
+        from: this.profileService.ownerEmailAddress,
+        companyName: companyName
+      }, { emitEvent: true });
     });
     this.emailReferralForm.valueChanges.subscribe(() => this.onFormValueChange());
 
@@ -109,19 +116,24 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.apiErrorMsg = null;
     this.successMessage = null;
-    this.emailService.generateAiDraftColdEmail$(from, to, companyName, jobDescription, templateType, jobUrlsExtract).pipe(
+    // Pass the existing tailoredResumeId to the service call
+    this.emailService.generateAiDraftColdEmail$(from, to, companyName, jobDescription, templateType, jobUrlsExtract, this.tailoredResumeId || undefined).pipe(
       catchError(err => {
         this.apiErrorMsg = err.error.error || `Unable to process your request!`;
         return of(null);
       })
     ).subscribe(data => {
-      if (data === null) return;
+      if (data === null) {
+        this.loading = false;
+        return;
+      }
       this.html = this.markdownService.parse(data.mailBody) as string;
       this.emailReferralForm.patchValue({
         subject: data.mailSubject,
         body: this.html
       }, { emitEvent: true });
-      this.tailoredResumeId = data.tailoredResumeId || null;
+      // If the backend returns a new ID, use it. Otherwise, keep the existing one.
+      this.tailoredResumeId = data.tailoredResumeId || this.tailoredResumeId;
       this.loading = false;
       this.apiErrorMsg = null;
     })

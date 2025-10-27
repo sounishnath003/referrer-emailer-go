@@ -36,7 +36,7 @@
                 <span *ngIf="formErrors.jobUrls.pattern">* Not a valid URLs</span>
             </div>
         </div>
-        <div>
+        <div *ngIf="!tailoredResumeId">
             <label for="job-description" class="block text-sm font-medium text-gray-700 mb-2">Job Description
                 (Optional)</label>
             <textarea id="job-description" formControlName="jobDescription" name="job-description" rows="2"
@@ -46,6 +46,11 @@
                     formErrors.jobDescription.maxlength.actualLength
                     }} / {{ formErrors.jobDescription.maxlength.requiredLength }} </span>
             </div>
+        </div>
+        <div *ngIf="tailoredResumeId" class="p-4 bg-green-100 border border-green-200 rounded-md">
+            <p class="text-sm font-medium text-green-800">
+                A tailored resume is attached. The job description is not needed.
+            </p>
         </div>
         <div>
             <label for="template-type" class="block text-sm font-medium text-gray-700 mb-2">Template Type</label>

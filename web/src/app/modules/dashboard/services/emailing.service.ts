@@ -44,11 +44,11 @@ export class EmailingService {
     })
   }
 
-  generateAiDraftColdEmail$(from: string, to: string, companyName: string, jobDescription: string, templateType: string, jobUrls: string[]): Observable<AiDraftColdMail> {
+  generateAiDraftColdEmail$(from: string, to: string, companyName: string, jobDescription: string, templateType: string, jobUrls: string[], tailoredResumeId?: string): Observable<AiDraftColdMail> {
     const headers = new HttpHeaders();
     headers.append("Content-Type", "application/json");
 
-    const payload = {
+    const payload: any = {
       from,
       to,
       companyName,
@@ -56,6 +56,10 @@ export class EmailingService {
       templateType,
       jobUrls
     };
+
+    if (tailoredResumeId) {
+      payload.tailoredResumeId = tailoredResumeId;
+    }
 
     return this.httpClient.post<AiDraftColdMail>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/draft-with-ai`, payload, { headers: headers });
   }

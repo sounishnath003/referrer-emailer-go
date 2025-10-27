@@ -36,7 +36,7 @@ app.post('/generate-pdf', async (req, res) => {
                 -moz-osx-font-smoothing: grayscale;
             }
             *, body {
-                font-size: 10.6pt;
+                font-size: 9.7pt;
                 font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             }
             h1 { margin-block: 0.83em; font-size: 1.50em; }
@@ -60,7 +60,7 @@ app.post('/generate-pdf', async (req, res) => {
             format: 'Letter',
             printBackground: true,
             displayHeaderFooter: true,
-            margin: { top: '0.12in', bottom: '0.12in', left: '0.15in', right: '0.15in' }
+            margin: { top: '0.1in', bottom: '0.1in', left: '0.1in', right: '0.1in' }
         });
 
         await browser.close();

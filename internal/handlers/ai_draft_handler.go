@@ -12,10 +12,11 @@ type ReferralColdmailRequestDto struct {
 	To   string `json:"to"`
 	From string `json:"from"`
 
-	CompanyName    string   `json:"companyName"`
-	JobUrls        []string `json:"jobUrls"`
-	JobDescription string   `json:"jobDescription"`
-	TemplateType   string   `json:"templateType"`
+	CompanyName      string   `json:"companyName"`
+	JobUrls          []string `json:"jobUrls"`
+	JobDescription   string   `json:"jobDescription"`
+	TemplateType     string   `json:"templateType"`
+	TailoredResumeID string   `json:"tailoredResumeId"`
 }
 
 func DraftReferralEmailWithAiHandler(c echo.Context) error {
@@ -53,11 +54,11 @@ func DraftReferralEmailWithAiHandler(c echo.Context) error {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("unable to generated draft email %s: %w", rmailDto.From, err))
 	}
 
-	var tailoredResumeID string
+	tailoredResumeID := rmailDto.TailoredResumeID
 
-	// If Jobdescription has been provided, then only generate a tailored resume
-	if len(rmailDto.JobDescription) > 0 {
-		// Step03: Generate tailored resume and store it
+	// If a Job Description is provided AND no tailored resume ID was given, then generate a new one.
+	if len(rmailDto.JobDescription) > 0 && len(tailoredResumeID) == 0 {
+		// Generate tailored resume and store it
 		resumeMarkdown, tErr := hctx.GetCore().TailorResumeWithJobDescriptionLLM(rmailDto.JobDescription, u.ExtractedContent, rmailDto.CompanyName, rmailDto.TemplateType)
 		if tErr == nil {
 			tr := &repository.TailoredResume{
@@ -75,7 +76,10 @@ func DraftReferralEmailWithAiHandler(c echo.Context) error {
 		}
 	}
 
-	// Step04: Store the draft email with tailoredResumeID
+	// Step04: Store the draft email with the correct tailoredResumeID
+	// If a tailoredResumeID was passed in the request, it will be used.
+	// If a new one was generated, that one will be used.
+	// Otherwise, it will be an empty string, and the default resume will be used upon sending.
 	_, _ = hctx.GetCore().DB.CreateAiDraftEmail(
 		rmailDto.From,
 		rmailDto.To,

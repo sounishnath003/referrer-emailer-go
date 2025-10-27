@@ -13,6 +13,7 @@
           'Edit' }}</button>
         <button (click)="downloadPDF()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">{{
           downloadLoading ? 'Processing...' : 'Download PDF' }}</button>
+        <button (click)="sendEmail()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Send via Email</button>
       </div>
     </div>
     <div class="text-xs text-gray-400 mb-2 px-8">Created: {{ resume.createdAt | date:'medium' }}</div>

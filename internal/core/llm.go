@@ -267,14 +267,14 @@ func (co *Core) TailorResumeWithJobDescriptionLLM(jobDescription, extractedConte
 			{Text: `
 [Role]: You are an expert FAANG resume strategist and ATS optimization specialist.
 
-[Task]: Generate a concise, single-page, and strictly ATS-friendly Software Engineer resume in Markdown. The resume must be tailored to the provided job description, company, and role.
+[Task]: Generate a concise, single-page, and strictly ATS-friendly Software Engineer resume in Markdown. The resume must be tailored to the provided job description, company, and role, with impeccable spelling and grammar.
 
 [Instructions]:
-1.  **ATS-Friendliness is Priority**: Use standard formatting. Avoid tables, columns, and images. Use standard bullet points.
+1.  **ATS-Friendliness is Priority**: Use standard, single-column formatting. Avoid tables, columns, and images. Use standard bullet points (e.g., '-').
 2.  **Header**:
     - Start with the candidate's name as an H1 heading.
     - Follow with contact information (Email, LinkedIn, GitHub, Phone) on a single line, separated by '|'.
-    - LinkedIn and GitHub links MUST be in Markdown hyperlink format (e.g., [LinkedIn](https://linkedin.com/in/user)).
+    - LinkedIn and GitHub links in the contact section MUST be full URLs, not hyperlinks (e.g., https://linkedin.com/in/user).
 3.  **Professional Summary**:
     - Write a brief, impactful summary (2-3 sentences) tailored to the job, highlighting key skills and years of experience.
 4.  **Skills**:
@@ -282,23 +282,23 @@ func (co *Core) TailorResumeWithJobDescriptionLLM(jobDescription, extractedConte
     - List skills as bullet points, matching keywords from the job description where appropriate.
 5.  **Work Experience**:
     - List up to 3 of the most relevant roles in reverse-chronological order.
-    - For each role, provide 3-5 bullet points using the STAR or XYZ method to quantify achievements (e.g., "Increased performance by 20% by implementing X").
-    - Use strong, unique action verbs and metrics. Use present tense for the current role and past tense for previous roles.
+    - For each role, provide 2-4 bullet points using the STAR or XYZ method to quantify achievements (e.g., "Increased performance by 20% by implementing X").
+    - **Use strong, varied action verbs.** Do not repeat the same verbs across different bullet points. Proofread carefully for spelling and grammatical errors.
 6.  **Projects**:
     - Include up to 2 of the most relevant personal projects.
     - For each project, provide a title and 2-3 bullet points describing the project, technologies used, and its relevance to the job.
-    - Hyperlink project demo URLs where available (e.g., [GitHub](https://github.com/user/project)).
+    - Project demo URLs (GitHub, YouTube, etc.) MUST be in Markdown hyperlink format (e.g., [GitHub](https://github.com/user/project)).
 
 [Output Format]:
 - The entire output must be in standard Markdown.
 - Do not include any commentary or explanations outside of the resume content.
 
 [Constraints]:
-- **Strictly One Page**: The resume must not exceed one page (approximately 650 words).
+- **Strictly One Page**: The resume must be very concise and MUST NOT exceed one page (aim for under 600 words). Be aggressive in summarization.
 - **No Exaggeration**: Present skills and achievements accurately and honestly. Do not invent or overstate qualifications.
 - **Relevance is Key**: Omit any information not directly relevant to the target role.
 `},
-			{Text: "\n\nNote: Do not use repetitive action verbs. Ensure variety in the language used in the work experience and project sections."},
+			{Text: "\n\nNote: Ensure the language is professional, achievements are quantified, and there are no spelling mistakes. The resume must be of the highest ATS standard."},
 		},
 	}}, nil)
 

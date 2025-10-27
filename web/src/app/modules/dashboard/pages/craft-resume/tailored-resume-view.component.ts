@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProfileService } from '../../services/profile.service';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgIf, DatePipe, } from '@angular/common';
@@ -20,7 +20,7 @@ export class TailoredResumeViewComponent implements OnInit {
     editMode = false;
     editableMarkdown = '';
 
-    constructor(private route: ActivatedRoute, private profileService: ProfileService) { }
+    constructor(private route: ActivatedRoute, private profileService: ProfileService, private router: Router) { }
 
     ngOnInit() {
         const id = this.route.snapshot.paramMap.get('id');
@@ -83,5 +83,17 @@ export class TailoredResumeViewComponent implements OnInit {
                 this.error = err.error?.error || 'Failed to download resume as pdf.';
             }
         })
+    }
+
+    sendEmail() {
+        if (this.resume) {
+            this.router.navigate(['/dashboard/draft-with-ai'], {
+                queryParams: {
+                    template: this.resume.jobRole,
+                    tailoredResumeId: this.resume.id,
+                    companyName: this.resume.companyName,
+                }
+            });
+        }
     }
 }
