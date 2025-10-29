@@ -115,3 +115,19 @@ func PeopleSearchHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, results)
 }
+
+// UpdateProfileHandler handles the partial update of a user's profile.
+func UpdateProfileHandler(c echo.Context) error {
+	hctx := c.(*HandlerContext)
+
+	var user repository.User
+	if err := c.Bind(&user); err != nil {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid request body"))
+	}
+
+	if err := hctx.GetCore().DB.UpdateProfile(&user); err != nil {
+		return SendErrorResponse(c, http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Profile updated successfully"})
+}

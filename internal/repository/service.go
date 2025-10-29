@@ -54,6 +54,26 @@ func (mc *MongoDBClient) UpdateProfileInformation(u *User) error {
 	return err
 }
 
+// UpdateProfile updates the profile information partially
+func (mc *MongoDBClient) UpdateProfile(u *User) error {
+	ctx, cancel := getContextWithTimeout(10)
+	defer cancel()
+
+	collection := mc.Database("referrer").Collection("users")
+
+	filterCondn := bson.M{
+		"email": bson.M{"$regex": u.Email, "$options": "i"},
+	}
+	updateDoc := bson.M{"$set": bson.M{
+		"extractedContent": u.ExtractedContent,
+	}}
+	m, err := collection.UpdateOne(ctx, filterCondn, updateDoc)
+	if m.MatchedCount == 0 {
+		return fmt.Errorf("user does not exist.")
+	}
+	return err
+}
+
 // GetProfileByEmail helps to find the user by email address
 func (mc *MongoDBClient) GetProfileByEmail(email string) (*User, error) {
 	ctx, cancel := getContextWithTimeout(5)

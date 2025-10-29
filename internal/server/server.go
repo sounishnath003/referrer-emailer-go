@@ -86,6 +86,7 @@ func (s *Server) Start() error {
 	api.Add("POST", "/auth/login", handlers.LoginHandler)
 	// Profile endpoints.
 	api.Add("GET", "/profile", handlers.GetProfileHandler)
+	api.Add("PATCH", "/profile", handlers.UpdateProfileHandler)
 	api.Add("GET", "/profile/search-people", handlers.PeopleSearchHandler)
 	api.Add("GET", "/profile/analytics", handlers.ProfileAnalyticsHandler)
 	api.Add("POST", "/profile/information", handlers.ProfileInformationHandler)

@@ -97,6 +97,11 @@ export class ProfileService {
     })
   }
 
+  patchProfileInformation$(profileInfo: Partial<ApiProfileInformation>): Observable<ApiProfileInformation> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.httpClient.patch<ApiProfileInformation>(`${this.API_URL}/api/profile`, profileInfo, { headers });
+  }
+
   getProfileAnalytics$(userEmail: string): Observable<ProfileAnalytics> {
     const headers = new HttpHeaders();
     headers.append("Content-Type", "application/json");
