@@ -3,7 +3,7 @@ import { SubheroComponent } from "../shared/subhero/subhero.component";
 import { Editor, NgxEditorModule } from 'ngx-editor';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AsyncPipe, JsonPipe, NgIf } from '@angular/common';
+import { AsyncPipe, CommonModule, JsonPipe, NgIf } from '@angular/common';
 import { EmailingService } from '../../services/emailing.service';
 import { BehaviorSubject, catchError, debounceTime, distinctUntilChanged, filter, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { MarkdownModule, MarkdownService } from 'ngx-markdown';
@@ -12,7 +12,7 @@ import { ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-draft-with-ai',
-  imports: [SubheroComponent, NgxEditorModule, FormsModule, ReactiveFormsModule, NgIf, MarkdownModule, AsyncPipe, EmailAutocompleteComponent],
+  imports: [SubheroComponent, NgxEditorModule, FormsModule, ReactiveFormsModule, NgIf, MarkdownModule, AsyncPipe, EmailAutocompleteComponent, CommonModule],
   providers: [EmailingService, MarkdownService],
   templateUrl: './draft-with-ai.component.html',
   styleUrls: ['./draft-with-ai.component.css']
@@ -24,6 +24,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
   template: string | null = null;
 
   filteredSuggestions: { email: string, currentCompany: string }[] = [];
+  toEmailIds: string[] = [];
   private destroy$ = new Subject<void>();
 
   apiErrorMsg: string | null = null;
@@ -32,7 +33,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
 
   emailReferralForm: FormGroup = new FormGroup({
     from: new FormControl(null, [Validators.required, Validators.email]),
-    to: new FormControl(null, [Validators.required, Validators.email]),
+    to: new FormControl(null, [Validators.email]),
     jobUrls: new FormControl(null, [Validators.required, Validators.pattern(/(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g)]),
     jobDescription: new FormControl(null, [Validators.maxLength(2000)]),
     companyName: new FormControl('', [Validators.required]),
@@ -40,6 +41,13 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
     subject: new FormControl('', []),
     body: new FormControl('', []),
   })
+
+  get isFormValid(): boolean {
+    // Form is valid if the base form is valid (ignoring the empty 'to' input if chips exist)
+    // AND we have at least one recipient (either in chips or in the input)
+    const hasRecipient = this.toEmailIds.length > 0 || !!this.emailReferralForm.get('to')?.value;
+    return this.emailReferralForm.valid && hasRecipient;
+  }
 
   processing$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   successMessage: string | null = null;
@@ -67,6 +75,11 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
         companyName: companyName,
         to: to
       }, { emitEvent: true });
+      
+      // Auto-add if 'to' present
+      if (to) {
+         this.addEmail();
+      }
     });
     this.emailReferralForm.valueChanges.subscribe(() => this.onFormValueChange());
 
@@ -93,6 +106,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.editorBox.destroy();
+    this.toEmailIds = [];
     // Destroy the event cycl.
     this.destroy$.next();
     this.destroy$.complete();
@@ -101,17 +115,54 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
   onSuggestionSelected(suggestion: { email: string, currentCompany: string } | undefined): void {
     if (!suggestion) return;
 
-    // PatchValues
-    this.emailReferralForm.patchValue({
-      to: suggestion.email.trim(),
-      companyName: suggestion.currentCompany?.trim(),
-    });
+    const inputControl = this.emailReferralForm.get('to');
+    const currentValue = inputControl?.value || '';
+
+    // Replace everything after the '@' with the selected suggestion
+    const newValue = currentValue.replace(/@\w*$/, suggestion.email);
+    inputControl?.setValue(newValue.trim());
+    
+    // Update company if not set or empty
+    const currentCompany = this.emailReferralForm.get('companyName')?.value;
+    if (!currentCompany && suggestion.currentCompany) {
+        this.emailReferralForm.patchValue({ companyName: suggestion.currentCompany });
+    }
+
+    this.addEmail();
     this.filteredSuggestions = [];
+  }
+
+  // Function to handle email addition
+  addEmail(): void {
+    const emailControl = this.emailReferralForm.get('to');
+    if (emailControl?.valid) {
+      const email = emailControl.value.trim();
+      if (!this.toEmailIds.includes(email)) {
+        this.toEmailIds.push(email);
+        emailControl.reset(); // Clear input after adding
+      } else {
+        // window.alert('email exists')
+      }
+    }
+  }
+
+  // Remove email from the list
+  removeEmail(email: string): void {
+    this.toEmailIds = this.toEmailIds.filter((e) => e !== email);
   }
 
   generateAiEmail() {
     // Logic to generate AI email and update previewBody
-    const { from, to, companyName, jobUrls, jobDescription, templateType } = { ...this.emailReferralForm.value, templateType: this.template };
+    // For AI generation, we use the first email if multiple, or just generate generic.
+    // The prompt takes `to`. If multiple, we can send the first one as context or handle it.
+    // Let's use the first one if available in `toEmailIds`, else the input value.
+    
+    let toEmail = this.emailReferralForm.get('to')?.value;
+    if (this.toEmailIds.length > 0) {
+        toEmail = this.toEmailIds[0];
+    }
+    
+    const { from, companyName, jobUrls, jobDescription, templateType } = { ...this.emailReferralForm.value, templateType: this.template };
     // extract all the urls
     const jobUrlsExtract = this.extractAllUrls(jobUrls) || [jobUrls];
 
@@ -119,7 +170,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
     this.apiErrorMsg = null;
     this.successMessage = null;
     // Pass the existing tailoredResumeId to the service call
-    this.emailService.generateAiDraftColdEmail$(from, to, companyName, jobDescription, templateType, jobUrlsExtract, this.tailoredResumeId || undefined).pipe(
+    this.emailService.generateAiDraftColdEmail$(from, toEmail, companyName, jobDescription, templateType, jobUrlsExtract, this.tailoredResumeId || undefined).pipe(
       catchError(err => {
         this.apiErrorMsg = err.error.error || `Unable to process your request!`;
         return of(null);
@@ -142,26 +193,85 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
 
   }
 
+  isBulkSending: boolean = false;
+
   sendEmail() {
     // Logic to send email
-    const { from, to, subject, body } = { ...this.emailReferralForm.value };
+    const { from, subject, body } = { ...this.emailReferralForm.value };
+    
+    // Combine all recipients
+    const recipients = [...this.toEmailIds];
+    
+    // Include current input value if it looks like an email and isn't already added
+    const inputTo = this.emailReferralForm.get('to')?.value;
+    if (inputTo && typeof inputTo === 'string' && inputTo.includes('@') && !recipients.includes(inputTo)) {
+        recipients.push(inputTo);
+    }
+    
+    // Add sender (backend requires it in the 'to' list for logic consistency, though it filters it out for bulk targeting)
+    recipients.push(from);
+    
+    if (recipients.length <= 1) { // Only sender
+         window.alert("Please add at least one recipient.");
+         return;
+    }
 
     this.processing$.next(true);
+    this.isBulkSending = false;
 
-    this.emailService.sendEmail$(from, [to, from], subject, body, this.tailoredResumeId || undefined).pipe(
+    this.emailService.sendEmail$(from, recipients, subject, body, this.tailoredResumeId || undefined).pipe(
       catchError(err => {
         this.apiErrorMsg = err.error.error || `Something went wrong`;
+        this.processing$.next(false);
         return of(null);
       })
-    ).subscribe(data => {
+    ).subscribe((data: any) => {
       if (data === null) return;
       this.errorMessage = null;
-      this.successMessage = `Email has been sent.`;
-      this.processing$.next(false);
 
-      // Clear off
-      // this.emailReferralForm.reset();
+      // Check if it's a bulk response (202 Accepted) or single (200 OK)
+      if (data.jobId) {
+         // Start Polling
+         this.isBulkSending = true;
+         this.successMessage = data.message;
+         this.pollJobStatus(data.jobId);
+      } else {
+         this.successMessage = `Email has been sent.`;
+         this.processing$.next(false);
+         // Reset
+         this.toEmailIds = [];
+         this.emailReferralForm.reset();
+      }
     })
+  }
+
+  jobProgress: number = 0;
+  jobStatus: string = '';
+  isJobComplete: boolean = false;
+
+  pollJobStatus(jobId: string) {
+    const interval = setInterval(() => {
+      this.emailService.getBulkEmailJobStatus$(jobId).subscribe(job => {
+        this.jobStatus = job.status;
+        this.jobProgress = Math.round((job.sentCount / job.totalRecipients) * 100);
+        
+        if (job.status === 'COMPLETED' || job.status === 'FAILED') {
+          clearInterval(interval);
+          this.processing$.next(false);
+          this.isJobComplete = true;
+          this.successMessage = job.status === 'COMPLETED' ? 'All emails sent successfully!' : 'Some emails failed to send.';
+          
+          if (job.status === 'COMPLETED') {
+            //  this.emailReferralForm.reset(); 
+             setTimeout(() => {
+                 this.isJobComplete = false;
+                 this.isBulkSending = false;
+                 this.jobProgress = 0;
+             }, 5000);
+          }
+        }
+      });
+    }, 1000); // Poll every 1 second
   }
 
 

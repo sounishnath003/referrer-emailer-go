@@ -4,7 +4,7 @@ import { EmailingService } from '../../services/emailing.service';
 import { Editor, NgxEditorModule } from 'ngx-editor';
 import { EmailAutocompleteComponent } from "./components/email-autocomplete/email-autocomplete.component";
 import { BehaviorSubject, catchError, debounceTime, distinctUntilChanged, filter, of, Subject, switchMap, takeUntil } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { SubheroComponent } from "../shared/subhero/subhero.component";
 import { ApiProfileInformation, ProfileService } from '../../services/profile.service';
 import { ActivatedRoute } from '@angular/router';
@@ -13,7 +13,7 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'app-email-drafter',
   templateUrl: './email-drafter.component.html',
   styleUrls: ['./email-drafter.component.css'],
-  imports: [FormsModule, ReactiveFormsModule, NgxEditorModule, EmailAutocompleteComponent, AsyncPipe, SubheroComponent],
+  imports: [FormsModule, ReactiveFormsModule, NgxEditorModule, EmailAutocompleteComponent, AsyncPipe, SubheroComponent, CommonModule],
   providers: [EmailingService]
 })
 export class EmailDrafterComponent implements OnInit, OnDestroy {
@@ -28,11 +28,16 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
 
   emailSenderForm: FormGroup = new FormGroup({
-    to: new FormControl(null, [Validators.required, Validators.email]),
+    to: new FormControl(null, [Validators.email]),
     from: new FormControl(null, [Validators.required, Validators.email]),
     subject: new FormControl(null, [Validators.required, Validators.maxLength(40)]),
     body: new FormControl(null, [Validators.required, Validators.minLength(30), Validators.maxLength(2000)]),
   });
+
+  get isFormValid(): boolean {
+    const hasRecipient = this.toEmailIds.length > 0 || !!this.emailSenderForm.get('to')?.value;
+    return this.emailSenderForm.valid && hasRecipient;
+  }
 
   constructor(
     private readonly emailingService: EmailingService, 
@@ -135,41 +140,103 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
     this.toEmailIds = this.toEmailIds.filter((e) => e !== email);
   }
 
+  isBulkSending: boolean = false;
+
   onEmailSend() {
     console.log({ emailbox: this.html });
 
     const emailFormValue = this.emailSenderForm.value;
     // Check validations    
-    if (this.toEmailIds.length == 0 || emailFormValue["subject"].length < 3 || emailFormValue["body"].length < 10) {
-      console.log(this.emailSenderForm.value);
-      window.alert(JSON.stringify('Form is invalid'));
+    if (this.toEmailIds.length == 0 && !emailFormValue["to"]) {
+       // if both empty
+       window.alert('Please add at least one recipient');
+       return;
+    }
+    
+    if (emailFormValue["subject"].length < 3 || emailFormValue["body"].length < 10) {
+      window.alert(JSON.stringify('Form is invalid: Subject or Body too short'));
       return;
     }
 
+    // Combine recipients
+    const recipients = [...this.toEmailIds];
+    const inputTo = emailFormValue["to"];
+    if (inputTo && typeof inputTo === 'string' && inputTo.includes('@') && !recipients.includes(inputTo)) {
+        recipients.push(inputTo);
+    }
+    recipients.push(emailFormValue['from']); // Add sender
 
-    emailFormValue['to'] = [...this.toEmailIds, emailFormValue['from']];
-    emailFormValue['body'] = emailFormValue['body'];
+    if (recipients.length <= 1) {
+         window.alert("Please add at least one recipient.");
+         return;
+    }
+    
+    // Update Payload
+    const payloadTo = recipients; 
+    const payloadBody = emailFormValue['body'];
 
     // Call Api
     this.processing$.next(true);
-    this.emailingService.sendEmail$(this.profileService.ownerEmailAddress, emailFormValue["to"], emailFormValue["subject"], emailFormValue["body"]).pipe(
+    this.isBulkSending = false;
+
+    this.emailingService.sendEmail$(this.profileService.ownerEmailAddress, payloadTo, emailFormValue["subject"], payloadBody).pipe(
       catchError(err => {
         this.errorMessage = err.error.error;
+        this.processing$.next(false);
         return of(null);
       })
-    ).subscribe((resp) => {
+    ).subscribe((resp: any) => {
       if (resp === null) return;
       this.errorMessage = null;
-      this.successMessage = `Email has been sent.`;
-      this.processing$.next(false);
-
-      // Clear off
-      this.emailSenderForm.reset();
-      this.toEmailIds = [];
+      
+      // Check if it's a bulk response (202 Accepted) or single (200 OK)
+      if (resp.jobId) {
+         // Start Polling
+         this.isBulkSending = true;
+         this.successMessage = resp.message;
+         this.pollJobStatus(resp.jobId);
+      } else {
+         this.successMessage = `Email has been sent.`;
+         this.processing$.next(false);
+         this.emailSenderForm.reset();
+         this.toEmailIds = [];
+      }
+      
       console.log(resp);
     })
 
   }
+
+  jobProgress: number = 0;
+  jobStatus: string = '';
+  isJobComplete: boolean = false;
+
+  pollJobStatus(jobId: string) {
+    const interval = setInterval(() => {
+      this.emailingService.getBulkEmailJobStatus$(jobId).subscribe(job => {
+        this.jobStatus = job.status;
+        this.jobProgress = Math.round((job.sentCount / job.totalRecipients) * 100);
+        
+        if (job.status === 'COMPLETED' || job.status === 'FAILED') {
+          clearInterval(interval);
+          this.processing$.next(false);
+          this.isJobComplete = true;
+          this.successMessage = job.status === 'COMPLETED' ? 'All emails sent successfully!' : 'Some emails failed to send.';
+          
+          if (job.status === 'COMPLETED') {
+             this.emailSenderForm.reset();
+             this.toEmailIds = [];
+             setTimeout(() => {
+                 this.isJobComplete = false;
+                 this.isBulkSending = false;
+                 this.jobProgress = 0;
+             }, 5000);
+          }
+        }
+      });
+    }, 1000); // Poll every 1 second
+  }
+
 
 
   subscribeToFormUpdate$() {

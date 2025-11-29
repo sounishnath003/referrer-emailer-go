@@ -14,6 +14,8 @@ import (
 	"github.com/yuin/goldmark"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"github.com/sounishnath003/customgo-mailer-service/internal/repository"
 )
 
 // EmailSenderDto hold the DTO for the email sending data payload.
@@ -35,87 +37,127 @@ func SendEmailHandler(c echo.Context) error {
 
 	hctx := c.(*HandlerContext)
 
-	// Create a context with a timeout of 10 seconds
+	// Identify real recipients (excluding the sender)
+	var recipients []string
+	sender := emailSenderDto.From
+	for _, to := range emailSenderDto.To {
+		if !strings.EqualFold(to, sender) {
+			recipients = append(recipients, to)
+		}
+	}
+
+	// Helper to prepare resume
+	prepareResume := func(ctx context.Context) (string, error) {
+		if emailSenderDto.TailoredResumeID != "" {
+			objID, objErr := primitive.ObjectIDFromHex(emailSenderDto.TailoredResumeID)
+			if objErr != nil {
+				return "", fmt.Errorf("invalid tailoredResumeId: %w", objErr)
+			}
+			tr, tErr := hctx.GetCore().DB.GetTailoredResumeByID(ctx, objID)
+			if tErr != nil {
+				return "", tErr
+			}
+			var htmlBuf bytes.Buffer
+			if err := goldmark.Convert([]byte(tr.ResumeMarkdown), &htmlBuf); err != nil {
+				return "", fmt.Errorf("failed to convert markdown to HTML: %w", err)
+			}
+			pdfResp, pdfErr := generatePDFfromResume(hctx.GetCore().PdfServiceUri, htmlBuf.String())
+			if pdfErr != nil {
+				return "", pdfErr
+			}
+			tmpFile, tmpErr := os.CreateTemp("/tmp", "Sounish_Naths_Resume_*.pdf")
+			if tmpErr != nil {
+				return "", tmpErr
+			}
+			defer tmpFile.Close()
+			if _, wErr := tmpFile.Write(pdfResp); wErr != nil {
+				return "", wErr
+			}
+			return tmpFile.Name(), nil
+		} else {
+			u, err := hctx.GetCore().DB.GetProfileByEmail(emailSenderDto.From)
+			if err != nil {
+				return "", err
+			}
+			return hctx.GetCore().DownloadObjectFromGCSBucket(u.Resume)
+		}
+	}
+
+	// BULK MODE: >1 recipients
+	if len(recipients) > 1 {
+		// Create Job
+		job := &repository.BulkEmailJob{
+			UserEmail:       sender,
+			TotalRecipients: len(recipients),
+			SentCount:       0,
+			Status:          "PENDING",
+		}
+		if err := hctx.GetCore().DB.CreateBulkEmailJob(job); err != nil {
+			return SendErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("failed to create bulk job: %w", err))
+		}
+
+		go func() {
+			// Background context
+			bgCtx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+			defer cancel()
+
+			localDst, err := prepareResume(bgCtx)
+			if err != nil {
+				hctx.GetCore().Lo.Error("failed to prepare resume for bulk send", "error", err)
+				hctx.GetCore().DB.FailBulkEmailJob(job.ID, fmt.Sprintf("failed to prepare resume: %s", err.Error()))
+				return
+			}
+			defer os.Remove(localDst)
+
+			sentCount := 0
+			for _, recipient := range recipients {
+				// Construct To: [recipient, sender]
+				currentTo := []string{recipient, sender}
+				
+				// Send
+				err := hctx.GetCore().InvokeSendMailWithAttachment(
+					sender, 
+					currentTo, 
+					emailSenderDto.Sub, 
+					emailSenderDto.Body, 
+					emailSenderDto.TailoredResumeID, 
+					localDst,
+				)
+				
+				if err != nil {
+					hctx.GetCore().Lo.Error("failed to send bulk email", "to", recipient, "error", err)
+					// We log error but continue sending to others
+				} else {
+					hctx.GetCore().Lo.Info("bulk email sent", "to", recipient)
+					sentCount++
+					hctx.GetCore().DB.UpdateBulkEmailJobProgress(job.ID, sentCount)
+				}
+				
+				// Small delay to be nice to SMTP
+				time.Sleep(500 * time.Millisecond)
+			}
+			hctx.GetCore().DB.CompleteBulkEmailJob(job.ID)
+		}()
+
+		return c.JSON(http.StatusAccepted, map[string]any{
+			"message": fmt.Sprintf("Processing bulk emails to %d recipients in background.", len(recipients)),
+			"jobId":   job.ID.Hex(),
+		})
+	}
+
+	// SINGLE MODE (Existing synchronous logic)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	// Channel to receive the result of the email sending
-	errChan := make(chan error, 1)
+	localDst, err := prepareResume(ctx)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusInternalServerError, err)
+	}
+	defer os.Remove(localDst)
 
-	go func() {
-		var localDst string
-
-		if emailSenderDto.TailoredResumeID != "" {
-			// Convert string to ObjectID
-			objID, objErr := primitive.ObjectIDFromHex(emailSenderDto.TailoredResumeID)
-			if objErr != nil {
-				errChan <- fmt.Errorf("invalid tailoredResumeId: %w", objErr)
-				return
-			}
-			// Fetch tailored resume and generate PDF
-			tr, tErr := hctx.GetCore().DB.GetTailoredResumeByID(ctx, objID)
-			if tErr != nil {
-				errChan <- tErr
-				return
-			}
-			// Convert Markdown to HTML using goldmark
-			var htmlBuf bytes.Buffer
-			if err := goldmark.Convert([]byte(tr.ResumeMarkdown), &htmlBuf); err != nil {
-				errChan <- fmt.Errorf("failed to convert markdown to HTML: %w", err)
-				return
-			}
-			htmlContent := htmlBuf.String()
-			// Call PDF service to generate PDF from HTML
-			pdfResp, pdfErr := generatePDFfromResume(hctx.GetCore().PdfServiceUri, htmlContent)
-			if pdfErr != nil {
-				errChan <- pdfErr
-				return
-			}
-			// Save PDF to a temp file
-			tmpFile, tmpErr := os.CreateTemp("/tmp", "Sounish_Naths_Resume_*.pdf")
-			if tmpErr != nil {
-				errChan <- tmpErr
-				return
-			}
-			defer tmpFile.Close()
-			_, wErr := tmpFile.Write(pdfResp)
-			if wErr != nil {
-				errChan <- wErr
-				return
-			}
-			localDst = tmpFile.Name()
-		} else {
-			// get the `from` user from DB
-			u, err := hctx.GetCore().DB.GetProfileByEmail(emailSenderDto.From)
-			if err != nil {
-				errChan <- err
-				return
-			}
-			// Download the file into LocalDisk
-			localDst, err = hctx.GetCore().DownloadObjectFromGCSBucket(u.Resume)
-			if err != nil {
-				errChan <- err
-				return
-			}
-		}
-
-		// Invoke the SendMail with Attachment.
-		errChan <- hctx.GetCore().InvokeSendMailWithAttachment(emailSenderDto.From, emailSenderDto.To, emailSenderDto.Sub, emailSenderDto.Body, emailSenderDto.TailoredResumeID, localDst)
-
-		// Purge the Local file
-		if err := os.Remove(localDst); err != nil {
-			hctx.GetCore().Lo.Error("error deleting the file:", "error", err)
-		}
-	}()
-
-	select {
-	case <-ctx.Done():
-		// Context timeout
-		return SendErrorResponse(c, http.StatusRequestTimeout, ctx.Err())
-	case err := <-errChan:
-		if err != nil {
-			return SendErrorResponse(c, http.StatusInternalServerError, err)
-		}
+	err = hctx.GetCore().InvokeSendMailWithAttachment(emailSenderDto.From, emailSenderDto.To, emailSenderDto.Sub, emailSenderDto.Body, emailSenderDto.TailoredResumeID, localDst)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	return c.JSON(http.StatusOK, emailSenderDto)
@@ -174,3 +216,21 @@ func GetReferralEmailsHandler(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, emails)
 }
+
+func GetBulkEmailJobStatusHandler(c echo.Context) error {
+	hctx := c.(*HandlerContext)
+	idStr := c.Param("id")
+
+	id, err := primitive.ObjectIDFromHex(idStr)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid job id"))
+	}
+
+	job, err := hctx.GetCore().DB.GetBulkEmailJob(id)
+	if err != nil {
+		return SendErrorResponse(c, http.StatusNotFound, fmt.Errorf("job not found"))
+	}
+
+	return c.JSON(http.StatusOK, job)
+}
+

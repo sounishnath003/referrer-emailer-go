@@ -11,61 +11,28 @@ export class EmailingService {
   constructor(private readonly httpClient: HttpClient) { }
 
   sendEmail$(from: string, to: string[], subject: string, body: string, tailoredResumeId?: string) {
-    const payload: any = {
-      from,
-      to,
-      subject,
-      body,
-    };
-    if (tailoredResumeId) {
-      payload.tailoredResumeId = tailoredResumeId;
-    }
-    const httpHeaders = new HttpHeaders();
-    httpHeaders.append('Content-Type', 'application/json')
-
-    return this.httpClient.post(`${this.API_URL}/api/send-email`, payload, {
-      headers: httpHeaders,
-      withCredentials: false,
-    })
+    return this.httpClient.post(`${this.API_URL}/api/send-email`, { from, to, subject, body, tailoredResumeId });
   }
 
-  pollReferralMailbox$(userEmailAddress: string, company?: string): Observable<ReferralMailbox[]> {
-    const headers = new HttpHeaders();
-    headers.append("Content-Type", "application/json");
-
-    let params: { [key: string]: string } = { email: userEmailAddress };
-    if (company) {
-      params['company'] = company;
-    }
-
-    return this.httpClient.get<ReferralMailbox[]>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/sent-referrals`, {
-      headers: headers,
-      params: params
-    })
+  getBulkEmailJobStatus$(jobId: string) {
+    return this.httpClient.get<any>(`${this.API_URL}/api/send-email/jobs/${jobId}`);
   }
 
-  generateAiDraftColdEmail$(from: string, to: string, companyName: string, jobDescription: string, templateType: string, jobUrls: string[], tailoredResumeId?: string): Observable<AiDraftColdMail> {
-    const headers = new HttpHeaders();
-    headers.append("Content-Type", "application/json");
-
-    const payload: any = {
-      from,
-      to,
-      companyName,
-      jobDescription,
-      templateType,
-      jobUrls
-    };
-
-    if (tailoredResumeId) {
-      payload.tailoredResumeId = tailoredResumeId;
-    }
-
-    return this.httpClient.post<AiDraftColdMail>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/draft-with-ai`, payload, { headers: headers });
+  generateAiDraftColdEmail$(from: string, to: string, companyName: string, jobDescription: string, templateType: string | null, jobUrls: string[], tailoredResumeId?: string): Observable<AiDraftColdMail> {
+    const payload = { from, to, companyName, jobDescription, templateType, jobUrls, tailoredResumeId };
+    return this.httpClient.post<AiDraftColdMail>(`${this.API_URL}/api/draft-with-ai`, payload);
   }
 
-  getReferralEmailByUuid$(uuid: string) {
-    return this.httpClient.get<ReferralMailbox[]>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/sent-referrals?uuid=${uuid}`)
+  getReferralEmailByUuid$(uuid: string): Observable<ReferralMailbox[]> {
+    return this.httpClient.get<ReferralMailbox[]>(`${this.API_URL}/api/sent-referrals?uuid=${uuid}`);
+  }
+
+  pollReferralMailbox$(email: string, companyName?: string): Observable<ReferralMailbox[]> {
+    let url = `${this.API_URL}/api/sent-referrals?email=${email}`;
+    if (companyName && companyName.trim().length > 0) {
+      url += `&company=${companyName}`;
+    }
+    return this.httpClient.get<ReferralMailbox[]>(url);
   }
 }
 

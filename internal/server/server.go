@@ -101,6 +101,7 @@ func (s *Server) Start() error {
 	// Email endpoints.
 	api.Add("GET", "/sent-referrals", handlers.GetReferralEmailsHandler)
 	api.Add("POST", "/send-email", handlers.SendEmailHandler)
+	api.Add("GET", "/send-email/jobs/:id", handlers.GetBulkEmailJobStatusHandler)
 
 	// Network / Contact Management endpoints
 	api.Add("POST", "/network/contacts", handlers.AddContactHandler)
