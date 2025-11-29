@@ -1,35 +1,41 @@
-<div class="p-4">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4">Sent Referrals</h2>
-    <div class="mb-4">
-        <input type="text" placeholder="Search by company..." [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)"
-            class="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-    </div>
-    <div class="flex flex-col gap-2">
-        <a routerLink="/dashboard" class="flex items-center gap-2 p-2 rounded-lg text-gray-700 hover:bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM5.5 9a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM10 14a4 4 0 110-8 4 4 0 010 8zm4.5-5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-            </svg>
-            <span>Inbox</span>
-        </a>
-        <hr />
-        <div class="overflow-y-auto h-screen">
-            @if (sentReferrals && sentReferrals.length > 0) {
-                @for (item of sentReferrals; track item.uuid) {
-                    <a [routerLink]="['sent-referrals', item.uuid]"
-                        class="flex items-start gap-3 p-2 rounded-lg text-gray-700 hover:bg-gray-100">
-                        <div class="flex flex-col">
-                            <span class="text-sm font-semibold text-gray-800">{{ getCompanyName(item.subject) }}</span>
-                            <div class="flex items-center gap-2 text-xs text-gray-500">
-                                <span>To: {{ getEmailPrefix(item.to[0]) }}</span>
-                                <span class="text-gray-300">•</span>
-                                <span>{{ item.createdAt | date:'MMM d' }}</span>
-                            </div>
-                        </div>
-                    </a>
-                }
-            } @else {
-                <div class="text-center text-sm text-gray-500 mt-4">No referrals found.</div>
-            }
+<div class="h-full flex flex-col bg-white border-r border-gray-200">
+    <!-- Logo Area -->
+    <div class="p-6 flex items-center gap-3">
+        <div class="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-lg">R</span>
         </div>
+        <span class="text-xl font-bold text-gray-900 tracking-tight">Referrer</span>
+    </div>
+
+    <!-- Compose Button -->
+    <div class="px-4 mb-6">
+        <a routerLink="/dashboard/email-drafter" 
+           class="flex items-center justify-center gap-2 w-full bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-4 py-3 rounded-xl font-semibold transition-colors shadow-sm border border-indigo-100">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+            </svg>
+            Compose
+        </a>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+        <a *ngFor="let item of menuItems" 
+           [routerLink]="item.link" 
+           [queryParams]="item.queryParams"
+           routerLinkActive="bg-gray-100 text-indigo-700 font-medium"
+           [routerLinkActiveOptions]="{exact: true}"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors group">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                 class="size-6 text-gray-400 group-hover:text-gray-600 group-[.text-indigo-700]:text-indigo-600 transition-colors">
+                <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icon" />
+            </svg>
+            <span class="text-sm">{{ item.label }}</span>
+        </a>
+    </nav>
+
+    <!-- Footer / User Profile (Optional placeholder) -->
+    <div class="p-4 border-t border-gray-200">
+        <!-- Can be user profile summary -->
     </div>
 </div>

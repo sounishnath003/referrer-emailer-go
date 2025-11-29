@@ -1,44 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SidebarViewComponent } from '../../shared/components/sidebar-view/sidebar-view.component';
-import { MenuComponent } from "./pages/shared/menu/menu.component";
-import { EmailingService, ReferralMailbox } from './services/emailing.service';
-import { BehaviorSubject, catchError, of } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { EmailingService } from './services/emailing.service';
 import { ProfileService } from './services/profile.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterOutlet, SidebarViewComponent, MenuComponent, MenuComponent, AsyncPipe],
-  providers: [EmailingService],
+  imports: [RouterOutlet, SidebarViewComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent implements OnInit {
-  sentReferrals: BehaviorSubject<ReferralMailbox[]> = new BehaviorSubject<ReferralMailbox[]>([]);
-  showSidebar: boolean = true;
+export class DashboardComponent implements OnInit, OnDestroy {
+  destroy$ = new Subject<void>();
 
-  constructor(private readonly emailingService: EmailingService, private readonly profileService: ProfileService) { }
+  constructor(
+    private readonly emailingService: EmailingService,
+    private readonly profileService: ProfileService
+  ) { }
 
   ngOnInit(): void {
-    this.pollReferralMailbox();
   }
 
-  pollReferralMailbox(company?: string) {
-    this.emailingService.pollReferralMailbox$(this.profileService.ownerEmailAddress, company).pipe(
-      catchError(err => {
-        console.error(err);
-        this.sentReferrals.next([]);
-        return of([]);
-      })
-    ).subscribe(
-      data => {
-        this.sentReferrals.next(data || []);
-      }
-    )
-  }
-
-  toggleSidebar() {
-    this.showSidebar = !this.showSidebar;
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

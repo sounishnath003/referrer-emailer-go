@@ -11,6 +11,7 @@ import { CraftResumeComponent } from './pages/craft-resume/craft-resume.componen
 import { TailoredResumeViewComponent } from './pages/craft-resume/tailored-resume-view.component';
 import { TailoredResumeListComponent } from './pages/craft-resume/tailored-resume-list.component';
 import { NetworkComponent } from './pages/network/network.component';
+import { MailboxComponent } from './pages/mailbox/mailbox.component';
 
 export const routes: Routes = [
     {
@@ -26,6 +27,11 @@ export const routes: Routes = [
                 path: "network",
                 pathMatch: "full",
                 component: NetworkComponent
+            },
+            {
+                path: "mailbox",
+                pathMatch: "full",
+                component: MailboxComponent
             },
             {
                 path: "email-drafter",

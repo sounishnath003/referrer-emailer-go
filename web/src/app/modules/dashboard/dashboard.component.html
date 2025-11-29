@@ -1,12 +1,9 @@
 <div class="flex h-screen bg-gray-50">
-    <div class="w-64 bg-white shadow-md">
-        <app-sidebar-view [sentReferrals]="(sentReferrals | async) || []" (searchTermChange)="pollReferralMailbox($event)"></app-sidebar-view>
+    <div class="w-64 bg-white shadow-md z-20">
+        <app-sidebar-view></app-sidebar-view>
     </div>
     <div class="flex-1 flex flex-col overflow-hidden">
-        <div class="bg-white shadow-sm">
-            <app-menu></app-menu>
-        </div>
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6 relative">
             <router-outlet></router-outlet>
         </main>
     </div>

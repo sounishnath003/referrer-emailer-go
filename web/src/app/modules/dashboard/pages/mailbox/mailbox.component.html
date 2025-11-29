@@ -1,0 +1,73 @@
+<div class="h-full flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <!-- Toolbar -->
+    <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+        <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-indigo-600">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+            </svg>
+            Sent Mail
+        </h2>
+        
+        <div class="relative w-96">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch($event)"
+                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm transition duration-150 ease-in-out"
+                placeholder="Search mail by company or subject...">
+        </div>
+    </div>
+
+    <!-- Email List -->
+    <div class="flex-1 overflow-y-auto relative">
+        <!-- Loading -->
+        <div *ngIf="isLoading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+            <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <!-- Table Header -->
+        <div class="grid grid-cols-12 gap-4 px-4 py-2 border-b border-gray-200 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <div class="col-span-3">To</div>
+            <div class="col-span-7">Subject & Summary</div>
+            <div class="col-span-2 text-right">Date</div>
+        </div>
+
+        <!-- Rows -->
+        <div *ngIf="sentEmails.length === 0 && !isLoading" class="flex flex-col items-center justify-center h-64 text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10 mb-2 text-gray-300">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+            </svg>
+            <p>No sent emails found.</p>
+        </div>
+
+        <a *ngFor="let email of sentEmails" [routerLink]="['/dashboard/sent-referrals', email.uuid]" 
+           class="grid grid-cols-12 gap-4 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 hover:shadow-sm transition-all duration-150 cursor-pointer group items-center">
+            
+            <!-- To -->
+            <div class="col-span-3 truncate text-sm font-medium text-gray-900">
+                {{ getEmailDisplay(email.to) }}
+            </div>
+            
+            <!-- Subject/Body Preview -->
+            <div class="col-span-7 flex flex-col justify-center min-w-0">
+                <span class="text-sm font-medium text-gray-800 truncate group-hover:text-indigo-600 transition-colors">
+                    {{ email.subject }}
+                </span>
+                <span class="text-xs text-gray-500 truncate mt-0.5">
+                    <!-- We could strip HTML here for better preview, but basic truncation helps -->
+                    {{ email.body.replace('<[^>]*>', ' ') | slice:0:100 }}...
+                </span>
+            </div>
+            
+            <!-- Date -->
+            <div class="col-span-2 text-right text-xs text-gray-500 font-medium">
+                {{ email.createdAt | date:'MMM d' }}
+            </div>
+        </a>
+    </div>
+</div>
