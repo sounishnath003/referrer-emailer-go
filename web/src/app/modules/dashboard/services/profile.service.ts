@@ -10,6 +10,8 @@ export type ProfileInformation = {
   email: string;
   about: string;
   country: string;
+  currentCompany: string;
+  currentRole: string;
   notifications: {
     offers: boolean;
     pushNotifications: string;
@@ -24,6 +26,8 @@ export interface ApiProfileInformation {
   resume: string;
   about: string;
   country: string;
+  currentCompany: string;
+  currentRole: string;
   notifications: Notifications;
   email: string;
   profileSummary: string;
@@ -70,11 +74,11 @@ export class ProfileService {
     return this.httpClient.get<ApiProfileInformation>(`${environment.NG_REFERRER_BACKEND_API_URL}/api/profile?email=${email}`, { headers })
   }
 
-  searchPeople$(query: string): Observable<{ email: string, companyName: string }[]> {
+  searchPeople$(query: string): Observable<{ name: string, email: string, currentCompany: string, currentRole: string, about: string }[]> {
     const headers = new HttpHeaders();
     headers.append("Content-Type", "application/json");
 
-    return this.httpClient.get<{ email: string, companyName: string }[]>(`${this.API_URL}/api/profile/search-people?query=${query}`, { headers: headers, withCredentials: false })
+    return this.httpClient.get<{ name: string, email: string, currentCompany: string, currentRole: string, about: string }[]>(`${this.API_URL}/api/profile/search-people?query=${query}`, { headers: headers, withCredentials: false })
   }
 
   updateProfileInformation$(profileInfo: ProfileInformation): Observable<ApiProfileInformation> {
@@ -89,6 +93,8 @@ export class ProfileService {
     formData.append("email", profileInfo.email);
     formData.append("about", profileInfo.about);
     formData.append("country", profileInfo.country);
+    formData.append("currentCompany", profileInfo.currentCompany || "");
+    formData.append("currentRole", profileInfo.currentRole || "");
     formData.append("notifications", JSON.stringify(profileInfo.notifications));
 
     return this.httpClient.post<ApiProfileInformation>(`${this.API_URL}/api/profile/information`, formData, {

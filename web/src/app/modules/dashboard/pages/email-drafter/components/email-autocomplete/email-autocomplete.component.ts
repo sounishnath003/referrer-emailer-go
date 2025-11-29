@@ -8,10 +8,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrl: './email-autocomplete.component.css'
 })
 export class EmailAutocompleteComponent {
-  @Input() suggestions: { email: string, companyName: string }[] = [];
-  @Output() suggestionSelected = new EventEmitter<{ email: string, companyName: string }>();
+  @Input() suggestions: { email: string, currentCompany: string }[] = [];
+  @Output() suggestionSelected = new EventEmitter<{ email: string, currentCompany: string }>();
 
-  selectSuggestion(suggestion: { email: string, companyName: string }) {
+  selectSuggestion(suggestion: { email: string, currentCompany: string }) {
     this.suggestionSelected.emit(suggestion);
   }
 }

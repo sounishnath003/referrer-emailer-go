@@ -23,7 +23,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
   formErrors: any = {};
   template: string | null = null;
 
-  filteredSuggestions: { email: string, companyName: string }[] = [];
+  filteredSuggestions: { email: string, currentCompany: string }[] = [];
   private destroy$ = new Subject<void>();
 
   apiErrorMsg: string | null = null;
@@ -59,11 +59,13 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
       this.template = t;
       this.tailoredResumeId = params.get('tailoredResumeId');
       const companyName = params.get('companyName');
+      const to = params.get('to');
 
       this.emailReferralForm.patchValue({
         templateType: t,
         from: this.profileService.ownerEmailAddress,
-        companyName: companyName
+        companyName: companyName,
+        to: to
       }, { emitEvent: true });
     });
     this.emailReferralForm.valueChanges.subscribe(() => this.onFormValueChange());
@@ -80,7 +82,7 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: res => {
-        this.filteredSuggestions = [...res];
+        this.filteredSuggestions = res.map(r => ({ email: r.email, currentCompany: r.currentCompany }));
       },
       error: err => {
         console.error(err);
@@ -96,13 +98,13 @@ export class DraftWithAiComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSuggestionSelected(suggestion: { email: string, companyName: string } | undefined): void {
+  onSuggestionSelected(suggestion: { email: string, currentCompany: string } | undefined): void {
     if (!suggestion) return;
 
     // PatchValues
     this.emailReferralForm.patchValue({
       to: suggestion.email.trim(),
-      companyName: suggestion.companyName.trim(),
+      companyName: suggestion.currentCompany?.trim(),
     });
     this.filteredSuggestions = [];
   }

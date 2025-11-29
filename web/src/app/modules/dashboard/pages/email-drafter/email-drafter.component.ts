@@ -7,6 +7,7 @@ import { BehaviorSubject, catchError, debounceTime, distinctUntilChanged, filter
 import { AsyncPipe } from '@angular/common';
 import { SubheroComponent } from "../shared/subhero/subhero.component";
 import { ApiProfileInformation, ProfileService } from '../../services/profile.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-email-drafter',
@@ -19,7 +20,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
   editorBox!: Editor;
   html: string = "";
   toEmailIds: string[] = [];
-  filteredSuggestions: { email: string, companyName: string }[] = [];
+  filteredSuggestions: { email: string, currentCompany: string }[] = [];
   private destroy$ = new Subject<void>();
   processing$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -33,12 +34,25 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
     body: new FormControl(null, [Validators.required, Validators.minLength(30), Validators.maxLength(2000)]),
   });
 
-  constructor(private readonly emailingService: EmailingService, private readonly profileService: ProfileService) { }
+  constructor(
+    private readonly emailingService: EmailingService, 
+    private readonly profileService: ProfileService,
+    private readonly route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
     this.editorBox = new Editor();
     // Update the sender from with owner email address
     this.emailSenderForm.patchValue({ from: this.profileService.ownerEmailAddress }, { emitEvent: true });
+
+    // Handle Query Params for pre-filling "To" field
+    this.route.queryParams.subscribe(params => {
+      const to = params['to'];
+      if (to) {
+        this.emailSenderForm.patchValue({ to: to });
+        this.addEmail(); // Automatically add to chips
+      }
+    });
 
     this.profileService.getProfileInformation$(this.profileService.ownerEmailAddress)
       .pipe(
@@ -67,7 +81,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: res => {
-        this.filteredSuggestions = [...res];
+        this.filteredSuggestions = res.map(r => ({ email: r.email, currentCompany: r.currentCompany }));
       },
       error: err => {
         console.error(err);
@@ -86,7 +100,7 @@ export class EmailDrafterComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSuggestionSelected(suggestion: { email: string, companyName: string } | undefined): void {
+  onSuggestionSelected(suggestion: { email: string, currentCompany: string } | undefined): void {
     if (!suggestion) return;
 
     const inputControl = this.emailSenderForm.get('to');

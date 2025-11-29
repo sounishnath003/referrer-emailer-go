@@ -102,6 +102,12 @@ func (s *Server) Start() error {
 	api.Add("GET", "/sent-referrals", handlers.GetReferralEmailsHandler)
 	api.Add("POST", "/send-email", handlers.SendEmailHandler)
 
+	// Network / Contact Management endpoints
+	api.Add("POST", "/network/contacts", handlers.AddContactHandler)
+	api.Add("GET", "/network/contacts", handlers.GetContactsHandler)
+	api.Add("DELETE", "/network/contacts/:id", handlers.DeleteContactHandler)
+	api.Add("POST", "/network/contacts/sync", handlers.SyncContactsHandler)
+
 	// Log that server started
 	s.co.Lo.Info("server has been started on port ", slog.Any("API", fmt.Sprintf("http://localhost:%d", s.co.Port)))
 	return e.Start(fmt.Sprintf(":%d", s.co.Port))

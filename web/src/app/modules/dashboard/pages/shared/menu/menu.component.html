@@ -2,6 +2,7 @@
     <div class="flex items-center space-x-4">
         <a *ngFor="let item of [
             { label: 'Home', link: '/dashboard', queryParams: null },
+            { label: 'Network', link: 'network', queryParams: null },
             { label: 'Preview Resume', link: 'profile/resume', queryParams: null },
             { label: 'Profile Analytics', link: 'profile/analytics', queryParams: null },
             { label: 'Update Profile', link: 'profile/update', queryParams: {email: ownerEmailAddress} },

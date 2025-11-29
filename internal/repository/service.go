@@ -44,6 +44,8 @@ func (mc *MongoDBClient) UpdateProfileInformation(u *User) error {
 		"notifications":    u.Notification,
 		"resume":           u.Resume,
 		"country":          u.Country,
+		"currentCompany":   u.CurrentCompany,
+		"currentRole":      u.CurrentRole,
 		"profileSummary":   u.ProfileSummary,
 		"extractedContent": u.ExtractedContent,
 	}}
@@ -297,8 +299,7 @@ func (mc *MongoDBClient) GetProfileAnalytics(userEmail string) (ExtendedProfileA
 	}, nil
 }
 
-// SearchPeople searches for people by email or company name in AI-drafted emails.
-// It returns a list of unique combinations of email and companyName.
+// SearchPeople searches for users in the network by company name or role.
 func (mc *MongoDBClient) SearchPeople(query string) ([]map[string]string, error) {
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
@@ -306,48 +307,48 @@ func (mc *MongoDBClient) SearchPeople(query string) ([]map[string]string, error)
 	safeQuery := regexp.QuoteMeta(query)
 
 	pipeline := mongo.Pipeline{
-		// Match documents where 'to' or 'companyName' contains the query
 		bson.D{{"$match", bson.D{
 			{"$or", bson.A{
-				bson.D{{"to", bson.D{{"$regex", safeQuery}, {"$options", "i"}}}},
-				bson.D{{"companyName", bson.D{{"$regex", safeQuery}, {"$options", "i"}}}},
+				bson.D{{"currentCompany", bson.D{{"$regex", safeQuery}, {"$options", "i"}}}},
+				bson.D{{"currentRole", bson.D{{"$regex", safeQuery}, {"$options", "i"}}}},
+				bson.D{{"firstName", bson.D{{"$regex", safeQuery}, {"$options", "i"}}}},
+				bson.D{{"lastName", bson.D{{"$regex", safeQuery}, {"$options", "i"}}}},
 			}},
 		}}},
-		// Group by 'to' and 'companyName' to get unique combinations
-		bson.D{{"$group", bson.D{
-			{"_id", bson.D{
-				{"email", "$to"},
-				{"companyName", "$companyName"},
-			}},
+		bson.D{{"$project", bson.D{
+			{"firstName", 1},
+			{"lastName", 1},
+			{"email", 1},
+			{"currentCompany", 1},
+			{"currentRole", 1},
+			{"country", 1},
+			{"about", 1},
 		}}},
-		// Sort by email alphabetically
-		bson.D{{"$sort", bson.D{{"_id.email", 1}}}},
-		// Limit to 15 results
-		bson.D{{"$limit", 15}},
+		bson.D{{"$limit", 20}},
 	}
 
-	collection := mc.Database("referrer").Collection("ai_email_drafts")
+	collection := mc.Database("referrer").Collection("users")
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	var results []bson.M
+	var results []User
 	if err := cursor.All(ctx, &results); err != nil {
 		return nil, err
 	}
 
 	output := []map[string]string{}
-	for _, result := range results {
-		if id, ok := result["_id"].(bson.M); ok {
-			email, _ := id["email"].(string)
-			company, _ := id["companyName"].(string)
-			output = append(output, map[string]string{
-				"email":       email,
-				"companyName": company,
-			})
-		}
+	for _, u := range results {
+		output = append(output, map[string]string{
+			"name":           fmt.Sprintf("%s %s", u.Firstname, u.LastName),
+			"email":          u.Email,
+			"currentCompany": u.CurrentCompany,
+			"currentRole":    u.CurrentRole,
+			"country":        u.Country,
+			"about":          u.About,
+		})
 	}
 
 	return output, nil

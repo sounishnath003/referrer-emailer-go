@@ -28,6 +28,8 @@ export class ProfileComponent implements OnInit {
       resume: ["", [Validators.required]],
       email: [{ value: "", disabled: true }],
       country: ['', Validators.required],
+      currentCompany: [''],
+      currentRole: [''],
       notifications: this.fb.group({
         receiveEmails: [true],
         offers: [false],

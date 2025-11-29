@@ -10,6 +10,7 @@ import { ProfileAnalyticsComponent } from './pages/profile-analytics/profile-ana
 import { CraftResumeComponent } from './pages/craft-resume/craft-resume.component';
 import { TailoredResumeViewComponent } from './pages/craft-resume/tailored-resume-view.component';
 import { TailoredResumeListComponent } from './pages/craft-resume/tailored-resume-list.component';
+import { NetworkComponent } from './pages/network/network.component';
 
 export const routes: Routes = [
     {
@@ -20,6 +21,11 @@ export const routes: Routes = [
                 path: "",
                 pathMatch: "full",
                 component: HomeComponent
+            },
+            {
+                path: "network",
+                pathMatch: "full",
+                component: NetworkComponent
             },
             {
                 path: "email-drafter",

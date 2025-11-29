@@ -21,6 +21,8 @@ func ProfileInformationHandler(c echo.Context) error {
 	about := c.FormValue("about")
 	email := c.FormValue("email")
 	country := c.FormValue("country")
+	currentCompany := c.FormValue("currentCompany")
+	currentRole := c.FormValue("currentRole")
 	notificationsStr := c.FormValue("notifications")
 
 	// Parse the notification into the repository.notification struct
@@ -63,6 +65,8 @@ func ProfileInformationHandler(c echo.Context) error {
 		About:            about,
 		Email:            email,
 		Country:          country,
+		CurrentCompany:   currentCompany,
+		CurrentRole:      currentRole,
 		ProfileSummary:   "",
 		ExtractedContent: "",
 		Notification:     notification,
@@ -106,9 +110,51 @@ func PeopleSearchHandler(c echo.Context) error {
 	hctx := c.(*HandlerContext)
 
 	queryParam := c.QueryParam("query")
+	// For self-hosted, we assume the search is performed by the owner. 
+	// We might need the owner's email here. For now, let's try to get it from query or header if possible,
+	// or we can change the signature to accept it.
+	// HOWEVER, the `SearchPeople` previously didn't filter by owner.
+	// Since this is SINGLE USER, we can probably just search ALL contacts or require the email.
+	// But `PeopleSearchHandler` is called by `searchPeople$` in frontend which doesn't pass email usually in the query for the autocomplete.
+	// Wait, `searchPeople$` in frontend DOES NOT pass email.
+	// To fix this for "Single User Self Hosted", we can just fetch ALL contacts matching query, assuming all contacts belong to the single user.
+	// Or we can try to extract the user from the JWT token if available.
+	
+	// Let's assume we search all contacts for now as it's single user.
+	// But `GetContacts` requires OwnerID.
+	// We can fetch the first user from DB or just allow passing a wildcard?
+	// Better: Extract from JWT token "email" claim if possible.
+	
+	// SIMPLE FIX for Single User: Just search all contacts or use a wildcard owner if we modified repository.
+	// But let's look at `SearchContactsForAutocomplete`.
+	// We will pass a wildcard "%" or empty string if we can't find the user, but `GetContacts` filters by OwnerID.
+	
+	// Let's actually UPDATE `PeopleSearchHandler` to get the user from the JWT Token.
+	// user := c.Get("user") // echojwt puts the token in "user" context
+	// But wait, the token parsing might be different.
+	// Let's check server.go... `echojwt.Config{...}`.
+	// It sets claims.
+	
+	// If we can't get the user, we might be in trouble. 
+	// But wait, `PeopleSearchHandler` is used in `DraftWithAi` and `EmailDrafter`.
+	// These pages should be protected.
+	
+	// FALLBACK: Since it's self-hosted, let's just search *all* contacts if we can't identify the owner, 
+	// OR we can update the repository to NOT filter by owner if ownerID is empty.
+	
 	hctx.GetCore().Lo.Info("Received search Param", "query", queryParam)
 
-	results, err := hctx.GetCore().DB.SearchPeople(queryParam)
+	// In a single-user self-hosted env, we can just search matching any contact.
+	// Let's use a repository method that ignores owner for autocomplete if we want, 
+	// OR just assume one main user.
+	// Let's try to use the "owner" from the query param if frontend sends it? No it doesn't.
+	
+	// Let's update `SearchContactsForAutocomplete` to take a wildcard for owner.
+	// Actually, let's just fetch all contacts matching the query.
+	
+	// We will modify repository to allow empty ownerID to mean "all".
+	
+	results, err := hctx.GetCore().DB.SearchContactsForAutocomplete("", queryParam)
 	if err != nil {
 		return SendErrorResponse(c, http.StatusInternalServerError, err)
 	}
