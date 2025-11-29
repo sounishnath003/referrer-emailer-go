@@ -155,7 +155,7 @@ func (mc *MongoDBClient) CreateEmailInMailbox(from string, to []string, subject,
 	return nil
 }
 
-func (mc *MongoDBClient) GetLatestEmailsByFilter(filterCondn bson.M) ([]*ReferralMailbox, error) {
+func (mc *MongoDBClient) GetLatestEmailsByFilter(filterCondn bson.M, limit, offset int) ([]*ReferralMailbox, int64, error) {
 	// Get context.
 	ctx, cancel := getContextWithTimeout(10)
 	defer cancel()
@@ -163,17 +163,23 @@ func (mc *MongoDBClient) GetLatestEmailsByFilter(filterCondn bson.M) ([]*Referra
 	var mails []*ReferralMailbox
 
 	collection := mc.Database("referrer").Collection("referral_mailbox")
-	fmt.Println(filterCondn)
+	
+	// Count total documents matching filter
+	totalCount, err := collection.CountDocuments(ctx, filterCondn)
+	if err != nil {
+		return nil, 0, err
+	}
 
-	cursor, err := collection.Find(ctx, filterCondn, options.Find().SetLimit(10).SetSort(bson.M{"createdAt": -1}))
+	opts := options.Find().SetLimit(int64(limit)).SetSkip(int64(offset)).SetSort(bson.M{"createdAt": -1})
+	cursor, err := collection.Find(ctx, filterCondn, opts)
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer cursor.Close(ctx)
 
 	if err := cursor.Err(); err != nil {
-		return mails, nil
+		return mails, 0, nil
 	}
 
 	for cursor.Next(ctx) {
@@ -181,16 +187,16 @@ func (mc *MongoDBClient) GetLatestEmailsByFilter(filterCondn bson.M) ([]*Referra
 		err := cursor.Decode(&r)
 		if err != nil {
 			fmt.Println("error occured", err)
-			return nil, err
+			return nil, 0, err
 		}
 		mails = append(mails, &r)
 	}
-
-	if len(mails) == 0 {
-		return mails, fmt.Errorf("no results found")
+	
+	if mails == nil {
+		mails = []*ReferralMailbox{}
 	}
 
-	return mails, nil
+	return mails, totalCount, nil
 }
 
 func (mc *MongoDBClient) CreateAiDraftEmail(from, to, companyName, templateType, jobDescription, userProfileSummary, mailSubject, mailBody, tailoredResumeID string, jobUrls []string) (*AiDraftColdEmail, error) {

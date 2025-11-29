@@ -13,6 +13,7 @@ import { AsyncPipe, DatePipe, TitleCasePipe } from '@angular/common';
 export class SentReferralsComponent implements OnInit {
   apiErrorMessage: string | null = null;
   referralEmails: ReferralMailbox[] = [];
+  email: ReferralMailbox | undefined;
   resendButtonText: string = 'Resend email';
   isResending: boolean = false;
 
@@ -20,18 +21,27 @@ export class SentReferralsComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.pipe(
-      switchMap((param: Params) =>
-        this.emailService.getReferralEmailByUuid$(param["uuid"]
-        )
-      ), catchError(err => {
-        this.apiErrorMessage = JSON.stringify(err.error) || 'Something went wrong!'
-        return of(null)
-      })).subscribe(data => {
-        if (data === null) return;
-        this.referralEmails = data as ReferralMailbox[];
-        this.apiErrorMessage = null;
-        console.log(data);
+      switchMap(param => {
+        if (!param["uuid"]) {
+          return of(null);
+        }
+        return this.emailService.getReferralEmailByUuid$(param["uuid"])
       })
+    ).subscribe((data: any) => {
+      // Handle both paginated ({data: [], meta: {}}) and array ([]) responses
+      let emails: ReferralMailbox[] = [];
+      
+      if (data && data.data && Array.isArray(data.data)) {
+        emails = data.data;
+      } else if (Array.isArray(data)) {
+        emails = data;
+      }
+
+      if (emails.length > 0) {
+        this.referralEmails = emails;
+        this.email = emails[0];
+      }
+    })
   }
 
   onResendEmail() {

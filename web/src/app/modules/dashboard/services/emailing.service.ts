@@ -23,16 +23,22 @@ export class EmailingService {
     return this.httpClient.post<AiDraftColdMail>(`${this.API_URL}/api/draft-with-ai`, payload);
   }
 
-  getReferralEmailByUuid$(uuid: string): Observable<ReferralMailbox[]> {
-    return this.httpClient.get<ReferralMailbox[]>(`${this.API_URL}/api/sent-referrals?uuid=${uuid}`);
+  getReferralEmailByUuid$(uuid: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.API_URL}/api/sent-referrals?uuid=${uuid}`);
   }
 
-  pollReferralMailbox$(email: string, companyName?: string): Observable<ReferralMailbox[]> {
-    let url = `${this.API_URL}/api/sent-referrals?email=${email}`;
+  pollReferralMailbox$(email: string, companyName?: string, page: number = 1, limit: number = 10, startDate?: string, endDate?: string): Observable<any> {
+    let url = `${this.API_URL}/api/sent-referrals?email=${email}&page=${page}&limit=${limit}`;
     if (companyName && companyName.trim().length > 0) {
-      url += `&company=${companyName}`;
+      url += `&company=${encodeURIComponent(companyName.trim())}`;
     }
-    return this.httpClient.get<ReferralMailbox[]>(url);
+    if (startDate) {
+      url += `&startDate=${startDate}`;
+    }
+    if (endDate) {
+      url += `&endDate=${endDate}`;
+    }
+    return this.httpClient.get<any>(url);
   }
 }
 

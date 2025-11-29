@@ -193,6 +193,23 @@ func GetReferralEmailsHandler(c echo.Context) error {
 	userEmail := c.QueryParam("email")
 	emailUuid := c.QueryParam("uuid")
 	company := c.QueryParam("company")
+	
+	// Pagination params
+	page := 1
+	limit := 10
+	if p := c.QueryParam("page"); p != "" {
+		fmt.Sscanf(p, "%d", &page)
+	}
+	if l := c.QueryParam("limit"); l != "" {
+		fmt.Sscanf(l, "%d", &limit)
+	}
+	if page < 1 { page = 1 }
+	if limit < 1 { limit = 10 }
+	offset := (page - 1) * limit
+
+	// Date Range params (YYYY-MM-DD)
+	startDateStr := c.QueryParam("startDate")
+	endDateStr := c.QueryParam("endDate")
 
 	if len(userEmail) > 0 && !isValidEmail(userEmail) {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid email or no email found"))
@@ -206,15 +223,42 @@ func GetReferralEmailsHandler(c echo.Context) error {
 		if company != "" {
 			filter["subject"] = bson.M{"$regex": primitive.Regex{Pattern: company, Options: "i"}}
 		}
+		
+		// Add Date Range Filter
+		if startDateStr != "" || endDateStr != "" {
+			dateFilter := bson.M{}
+			if startDateStr != "" {
+				if t, err := time.Parse("2006-01-02", startDateStr); err == nil {
+					dateFilter["$gte"] = t
+				}
+			}
+			if endDateStr != "" {
+				if t, err := time.Parse("2006-01-02", endDateStr); err == nil {
+					// Add 23h 59m 59s to end date to include the whole day
+					dateFilter["$lte"] = t.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
+				}
+			}
+			if len(dateFilter) > 0 {
+				filter["createdAt"] = dateFilter
+			}
+		}
 	} else {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("either email or uuid must be provided"))
 	}
 
-	emails, err := hctx.GetCore().DB.GetLatestEmailsByFilter(filter)
+	emails, totalCount, err := hctx.GetCore().DB.GetLatestEmailsByFilter(filter, limit, offset)
 	if err != nil {
 		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("failed to fetch mails: %w", err))
 	}
-	return c.JSON(http.StatusOK, emails)
+	
+	return c.JSON(http.StatusOK, map[string]any{
+		"data": emails,
+		"meta": map[string]any{
+			"total": totalCount,
+			"page":  page,
+			"limit": limit,
+		},
+	})
 }
 
 func GetBulkEmailJobStatusHandler(c echo.Context) error {
