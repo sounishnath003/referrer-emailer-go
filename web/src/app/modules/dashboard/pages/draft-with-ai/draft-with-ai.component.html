@@ -1,7 +1,7 @@
 <app-subhero title="Email Writing Assistant" [subtitle]="template || ''"></app-subhero>
 
-<div class="mx-auto p-6 bg-white rounded-lg border -mt-8">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-6"> &bull; {{template}} Cold Mail </h2>
+<div class="mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg border dark:border-gray-800 -mt-8 transition-colors duration-300">
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6"> &bull; {{template}} Cold Mail </h2>
 
     <form [formGroup]="emailReferralForm" class="space-y-4" autocomplete="off" (ngSubmit)="sendEmail()">
         <div>
@@ -10,7 +10,7 @@
             <!-- Email Chips -->
             <div class="flex flex-row flex-wrap gap-1 w-full mb-2">
                 @for (email of toEmailIds; track $index) {
-                <span class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10 cursor-pointer hover:bg-indigo-100" (click)="removeEmail(email)">
+                <span class="inline-flex items-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-300 ring-1 ring-inset ring-indigo-700/10 dark:ring-indigo-900 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50" (click)="removeEmail(email)">
                     {{ email }} <span class="ml-1 text-indigo-400 font-bold">&times;</span>
                 </span>
                 }

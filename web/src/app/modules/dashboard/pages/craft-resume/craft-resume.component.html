@@ -1,36 +1,36 @@
 <app-subhero title="Let's Craft a Tailored Resume"
     subtitle="✨ Lets crack your next role with ATS friendly resume"></app-subhero>
-<div class="max-w-2xl mx-auto mt-8 p-8 bg-white rounded-xl shadow-lg">
+<div class="max-w-2xl mx-auto mt-8 p-8 bg-white dark:bg-gray-900 rounded-xl shadow-lg dark:border dark:border-gray-800 transition-colors duration-300">
     <form (ngSubmit)="tailorResume()" class="flex flex-col gap-4">
-        <label for="companyName" class="font-semibold text-gray-700">Company Name:</label>
+        <label for="companyName" class="font-semibold text-gray-700 dark:text-gray-300">Company Name:</label>
         <input aria-autocomplete="none" autocomplete="off" id="companyName" [(ngModel)]="companyName" name="companyName"
             type="text" required placeholder="Enter company name"
-            class="w-full p-2 rounded-md border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <label for="jobRole" class="font-semibold text-gray-700">Job Role:</label>
+            class="w-full p-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-base text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 input-focus-effect" />
+        <label for="jobRole" class="font-semibold text-gray-700 dark:text-gray-300">Job Role:</label>
         <input aria-autocomplete="none" autocomplete="off" id="jobRole" [(ngModel)]="jobRole" name="jobRole" type="text"
             required placeholder="Enter job role/title"
-            class="w-full p-2 rounded-md border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <label for="userEmail" class="font-semibold text-gray-700">Your Email:</label>
+            class="w-full p-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-base text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 input-focus-effect" />
+        <label for="userEmail" class="font-semibold text-gray-700 dark:text-gray-300">Your Email:</label>
         <input aria-autocomplete="none" autocomplete="off" id="userEmail" #userEmailInput type="email" required
             placeholder="Enter your email" [value]="userEmail" readonly
-            class="w-full p-2 rounded-md border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            class="w-full p-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-base text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 input-focus-effect" />
 
-        <label for="jobDescription" class="font-semibold text-gray-700">Paste Job Description:</label>
+        <label for="jobDescription" class="font-semibold text-gray-700 dark:text-gray-300">Paste Job Description:</label>
         <textarea id="jobDescription" [(ngModel)]="jobDescription" name="jobDescription" rows="8" required
             maxlength="6000"
-            class="w-full min-h-[120px] p-3 rounded-md border border-gray-300 text-base resize-vertical focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            class="w-full min-h-[120px] p-3 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-base text-gray-900 dark:text-gray-100 resize-vertical placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 input-focus-effect"></textarea>
         <div class="text-sm text-right"
-            [ngClass]="{'text-red-600 font-semibold': jobDescription.length >= 6000, 'text-gray-500': jobDescription.length < 6000}">
+            [ngClass]="{'text-red-600 dark:text-red-400 font-semibold': jobDescription.length >= 6000, 'text-gray-500 dark:text-gray-400': jobDescription.length < 6000}">
             {{ jobDescription.length }}/6000
         </div>
 
         <button type="submit" [disabled]="loading || !jobDescription || !userEmailInput.value"
-            class="bg-blue-600 text-white rounded-md px-6 py-2 text-lg font-medium mt-2 transition-colors duration-200 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed">Tailor
+            class="bg-blue-600 dark:bg-blue-700 text-white rounded-md px-6 py-2 text-lg font-medium mt-2 transition-colors duration-200 hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-blue-300 dark:disabled:bg-blue-900/50 disabled:cursor-not-allowed btn-hover-effect">Tailor
             My Resume</button>
     </form>
 
-    <div *ngIf="loading" class="mt-6 text-blue-600 font-semibold flex items-center gap-2"><span
-            class="animate-spin inline-block w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full"></span>
+    <div *ngIf="loading" class="mt-6 text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-2"><span
+            class="animate-spin inline-block w-5 h-5 border-2 border-blue-400 dark:border-blue-300 border-t-transparent rounded-full"></span>
         Generating tailored resume...</div>
-    <div *ngIf="error" class="mt-6 text-red-600 font-semibold">{{ error }}</div>
+    <div *ngIf="error" class="mt-6 text-red-600 dark:text-red-400 font-semibold">{{ error }}</div>
 </div>

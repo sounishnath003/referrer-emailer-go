@@ -3,7 +3,7 @@
 }
 
 .form-control-input-box {
-    @apply block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6;
+    @apply block w-full rounded-md bg-white text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 px-3 py-1.5 text-base sm:text-sm/6 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:bg-gray-900 dark:text-gray-100 dark:outline-gray-700 dark:focus:outline-indigo-500;
 }
 
 .form-control-errors {

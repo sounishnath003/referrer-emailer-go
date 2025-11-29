@@ -1,13 +1,13 @@
 <app-subhero title="Let's draft a Referral Email"
     subtitle="✨ Use the potential to redefine the customized referral message"></app-subhero>
-<div class="flex flex-col gap-5 items-center justify-between md:min-w-[660px]">
+<div class="flex flex-col gap-5 items-center justify-between md:min-w-[660px] bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 transition-colors duration-300">
     <div class="w-full">
         <form [formGroup]="emailSenderForm" class="flex flex-col gap-5 w-full">
             <!-- Email Chips -->
             <div class="flex flex-row flex-wrap gap-1 w-full">
                 @for (email of toEmailIds; track $index) {
-                <span class="email-pill" (click)="removeEmail(email)">
-                    {{ email }} &times;
+                <span class="inline-flex items-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-300 ring-1 ring-inset ring-indigo-700/10 dark:ring-indigo-900 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50" (click)="removeEmail(email)">
+                    {{ email }} <span class="ml-1 text-indigo-400 font-bold">&times;</span>
                 </span>
                 }
             </div>

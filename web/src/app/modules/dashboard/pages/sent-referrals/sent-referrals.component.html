@@ -1,56 +1,54 @@
 @if (apiErrorMessage) {
 
-<div class="p-6 text-sm flex flex-col gap-4 items-center justify-center">
-    <div class="text-red-600 text-sm bg-red-50 p-2 rounded-lg text-center"> {{apiErrorMessage}} </div>
-    <div routerLink="/dashboard" class="bg-blue-50 px-8 py-2 text-blue-700 cursor-pointer"> Take me back to home </div>
+<div class="p-6 text-sm flex flex-col gap-4 items-center justify-center dark:text-gray-200">
+    <div class="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/30 p-2 rounded-lg text-center"> {{apiErrorMessage}} </div>
+    <div routerLink="/dashboard" class="bg-blue-50 dark:bg-blue-900/30 px-8 py-2 text-blue-700 dark:text-blue-300 cursor-pointer rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors btn-hover-effect"> Take me back to home </div>
 </div>
 } @else {
 <div class="m-4">
     @for (item of referralEmails; track $index) {
-    <div class="min-w-[720px] w-auto bg-white p-4 rounded-lg flex flex-col items-start justify-start gap-4">
-        <div class="text-xl md:text-3xl my-2"> Subject: {{ item.subject | titlecase }} </div>
-        <div class="flex flex-row gap-4">
-            <div>To:</div>
-            @for (item of item.to; track $index) {
-            <div class="text-blue-600 px-4 rounded-lg bg-blue-50"> {{item}} </div>
+    <div class="min-w-[720px] w-auto p-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 flex flex-col items-start justify-start gap-4 transition-colors duration-300">
+        <div class="text-xl md:text-3xl my-2 font-bold text-gray-900 dark:text-white"> Subject: {{ item.subject | titlecase }} </div>
+        <div class="flex flex-row gap-4 items-center">
+            <div class="text-gray-700 dark:text-gray-300 font-medium">To:</div>
+            @for (recipient of item.to; track $index) {
+            <div class="text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-sm font-medium border border-indigo-100 dark:border-indigo-800"> {{recipient}} </div>
             }
         </div>
-        <div class="text-sm">Mail sent: <span class="text-indigo-700 font-semibold">{{ item.createdAt | date : 'dd MMMM,
+        <div class="text-sm text-gray-500 dark:text-gray-400">Mail sent: <span class="text-indigo-700 dark:text-indigo-400 font-semibold">{{ item.createdAt | date : 'dd MMMM,
                 YYYY' }}</span>
         </div>
-        <div class="min-w-full bg-white prose py-3 leading-relaxed" [innerHTML]="item.body">
+        <div class="w-full bg-gray-50 dark:bg-gray-800/50 p-6 rounded-lg border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-200 prose dark:prose-invert max-w-none leading-relaxed" [innerHTML]="item.body">
         </div>
     </div>
     }
 
     <div class="flex gap-4 items-center justify-end my-4 text-right">
 
-        <button>
-            <div routerLink="/dashboard/mailbox"
-                class="px-8 py-2 bg-indigo-50 hover:bg-gray-200 cursor-pointer font-sans inline-flex rounded-lg font-medium">
-                &larr;
-                Back</div>
+        <button type="button" routerLink="/dashboard/mailbox"
+            class="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer font-sans inline-flex items-center gap-2 rounded-lg font-medium shadow-sm transition-all btn-hover-effect">
+            &larr; Back
         </button>
 
         <button type="button" (click)="onResendEmail()" [disabled]="referralEmails.length === 0"
-            class="px-8 py-2 bg-indigo-50 hover:bg-gray-200 cursor-pointer font-sans inline-flex items-center gap-2 rounded-lg font-medium text-blue-700 disabled:opacity-50">
+            class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white cursor-pointer font-sans inline-flex items-center gap-2 rounded-lg font-medium shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed btn-hover-effect">
             {{resendButtonText}}
             @if (isResending) {
             <span class="animate-spin">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                    stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
                 </svg>
             </span>
             } @else {
-            <span class="text-xl">&rarr;</span>
+            <span class="text-xl leading-none">&rarr;</span>
             }
         </button>
     </div>
 </div>
 }
 
-<div class="text-white opacity-0">
+<div class="text-white opacity-0 hidden">
     Lorem, ipsum dolor sit amet consectetur adipisicing elit. Exercitationem, dolor animi asperiores eveniet vero
     commodi quidem quia esse pariatur consequatur necessitatibus earum maxime cupiditate quasi tempora itaque
     voluptatem

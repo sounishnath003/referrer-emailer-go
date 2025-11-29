@@ -1,28 +1,28 @@
-<div class="w-full min-h-screen bg-gray-50">
-  <div *ngIf="loading" class="text-blue-600 font-semibold flex items-center gap-2 px-8 pt-8">
-    <span class="animate-spin inline-block w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full"></span>
+<div class="w-full min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+  <div *ngIf="loading" class="text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-2 px-8 pt-8">
+    <span class="animate-spin inline-block w-5 h-5 border-2 border-blue-400 dark:border-blue-300 border-t-transparent rounded-full"></span>
     Loading tailored resume...
   </div>
-  <div *ngIf="error" class="text-red-600 font-semibold px-8 pt-8">{{ error }}</div>
+  <div *ngIf="error" class="text-red-600 dark:text-red-400 font-semibold px-8 pt-8">{{ error }}</div>
   <ng-container *ngIf="resume">
     <div class="flex justify-between items-center mb-4 px-8 pt-8">
-      <h2 class="text-2xl font-bold">Tailored Resume</h2>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Tailored Resume</h2>
       <div class="flex gap-2">
         <button (click)="toggleEdit()"
-          class="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition">{{ editMode ? 'Preview' :
+          class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition btn-hover-effect">{{ editMode ? 'Preview' :
           'Edit' }}</button>
-        <button (click)="downloadPDF()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">{{
+        <button (click)="downloadPDF()" class="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition btn-hover-effect">{{
           downloadLoading ? 'Processing...' : 'Download PDF' }}</button>
-        <button (click)="sendEmail()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Send via Email</button>
+        <button (click)="sendEmail()" class="bg-green-600 dark:bg-green-700 text-white px-4 py-2 rounded hover:bg-green-700 dark:hover:bg-green-600 transition btn-hover-effect">Send via Email</button>
       </div>
     </div>
-    <div class="text-xs text-gray-400 mb-2 px-8">Created: {{ resume.createdAt | date:'medium' }}</div>
+    <div class="text-xs text-gray-400 dark:text-gray-500 mb-2 px-8">Created: {{ resume.createdAt | date:'medium' }}</div>
     <div *ngIf="editMode" class="px-8">
       <textarea [(ngModel)]="editableMarkdown" rows="18"
-        class="w-full p-6 bg-white rounded-lg shadow border border-gray-200 font-mono text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
+        class="w-full p-6 bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 font-mono text-base text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 input-focus-effect"
         placeholder="Edit your resume in Markdown here..."></textarea>
     </div>
-    <div id="resume-pdf-content" class="mx-6 max-w-5xl bg-white rounded-lg prose p-8 shadow leading-relaxed">
+    <div id="resume-pdf-content" class="mx-6 max-w-5xl bg-white dark:bg-gray-900 rounded-lg prose dark:prose-invert p-8 shadow leading-relaxed border dark:border-gray-800 transition-colors duration-300">
       <markdown [data]="editMode ? editableMarkdown : resume.resumeMarkdown"></markdown>
     </div>
   </ng-container>

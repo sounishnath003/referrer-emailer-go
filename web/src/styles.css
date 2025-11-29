@@ -23,6 +23,26 @@ html,
         "wdth" 100;
 }
 
+/* Default to dark mode handling at root level for smooth transitions */
+@layer base {
+    body {
+        @apply transition-colors duration-300;
+    }
+}
+
+/* Dark mode overrides for custom classes */
+@media (prefers-color-scheme: dark) {
+    body {
+        @apply bg-gray-950 text-gray-100;
+    }
+    
+    .notion-style {
+        background: #111827; /* gray-900 */
+        color: #e5e7eb; /* gray-200 */
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+    }
+}
+
 .notion-style {
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     background: #fff;
@@ -48,4 +68,17 @@ html,
 
 .notion-style p {
     margin-bottom: 1rem;
+}
+
+/* Microinteractions */
+.btn-hover-effect {
+    @apply transition-transform active:scale-95 duration-150 ease-in-out;
+}
+
+.card-hover-effect {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+}
+
+.input-focus-effect {
+    @apply transition-all duration-200 focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-gray-900;
 }
