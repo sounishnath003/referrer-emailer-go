@@ -48,7 +48,7 @@
 ![login](assets/login.png)
 
 ## Dashboard
-![login](assets/login.png)
+![login](assets/dashboard.png)
 
 ## Tailored Resumes
 ![login](assets/tailored-resumes.png)
