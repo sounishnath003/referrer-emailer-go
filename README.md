@@ -5,7 +5,7 @@
 [![GitHub Issues](https://img.shields.io/github/issues/sounishnath003/referrer-emailer-go)](https://github.com/sounishnath003/referrer-emailer-go/issues)
 [![GitHub Stars](https://img.shields.io/github/stars/sounishnath003/referrer-emailer-go)](https://github.com/sounishnath003/referrer-emailer-go/stargazers)
 
-**Referrer Mailer** is a powerful, self-hosted referral system designed to give you complete control over your referral process. Leveraging the power of Gemini 1.5 Flash, Go, MongoDB, and Angular, this project automates resume analysis, candidate screening, and email notifications.
+**Referrer Mailer** is a powerful, self-hosted referral system designed to give you complete control over your referral process. Leveraging the power of Gemini-2.5-flash, Go, MongoDB, and Angular, this project automates resume analysis, candidate screening, and email notifications.
 
 ## High Level Architecture:
 ![hld](assets/arch.png)
@@ -17,13 +17,21 @@
 ## Features
 
 * **Self-Hosted & Full Control:** Maintain complete ownership and privacy of your data.
-* **Gemini 1.5 Flash Integration:** AI-powered candidate screening and profile summaries.
+* **AI-Powered Candidate Screening & Summaries:** Leverage Gemini 2.5 Flash for intelligent candidate evaluation and profile summaries.
+* **AI-Powered Resume Customization:** Craft tailored resumes specifically for job descriptions using AI.
+* **AI-Powered Email Drafting:** Generate personalized cold emails and referral messages with AI assistance.
+* **Network & Rolodex Management:**
+    *   Manage your personal network of recruiters, peers, and referrers.
+    *   Add and store contact details, including name, email, company, role, LinkedIn, notes, and **mobile number**.
+    *   Search and filter your contacts efficiently.
+    *   **Delete individual contacts.**
+    *   Import contacts directly from your sent emails.
 * **Automated Resume Analysis:** Extract key information from uploaded resumes.
 * **Efficient Processing:** Go backend with worker pools and goroutines for concurrent task execution.
 * **Scalable Database:** MongoDB for robust data storage and job queue management.
 * **User-Friendly Interface:** Angular frontend for a seamless user experience.
 * **Inbuilt SMTP:** Reliable email delivery with your preferred SMTP server.
-* **Cloud Storage Integration:** Store resumes securely in cloud storage.
+* **Cloud Storage Integration:** Store resumes and other related files securely.
 * **Automated Email Notifications:** Send personalized referral emails and AI-drafted emails.
 
 ## Technologies Used
@@ -31,7 +39,7 @@
 * **Backend:** Go
 * **Database:** MongoDB
 * **Frontend:** Angular
-* **AI:** Gemini 1.5 Flash (Vertex AI Platform)
+* **AI:** Gemini 2.5 Flash (Vertex AI Platform)
 * **Email:** SMTP
 * **Cloud Storage:** (Specify which cloud storage you are using, e.g., Google Cloud Storage)
 
@@ -41,6 +49,14 @@
 
 ## Dashboard
 ![login](assets/login.png)
+
+## Tailored Resumes
+![login](assets/tailored-resumes.png)
+
+
+## My Network
+![login](assets/network.png)
+
 
 ## Update Account Settings
 ![login](assets/update-account.png)
@@ -75,7 +91,7 @@ The system follows a multi-stage workflow:
 ## Resume view (Auto Extraction)
 ![login](assets/resume-view.png)
 
-## Sent Referrals
+## Mailbox / Sent Referrals
 ![login](assets/sent-referrals.png)
 
 
