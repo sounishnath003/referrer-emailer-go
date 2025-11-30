@@ -47,7 +47,7 @@ func (s *Server) Start() error {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"http://localhost:4200", "http://localhost:3000"},
-		AllowMethods:     []string{echo.POST, echo.GET, echo.PATCH, echo.OPTIONS},
+		AllowMethods:     []string{echo.POST, echo.GET, echo.PATCH, echo.DELETE, echo.OPTIONS},
 		AllowCredentials: true,
 		AllowHeaders:     []string{"X-API-TrackerId", echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAuthorization, echo.HeaderContentLength},
 		MaxAge:           time.Now().Add(1 * time.Hour).Second(),
