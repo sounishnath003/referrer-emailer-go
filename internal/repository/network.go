@@ -18,6 +18,7 @@ type Contact struct {
 	Role      string             `bson:"role" json:"role"`
 	LinkedIn  string             `bson:"linkedin" json:"linkedin"`
 	Notes     string             `bson:"notes" json:"notes"`
+	Mobile    string             `bson:"mobile,omitempty" json:"mobile,omitempty"`
 	CreatedAt time.Time          `bson:"createdAt" json:"createdAt"`
 	UpdatedAt time.Time          `bson:"updatedAt" json:"updatedAt"`
 }
@@ -91,6 +92,7 @@ func (mc *MongoDBClient) UpdateContact(c *Contact) error {
 			"role":      c.Role,
 			"linkedin":  c.LinkedIn,
 			"notes":     c.Notes,
+			"mobile":    c.Mobile,
 			"updatedAt": time.Now(),
 		},
 	}

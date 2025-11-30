@@ -26,31 +26,33 @@ func AddContactHandler(c echo.Context) error {
 	// matching the other handlers:
 	
 	type requestDto struct {
-		OwnerEmail string `json:"ownerEmail"`
-		Name       string `json:"name"`
-		Email      string `json:"email"`
-		Company    string `json:"company"`
-		Role       string `json:"role"`
-		LinkedIn   string `json:"linkedin"`
-		Notes      string `json:"notes"`
+		OwnerID  string `json:"ownerId"`
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Company  string `json:"company"`
+		Role     string `json:"role"`
+		LinkedIn string `json:"linkedin"`
+		Notes    string `json:"notes"`
+		Mobile   string `json:"mobile"`
 	}
 	var req requestDto
 	if err := c.Bind(&req); err != nil {
 		return SendErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	if req.Name == "" || req.OwnerEmail == "" {
-		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("name and ownerEmail are required"))
+	if req.Name == "" || req.OwnerID == "" {
+		return SendErrorResponse(c, http.StatusBadRequest, fmt.Errorf("name and ownerId are required"))
 	}
 
 	contact := &repository.Contact{
-		OwnerID:  req.OwnerEmail, // Using Email as OwnerID for simplicity in this project structure
+		OwnerID:  req.OwnerID, // Using Email as OwnerID for simplicity in this project structure
 		Name:     req.Name,
 		Email:    req.Email,
 		Company:  req.Company,
 		Role:     req.Role,
 		LinkedIn: req.LinkedIn,
 		Notes:    req.Notes,
+		Mobile:   req.Mobile,
 	}
 
 	if err := hctx.GetCore().DB.CreateContact(contact); err != nil {

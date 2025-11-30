@@ -76,7 +76,7 @@ html,
 }
 
 .card-hover-effect {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-sm rounded inset-0;
 }
 
 .input-focus-effect {

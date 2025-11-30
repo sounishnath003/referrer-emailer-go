@@ -8,6 +8,7 @@ export interface Contact {
   ownerId: string;
   name: string;
   email: string;
+  mobile?: string;
   company: string;
   role: string;
   linkedin?: string;

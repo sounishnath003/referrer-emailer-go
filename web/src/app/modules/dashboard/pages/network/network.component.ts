@@ -38,6 +38,7 @@ export class NetworkComponent implements OnInit {
     this.contactForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
+      mobile: [''],
       company: ['', Validators.required],
       role: ['', Validators.required],
       linkedin: [''],

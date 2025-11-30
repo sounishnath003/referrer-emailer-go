@@ -17,7 +17,7 @@ import { SubheroComponent } from '../shared/subhero/subhero.component';
       <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Your Latest Tailored Resumes</h2>
       <div class="mb-4 flex flex-col sm:flex-row gap-2 items-center">
         <input type="text" [(ngModel)]="companyFilter" (ngModelChange)="onCompanyFilterChange()" placeholder="Search by company name..."
-          class="w-full sm:w-64 p-2 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 input-focus-effect" />
+          class="w-full sm:w-72 p-2 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 input-focus-effect" />
       </div>
       <div *ngIf="loading" class="text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-2"><span
             class="animate-spin inline-block w-5 h-5 border-2 border-blue-400 dark:border-blue-300 border-t-transparent rounded-full"></span>Loading...</div>
